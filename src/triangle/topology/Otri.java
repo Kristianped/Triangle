@@ -1,6 +1,7 @@
 package triangle.topology;
 
-import triangle.topology.dcel.Vertex;
+
+import triangle.geometry.Vertex;
 
 public class Otri {
 

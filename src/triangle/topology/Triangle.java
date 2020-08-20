@@ -3,7 +3,7 @@ package triangle.topology;
 import triangle.Mesh;
 import triangle.geometry.ISegment;
 import triangle.geometry.ITriangle;
-import triangle.topology.dcel.Vertex;
+import triangle.geometry.Vertex;
 
 public class Triangle implements ITriangle {
 
@@ -29,6 +29,32 @@ public class Triangle implements ITriangle {
 
         // Initialises the three adjoining triangles to be "outer space"
         neighbors = new Otri[3];
+
+        reset();
+    }
+
+    public void reset() {
+        for (int i = 0; i < 3; i++) {
+            vertices[i] = null;
+            subsegs[i] = new Osub();
+            neighbors[i] = new Otri();
+        }
+    }
+
+    public void setHash(int hash) {
+        this.hash = hash;
+    }
+
+    public boolean isInfected() {
+        return infected;
+    }
+
+    public void setInfected(boolean infected) {
+        this.infected = infected;
+    }
+
+    public void setVertex(int index, Vertex v) {
+        vertices[index] = v;
     }
 
     @Override

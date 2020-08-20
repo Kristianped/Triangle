@@ -3,9 +3,9 @@ package triangle.meshing;
 import triangle.geometry.Edge;
 import triangle.geometry.Point;
 import triangle.geometry.Rectangle;
+import triangle.geometry.Vertex;
 import triangle.topology.SubSegment;
 import triangle.topology.Triangle;
-import triangle.topology.dcel.Vertex;
 
 import java.util.Collection;
 import java.util.List;

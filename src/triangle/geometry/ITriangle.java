@@ -1,7 +1,5 @@
 package triangle.geometry;
 
-import triangle.topology.dcel.Vertex;
-
 public interface ITriangle {
 
     // Gets or sets the triangle ID.
