@@ -126,6 +126,15 @@ public class TrianglePool implements Collection<Triangle> {
         triangle.reset();
     }
 
+    public void copyTo(Triangle[] array, int index) {
+        var enumerator = iterator();
+
+        while (enumerator.hasNext()) {
+            array[index] = enumerator.next();
+            index++;
+        }
+    }
+
     @Override
     public int size() {
         return count - stack.size();

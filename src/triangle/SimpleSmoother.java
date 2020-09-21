@@ -1,6 +1,6 @@
 package triangle;
 
-import triangle.topology.dcel.Face;
+import triangle.dcel.Face;
 
 public class SimpleSmoother implements ISmoother {
 

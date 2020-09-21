@@ -1,4 +1,4 @@
-package triangle.topology.dcel;
+package triangle.dcel;
 
 import triangle.Edge;
 import triangle.IEdge;

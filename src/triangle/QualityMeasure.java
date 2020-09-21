@@ -54,6 +54,146 @@ public class QualityMeasure {
         qMeasure = new Q_Measure();
     }
 
+    public void update(Mesh mesh) {
+        this.mesh = mesh;
+
+        // Reset all measures
+        areaMeasure.reset();
+        alphaMeasure.reset();
+        qMeasure.reset();
+
+        compute();
+    }
+
+    private void compute() {
+        Point a, b, c;
+        double ab, bc, ca;
+        double lx, ly;
+        double area;
+
+        int n = 0;
+
+        for (var tri : mesh.triangles) {
+            n++;
+
+            a = tri.vertices[0];
+            b = tri.vertices[1];
+            c = tri.vertices[2];
+
+            lx = a.x - b.x;
+            ly = a.y - b.y;
+            ab = Math.sqrt(lx * lx + ly * ly);
+            lx = b.x - c.x;
+            ly = b.y - c.y;
+            bc = Math.sqrt(lx * lx + ly * ly);
+            lx = c.x - a.x;
+            ly = c.y - a.y;
+            ca = Math.sqrt(lx * lx + ly * ly);
+
+            area = areaMeasure.measure(a, b, c);
+            alphaMeasure.measure(ab, bc, ca, area);
+            qMeasure.measure(ab, bc, ca, area);
+        }
+
+        // Normalize measures
+        alphaMeasure.normalize(n, areaMeasure.area_total);
+        qMeasure.normalize(n, areaMeasure.area_total);
+    }
+
+    /**
+     * Determines the bandwidth of the coefficient matrix.
+     * <br><br>
+     * The quantity computed here is the "geometric" bandwidth determined
+     * by the finite element mesh alone.
+     *<br><br>
+     * If a single finite element variable is associated with each node
+     * of the mesh, and if the nodes and variables are numbered in the
+     * same way, then the geometric bandwidth is the same as the bandwidth
+     * of a typical finite element matrix.
+     *<br><br>
+     * The bandwidth M is defined in terms of the lower and upper bandwidths:
+     *<br>
+     *   M = ML + 1 + MU
+     * where
+     *<br>
+     *   ML = maximum distance from any diagonal entry to a nonzero
+     *   entry in the same row, but earlier column,
+     *<br>
+     *   MU = maximum distance from any diagonal entry to a nonzero
+     *   entry in the same row, but later column.
+     *<br>
+     * Because the finite element node adjacency relationship is symmetric,
+     * we are guaranteed that ML = MU.
+     * @return Bandwidth of the coefficient matrix
+     */
+    public int bandwidth() {
+        if (mesh == null) return 0;
+
+        // Lower and upper bandwidth of the matrix
+        int ml = 0, mu = 0;
+
+        int gi, gj;
+
+        for (var tri : mesh.triangles) {
+            for (int j = 0; j < 3; j++) {
+                gi = tri.getVertex(j).id;
+
+                for (int k = 0; k < 3; k++) {
+                    gj = tri.getVertex(k).id;
+
+                    mu = Math.max(mu, gj - gi);
+                    ml = Math.max(ml, gi - gj);
+                }
+            }
+        }
+
+        return ml + 1 + mu;
+    }
+
+    public double getAreaMinimmum() {
+        return areaMeasure.area_min;
+    }
+
+    public double getAreaMaximum() {
+        return areaMeasure.area_max;
+    }
+
+    public double getAreaRatio() {
+        return areaMeasure.area_max / areaMeasure.area_min;
+    }
+
+    public double getAlphaMinimum() {
+        return alphaMeasure.alpha_min;
+    }
+
+    public double getAlphaMaximum() {
+        return alphaMeasure.alpha_max;
+    }
+
+    public double getAlphaAverage() {
+        return alphaMeasure.alpha_ave;
+    }
+
+    public double getAlphaArea() {
+        return alphaMeasure.alpha_area;
+    }
+
+    public double getQMinimum() {
+        return qMeasure.q_min;
+    }
+
+    public double getQMaximum() {
+        return qMeasure.q_max;
+    }
+
+    public double getQAverage() {
+        return qMeasure.q_ave;
+    }
+
+    public double getQArea() {
+        return qMeasure.q_area;
+    }
+
 }
 
 class AreaMeasure {
@@ -109,7 +249,7 @@ class AlphaMeasure {
     // Value averaged over all triangles and weighted by area
     public double alpha_area;
 
-    public void Reset() {
+    public void reset() {
         alpha_min = Double.MAX_VALUE;
         alpha_max = -Double.MAX_VALUE;
         alpha_ave = 0;
@@ -182,7 +322,7 @@ class AlphaMeasure {
     }
 
 
-    public void Normalize(int n, double area_total) {
+    public void normalize(int n, double area_total) {
         if (n > 0)
             alpha_ave /= n;
         else
