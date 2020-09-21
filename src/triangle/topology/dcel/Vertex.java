@@ -1,9 +1,6 @@
 package triangle.topology.dcel;
 
-import triangle.geometry.Point;
-
-import java.util.Enumeration;
-import java.util.Iterator;
+import triangle.Point;
 
 public class Vertex extends Point {
 
@@ -20,7 +17,7 @@ public class Vertex extends Point {
 
     @Override
     public String toString() {
-        return String.format("V-ID {0}", super.id);
+        return String.format("V-ID {0}", super.getId());
     }
 
     public HalfEdge getLeaving() {

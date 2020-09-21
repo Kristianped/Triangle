@@ -1,6 +1,6 @@
 package triangle.topology.dcel;
 
-import triangle.geometry.Point;
+import triangle.Point;
 
 public class Face {
 

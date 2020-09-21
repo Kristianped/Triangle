@@ -1,14 +1,12 @@
 package triangle;
 
-import triangle.topology.Triangle;
-
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class TrianglePool implements Collection {
+public class TrianglePool implements Collection<Triangle> {
 
     // Determines the size of each block in the pool
-    private final int BLOCKSIZE = 1024;
+    private final static int BLOCKSIZE = 1024;
 
     // The total number of currently allocated triangles
     int size;
@@ -42,19 +40,20 @@ public class TrianglePool implements Collection {
 
         if (stack.size() > 0) {
             triangle = stack.pop();
-            triangle.setHash(-triangle.hashCode() - 1);
+            triangle.hash = -triangle.hash - 1;
+
             cleanup(triangle);
         } else if (count < size) {
             triangle = pool[count / BLOCKSIZE][count % BLOCKSIZE];
-            triangle.setID(triangle.hashCode());
+            triangle.id = triangle.hash;
 
             cleanup(triangle);
 
             count++;
         } else {
             triangle = new Triangle();
-            triangle.setHash(size);
-            triangle.setID(triangle.hashCode());
+            triangle.hash = size;
+            triangle.id = triangle.hash;
 
             int block = size / BLOCKSIZE;
 
@@ -76,7 +75,7 @@ public class TrianglePool implements Collection {
         stack.push(triangle);
 
         // Mark triangle as free
-        triangle.setHash(-triangle.hashCode() - 1);
+        triangle.hash = -triangle.hash - 1;
     }
 
     /**
@@ -84,7 +83,7 @@ public class TrianglePool implements Collection {
      */
     public TrianglePool restart() {
         for (Triangle t : stack)
-            t.setHash(-t.hashCode() - 1);
+            t.hash = -t.hash - 1;
 
         stack.clear();
         count = 0;
@@ -96,7 +95,7 @@ public class TrianglePool implements Collection {
      * Samples a number of triangles from the pool
      * @param k - The number of triangles to sample
      */
-    protected Iterable<Triangle> sample(int k) {
+    Iterable<Triangle> sample(int k) {
         int i;
         int count = this.count;
 
@@ -152,7 +151,7 @@ public class TrianglePool implements Collection {
     }
 
     @Override
-    public Iterator iterator() {
+    public Iterator<Triangle> iterator() {
         return new Enumerator(this);
     }
 
@@ -162,7 +161,7 @@ public class TrianglePool implements Collection {
     }
 
     @Override
-    public boolean add(Object o) {
+    public boolean add(Triangle o) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
@@ -249,11 +248,14 @@ public class TrianglePool implements Collection {
             return false;
         }
 
+        public void reset() {
+            index = 0;
+            offset = 0;
+        }
+
         @Override
         public Triangle next() {
             return current;
         }
-
-
     }
 }
