@@ -131,7 +131,7 @@ public class Mesh implements IMesh {
     }
 
     public int getNumberOfEdges() {
-        return 3 * triangles.size() + hullsize / 2;
+        return (3 * triangles.size() + hullsize) / 2;
     }
 
     public boolean isPolygon() {
@@ -144,6 +144,10 @@ public class Mesh implements IMesh {
 
     public void setQualityMesher(QualityMesher qmesher) {
         this.qualityMesher = qmesher;
+    }
+
+    public int getHullsize() {
+        return hullsize;
     }
 
     @Override

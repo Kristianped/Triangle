@@ -5,16 +5,16 @@ public class HalfEdge {
     protected int id;
     protected int mark;
 
-    protected Vertex origin;
+    protected DcelVertex origin;
     protected Face face;
     protected HalfEdge twin;
     protected HalfEdge next;
 
-    public HalfEdge(Vertex origin) {
+    public HalfEdge(DcelVertex origin) {
         this.setOrigin(origin);
     }
 
-    public HalfEdge(Vertex origin, Face face) {
+    public HalfEdge(DcelVertex origin, Face face) {
         this.setOrigin(origin);
         this.setFace(face);
 
@@ -43,11 +43,11 @@ public class HalfEdge {
         this.mark = mark;
     }
 
-    public Vertex getOrigin() {
+    public DcelVertex getOrigin() {
         return origin;
     }
 
-    public void setOrigin(Vertex origin) {
+    public void setOrigin(DcelVertex origin) {
         this.origin = origin;
     }
 

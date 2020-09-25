@@ -8,6 +8,24 @@ public class MutableInt {
         this.value = value;
     }
 
+    public void increment() {
+        value++;
+    }
+
+    public void decrement() {
+        value--;
+    }
+
+    public MutableInt incrementAndGet() {
+        value++;
+        return this;
+    }
+
+    public MutableInt decrementAndGet() {
+        value--;
+        return this;
+    }
+
     public void add(int value) {
         this.value += value;
     }

@@ -2,15 +2,15 @@ package triangle.dcel;
 
 import triangle.Point;
 
-public class Vertex extends Point {
+public class DcelVertex extends Point {
 
     protected HalfEdge leaving;
 
-    public Vertex(double x, double y) {
+    public DcelVertex(double x, double y) {
         super(x, y);
     }
 
-    public Vertex(double x, double y, HalfEdge leaving) {
+    public DcelVertex(double x, double y, HalfEdge leaving) {
         super(x, y);
         this.leaving = leaving;
     }

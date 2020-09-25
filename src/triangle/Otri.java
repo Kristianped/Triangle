@@ -16,6 +16,7 @@ public class Otri {
     public void setTriangle(Triangle value) {
         tri = value;
     }
+    public void setOrient(int value) {orient = value; }
 
     @Override
     public String toString() {
@@ -58,7 +59,7 @@ public class Otri {
     */
 
     /**
-     * Find the abutting triangle; same edge. [sym(abc -> ba*]
+     * Find the abutting triangle; same edge. [sym(abc - ba*]
      * Note that the edge direction is necessarily reversed, because the handle specified
      * by an oriented triangle is directed counterclockwise around the triangle.
      */
@@ -68,7 +69,7 @@ public class Otri {
     }
 
     /**
-     * Find the abutting triangle; same edge. [sym(abc) -> ba*]
+     * Find the abutting triangle; same edge. [sym(abc) - ba*]
      */
     public void sym() {
         int tmp = orient;
@@ -77,7 +78,7 @@ public class Otri {
     }
 
     /**
-     * Find the next edge (counterclockwise) of a triangle. [lnext(abc) -> bca]
+     * Find the next edge (counterclockwise) of a triangle. [lnext(abc) - bca]
      */
     public void lnext(Otri ot) {
         ot.tri = tri;
@@ -85,14 +86,14 @@ public class Otri {
     }
 
     /**
-     * Find the next edge (counterclockwise) of a triangle. [lnext(abc) -> bca]
+     * Find the next edge (counterclockwise) of a triangle. [lnext(abc) - bca]
      */
     public void lnext() {
         orient = plus1Mod3[orient];
     }
 
     /**
-     * Finds the prvious edge (clockwise) of a triangle. [lprev(abc) -> cab]
+     * Finds the prvious edge (clockwise) of a triangle. [lprev(abc) - cab]
      */
     public void lprev(Otri ot) {
         ot.tri = tri;
@@ -100,14 +101,14 @@ public class Otri {
     }
 
     /**
-     * Finds the prvious edge (clockwise) of a triangle. [lprev(abc) -> cab]
+     * Finds the prvious edge (clockwise) of a triangle. [lprev(abc) - cab]
      */
     public void lprev() {
         orient = minus1Mod3[orient];
     }
 
     /**
-     * Finds the next egde counterclockwise with the same origin. [onext(abc) -> ac*]
+     * Finds the next egde counterclockwise with the same origin. [onext(abc) - ac*]
      */
     public void onext(Otri ot) {
         ot.tri = tri;
@@ -119,7 +120,7 @@ public class Otri {
     }
 
     /**
-     * Finds the next edge counterclockwise with the same origin. [onext(abc) -> ac*]
+     * Finds the next edge counterclockwise with the same origin. [onext(abc) - ac*]
      */
     public void onext() {
         orient = minus1Mod3[orient];
@@ -130,7 +131,7 @@ public class Otri {
     }
 
     /**
-     * Finds the next edge clockwise with the same origin. [oprev(abc) -> a*b]
+     * Finds the next edge clockwise with the same origin. [oprev(abc) - a*b]
      */
     public void oprev(Otri ot) {
         ot.tri = tri.neighbors[orient].tri;
@@ -140,7 +141,7 @@ public class Otri {
     }
 
     /**
-     * Finds the next edge clockwise with the same origin. [oprev(abc) -> a*b]
+     * Finds the next edge clockwise with the same origin. [oprev(abc) - a*b]
      */
     public void oprev() {
         int tmp = orient;
@@ -151,7 +152,7 @@ public class Otri {
     }
 
     /**
-     * Finds the next edge counterclockwise with the same destination. [dnext(abc) -> *ba]
+     * Finds the next edge counterclockwise with the same destination. [dnext(abc) - *ba]
      */
     public void dnext(Otri ot) {
         ot.tri = tri.neighbors[orient].tri;
@@ -161,7 +162,7 @@ public class Otri {
     }
 
     /**
-     * Finds the next edge counterclockwise with the same destination. [dnext(abc) -> *ba]
+     * Finds the next edge counterclockwise with the same destination. [dnext(abc) - *ba]
      */
     public void dnext() {
         int tmp = orient;
@@ -172,7 +173,7 @@ public class Otri {
     }
 
     /**
-     * Finds the next edge clockwise with the same destination. [dprev(abc) -> cb*]
+     * Finds the next edge clockwise with the same destination. [dprev(abc) - cb*]
      */
     public void dprev(Otri ot) {
         ot.tri = tri;
@@ -184,7 +185,7 @@ public class Otri {
     }
 
     /**
-     * Finds the next edge clockwise with the same destination. [dprev(abc) -> cb*]
+     * Finds the next edge clockwise with the same destination. [dprev(abc) - cb*]
      */
     public void dprev() {
         orient = plus1Mod3[orient];
@@ -195,7 +196,7 @@ public class Otri {
     }
 
     /**
-     * Finds the next edge counterclockwise of the adjacent triangle. [rnext(abc) -> *a*]
+     * Finds the next edge counterclockwise of the adjacent triangle. [rnext(abc) - *a*]
      */
     public void rnext(Otri ot) {
         ot.tri = tri.neighbors[orient].tri;
@@ -209,7 +210,7 @@ public class Otri {
     }
 
     /**
-     * Finds the next edge counterclockwise of the adjacent triangle. [rnext(abc) -> *a*]
+     * Finds the next edge counterclockwise of the adjacent triangle. [rnext(abc) - *a*]
      */
     public void rnext() {
         int tmp = orient;
@@ -224,7 +225,7 @@ public class Otri {
     }
 
     /**
-     * Finds the previous edge clockwise of the adjacent triangle. [rprev(abc) -> b**]
+     * Finds the previous edge clockwise of the adjacent triangle. [rprev(abc) - b**]
      */
     public void rprev(Otri ot) {
         ot.tri = tri.neighbors[orient].tri;
@@ -238,7 +239,7 @@ public class Otri {
     }
 
     /**
-     * Finds the previous edge clockwise of the adjacent triangle. [rprev(abc) -> b**]
+     * Finds the previous edge clockwise of the adjacent triangle. [rprev(abc) - b**]
      */
     public void rprev() {
         int tmp = orient;
@@ -253,21 +254,21 @@ public class Otri {
     }
 
     /**
-     * Origin [org(abc) -> a]
+     * Origin [org(abc) - a]
      */
     public Vertex org() {
         return tri.vertices[plus1Mod3[orient]];
     }
 
     /**
-     * Destination [dest(abc) -> b]
+     * Destination [dest(abc) - b]
      */
     public Vertex dest() {
         return tri.vertices[minus1Mod3[orient]];
     }
 
     /**
-     * Apex [apex(abc) -> c]
+     * Apex [apex(abc) - c]
      */
     public Vertex apex() {
         return tri.vertices[orient];

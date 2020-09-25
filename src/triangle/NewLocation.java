@@ -35,7 +35,7 @@ public class NewLocation {
     /**
      * Find a new location for a Steiner point.
      */
-    public Point findLocation(Vertex org, Vertex dest, Vertex apex,  double xi, double eta, boolean offcenter, Otri badotri) {
+    public Point findLocation(Vertex org, Vertex dest, Vertex apex,  MutableDouble xi, MutableDouble eta, boolean offcenter, Otri badotri) {
         // Based on using the -U switch, call the corresponding function
         if (behavior.maxAngle == 0.0)
             return findNewLocationWithoutMaxAngle(org, dest, apex, xi, eta, true, badotri);
@@ -47,7 +47,7 @@ public class NewLocation {
     /**
      * Find a new location for a Steiner point.
      */
-    private Point findNewLocationWithoutMaxAngle(Vertex torg, Vertex tdest, Vertex tapex, double xi, double eta, boolean offcenter, Otri badotri) {
+    private Point findNewLocationWithoutMaxAngle(Vertex torg, Vertex tdest, Vertex tapex, MutableDouble xi, MutableDouble eta, boolean offcenter, Otri badotri) {
         double offconstant = behavior.offconstant;
 
         // for calculating the distances of the edges
@@ -92,7 +92,8 @@ public class NewLocation {
         Vertex neighborvertex_2;
         Vertex neighborvertex_3;
         // dummy variables
-        double xi_tmp = 0, eta_tmp = 0;
+        MutableDouble xi_tmp = new MutableDouble(0);
+        MutableDouble eta_tmp = new MutableDouble(0);
         //vertex thirdVertex;
         // for petal intersection
         double vector_x, vector_y, xMidOfLongestEdge, yMidOfLongestEdge, inter_x, inter_y;
@@ -656,8 +657,8 @@ public class NewLocation {
             circumcenter.y = origin_y + dy;
         }
 
-        xi = (yao * dx - xao * dy) * (2.0 * denominator);
-        eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
+        xi.setValue((yao * dx - xao * dy) * (2.0 * denominator));
+        eta.setValue((xdo * dy - ydo * dx) * (2.0 * denominator));
 
         return circumcenter;
     }
@@ -665,7 +666,7 @@ public class NewLocation {
     /**
      * Find a new location for a Steiner point
      */
-    private Point findNewLocation(Vertex torg, Vertex tdest, Vertex tapex, double xi, double eta, boolean offcenter, Otri badotri) {
+    private Point findNewLocation(Vertex torg, Vertex tdest, Vertex tapex, MutableDouble xi, MutableDouble eta, boolean offcenter, Otri badotri) {
         double offconstant = behavior.offconstant;
 
         // for calculating the distances of the edges
@@ -709,7 +710,8 @@ public class NewLocation {
         Vertex neighborvertex_2;
         Vertex neighborvertex_3;
         // dummy variables
-        double xi_tmp = 0, eta_tmp = 0;
+        MutableDouble xi_tmp = new MutableDouble();
+        MutableDouble eta_tmp = new MutableDouble();
         //vertex thirdVertex;
         // for petal intersection
         double vector_x, vector_y, xMidOfLongestEdge, yMidOfLongestEdge, inter_x, inter_y;
@@ -1702,8 +1704,8 @@ public class NewLocation {
             circumcenter.y = origin_y + dy;
         }
 
-        xi = (yao * dx - xao * dy) * (2.0 * denominator);
-        eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
+        xi.setValue((yao * dx - xao * dy) * (2.0 * denominator));
+        eta.setValue((xdo * dy - ydo * dx) * (2.0 * denominator));
 
         return circumcenter;
     }

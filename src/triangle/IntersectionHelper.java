@@ -13,7 +13,7 @@ public class IntersectionHelper {
      * @param q1 Segment 2 end point
      * @param c0 The intersection point
      */
-    public static void IntersectSegments(Point p0, Point p1, Point q0, Point q1, Point c0) {
+    public static void intersectSegments(Point p0, Point p1, Point q0, Point q1, Point c0) {
         double ux = p1.x - p0.x;
         double uy = p1.y - p0.y;
         double vx = q1.x - q0.x;
@@ -96,7 +96,7 @@ public class IntersectionHelper {
      * @param c1 The intersection point
      * @return Returns false, if startpoint is outside the box
      */
-    public static boolean BoxRayIntersection(Rectangle rect, Point p0, Point p1, Point c1)
+    public static boolean boxRayIntersection(Rectangle rect, Point p0, Point p1, Point c1)
     {
         return boxRayIntersection(rect, p0, p1.x - p0.x, p1.y - p0.y, c1);
     }
@@ -109,7 +109,7 @@ public class IntersectionHelper {
      * @param dy Y direction
      * @return Returns intersection point if found, or null if not found
      */
-    public static Point BoxRayIntersection(Rectangle rect, Point p, double dx, double dy) {
+    public static Point boxRayIntersection(Rectangle rect, Point p, double dx, double dy) {
         var intersection = new Point();
 
         if (boxRayIntersection(rect, p, dx, dy, intersection))

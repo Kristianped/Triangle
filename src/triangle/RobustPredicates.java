@@ -206,7 +206,7 @@ public class RobustPredicates implements IPredicates {
      * @return Coordinates of the circumcenter
      */
     @Override
-    public Point findCircumcenter(Point org, Point dest, Point apex, double xi, double eta) {
+    public Point findCircumcenter(Point org, Point dest, Point apex, MutableDouble xi, MutableDouble eta) {
         double xdo;
         double ydo;
         double xao;
@@ -246,8 +246,8 @@ public class RobustPredicates implements IPredicates {
         // directed from the triangle's origin to its destination, and
         // an eta-axis, directed from its origin to its apex.
         // Calculate the xi and eta coordinates of the circumcenter.
-        xi = (yao * dx - xao * dy) * (2.0 * denominator);
-        eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
+        xi.setValue((yao * dx - xao * dy) * (2.0 * denominator));
+        eta.setValue((xdo * dy - ydo * dx) * (2.0 * denominator));
 
         return new Point(org.x + dx, org.y + dy);
     }
@@ -263,7 +263,7 @@ public class RobustPredicates implements IPredicates {
      * @return Coordinates of the circumcenter (or off-center)
      */
     @Override
-    public Point findCircumcenter(Point org, Point dest, Point apex, double xi, double eta, double offconstant) {
+    public Point findCircumcenter(Point org, Point dest, Point apex, MutableDouble xi, MutableDouble eta, double offconstant) {
         double xdo;
         double ydo;
         double xao;
@@ -350,8 +350,8 @@ public class RobustPredicates implements IPredicates {
         // directed from the triangle's origin to its destination, and
         // an eta-axis, directed from its origin to its apex.
         // Calculate the xi and eta coordinates of the circumcenter.
-        xi = (yao * dx - xao * dy) * (2.0 * denominator);
-        eta = (xdo * dy - ydo * dx) * (2.0 * denominator);
+        xi.setValue((yao * dx - xao * dy) * (2.0 * denominator));
+        eta.setValue((xdo * dy - ydo * dx) * (2.0 * denominator));
 
         return new Point(org.x + dx, org.y + dy);
     }

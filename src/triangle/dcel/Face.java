@@ -56,4 +56,8 @@ public class Face {
     public void setBounded(boolean bounded) {
         this.bounded = bounded;
     }
+
+    public Point getGenerator() { return generator; }
+
+    public void setGenerator(Point generator) { this.generator = generator; }
 }

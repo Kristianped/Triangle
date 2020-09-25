@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class DcelMesh {
 
-    protected List<Vertex> vertices;
+    protected List<DcelVertex> vertices;
     protected List<HalfEdge> edges;
     protected List<Face> faces;
 
@@ -155,7 +155,7 @@ public class DcelMesh {
         return enumerateEdges();
     }
 
-    public List<Vertex> getVertices() {
+    public List<DcelVertex> getVertices() {
         return vertices;
     }
 

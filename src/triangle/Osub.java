@@ -19,7 +19,7 @@ public class Osub {
     }
 
     /**
-     * Reverse the orientation of a subsegment [sym(ab) -> ba]
+     * Reverse the orientation of a subsegment [sym(ab) - ba]
      */
     public void sym(Osub os) {
         os.seg = seg;
@@ -27,14 +27,14 @@ public class Osub {
     }
 
     /**
-     * Reverse the orientation of a subsegment [sym(ab) -> ba]
+     * Reverse the orientation of a subsegment [sym(ab) - ba]
      */
     public void sym() {
         orient = 1 - orient;
     }
 
     /**
-     * Find adjoining subsegment with the same origin [pivot(ab) -> a*]
+     * Find adjoining subsegment with the same origin [pivot(ab) - a*]
      * Note: pivot() finds the other subsegment (from the same segment)
      * that shares the same origin
      */
@@ -50,14 +50,14 @@ public class Osub {
     }
 
     /**
-     * Find next subsegment in sequence [next(ab) -> b*]
+     * Find next subsegment in sequence [next(ab) - b*]
      */
     public void next(Osub os) {
         os = seg.subsegs[1 - orient];
     }
 
     /**
-     * Find next subsegment in sequence [next(ab) -> b*]
+     * Find next subsegment in sequence [next(ab) - b*]
      */
     public Osub next() {
         return seg.subsegs[1 - orient];

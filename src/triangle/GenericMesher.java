@@ -62,8 +62,8 @@ public class GenericMesher {
 
     /**
      * Generates a structured mesh with bounds [0, 0, width, height].
-     * @param width Width of the mesh (must be > 0)
-     * @param height Height of the mesh (must be > 0)
+     * @param width Width of the mesh (must be higher than 0)
+     * @param height Height of the mesh (must be higher than 0)
      * @param nx Number of sections in x direction
      * @param ny Number of sections in y direction
      */

@@ -6,7 +6,7 @@ public interface IPredicates {
 
     public double inCircle(Point a, Point b, Point c, Point d);
 
-    public Point findCircumcenter(Point org, Point dest, Point apex, double xi, double eta);
+    public Point findCircumcenter(Point org, Point dest, Point apex, MutableDouble xi, MutableDouble eta);
 
-    public Point findCircumcenter(Point org, Point dest, Point apex, double xi, double eta, double offconstant);
+    public Point findCircumcenter(Point org, Point dest, Point apex, MutableDouble xi, MutableDouble eta, double offconstant);
 }

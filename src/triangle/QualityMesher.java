@@ -636,8 +636,8 @@ public class QualityMesher {
         Vertex bdest;
         Vertex bapex;
         Point newloc; // Location of the new vertex
-        double xi = 0;
-        double eta = 0;
+        MutableDouble xi = new MutableDouble(0);
+        MutableDouble eta = new MutableDouble(0);
         Enums.InsertVertexResult success;
         boolean errorflag;
 
@@ -685,9 +685,8 @@ public class QualityMesher {
                 // circumcenter lies outside the org-dest edge, and eta is
                 // negative.  Roundoff error might prevent eta from being
                 // negative when it should be, so I test eta against xi.)
-                if (eta < xi)
+                if (eta.getValue() < xi.getValue())
                     badotri.lprev();
-
 
                 // Assign triangle for attributes interpolation.
                 newvertex.tri.tri = newvertex_tri;

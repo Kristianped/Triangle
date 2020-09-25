@@ -6,7 +6,7 @@ package triangle;
  * Given a triangle abc with points A (ax, ay), B (bx, by), C (cx, cy).
  * <br><br>
  * The side lengths are given as<br>
- *   a = sqrt((cx - bx)^2 + (cy - by)^2) -- side BC opposite of A<br
+ *   a = sqrt((cx - bx)^2 + (cy - by)^2) -- side BC opposite of A<br>
  *   b = sqrt((cx - ax)^2 + (cy - ay)^2) -- side CA opposite of B<br>
  *   c = sqrt((ax - bx)^2 + (ay - by)^2) -- side AB opposite of C
  *   <br><br>
