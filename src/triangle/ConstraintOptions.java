@@ -2,9 +2,9 @@ package triangle;
 
 public class ConstraintOptions {
 
-    private boolean conformingDelaunay;
-    private boolean convex;
-    private int segmentSplitting;
+    protected boolean conformingDelaunay;
+    protected boolean convex;
+    protected int segmentSplitting;
 
     public boolean isConformingDelaunay() {
         return conformingDelaunay;

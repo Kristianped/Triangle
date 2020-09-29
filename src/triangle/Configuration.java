@@ -1,32 +1,37 @@
 package triangle;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 public class Configuration {
 
-    IPredicates predicates;
-    TrianglePool trianglePool;
+    private final static int dummy = 1;
+
+    Supplier<IPredicates> predicates;
+    Supplier<TrianglePool> trianglePool;
 
     public Configuration() {
-        this(RobustPredicates.Default(), new TrianglePool());
+        this(() -> RobustPredicates.Default(), () -> new TrianglePool());
     }
 
-    public Configuration(IPredicates predicates, TrianglePool trianglePool) {
+    public Configuration(Supplier<IPredicates> predicates, Supplier<TrianglePool> trianglePool) {
         this.predicates = predicates;
         this.trianglePool = trianglePool;
     }
 
-    public IPredicates getPredicates() {
+    public Supplier<IPredicates>  getPredicates() {
         return predicates;
     }
 
-    public void setPredicates(IPredicates predicates) {
+    public void setPredicates(Supplier<IPredicates> predicates) {
         this.predicates = predicates;
     }
 
-    public TrianglePool getTrianglePool() {
+    public Supplier<TrianglePool> getTrianglePool() {
         return trianglePool;
     }
 
-    public void setTrianglePool(TrianglePool trianglePool) {
+    public void setTrianglePool(Supplier<TrianglePool> trianglePool) {
         this.trianglePool = trianglePool;
     }
 }

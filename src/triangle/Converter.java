@@ -114,6 +114,7 @@ public class Converter {
             tri.setDest(mesh.vertices.get(corner[1]));
             tri.setApex(mesh.vertices.get(corner[2]));
 
+            int origOrient = tri.orient;
             // Try linking the triangle to others that share these vertices.
             for (tri.orient = 0; tri.orient < 3; tri.orient++) {
                 // Take the number for the origin of triangleloop.
@@ -158,6 +159,8 @@ public class Converter {
                     } while (checktri.tri.id != Mesh.DUMMY);
                 }
             }
+
+            tri.orient = origOrient;
 
             i++;
         }
@@ -269,6 +272,7 @@ public class Converter {
                     }
                 }
 
+                subseg.orient = 2;
                 i++;
             }
         }

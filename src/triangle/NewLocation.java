@@ -151,7 +151,7 @@ public class NewLocation {
         // coordinate value of the circumcenter
         myCircumcenter = new Point(torg.x + dx, torg.y + dy);
 
-        delotri = badotri; // save for later
+        delotri = badotri.shallowCopy(); // save for later
 
         ///////////////// FINDING THE ORIENTATION OF TRIANGLE //////////////////
         // Find the (squared) length of the triangle's shortest edge.  This
@@ -320,7 +320,7 @@ public class NewLocation {
 
             /// RELOCATION	(LOCAL SMOOTHING) ///
             /// check for possible relocation of one of triangle's points ///
-            relocated = doSmoothing(delotri, torg, tdest, tapex, newloc);
+            relocated = doSmoothing(delotri.shallowCopy(), torg, tdest, tapex, newloc);
 
             /// if relocation is possible, delete that vertex and insert a vertex at the new location ///
             if (relocated > 0) {
@@ -383,7 +383,7 @@ public class NewLocation {
                 }
 
                 /// find the third point of the neighbor triangle  ///
-                neighborNotFound = getNeighborsVertex(badotri, middleAngleCorner.x, middleAngleCorner.y,
+                neighborNotFound = getNeighborsVertex(badotri.shallowCopy(), middleAngleCorner.x, middleAngleCorner.y,
                         smallestAngleCorner.x, smallestAngleCorner.y, thirdPoint, neighborotri);
                 /// find the circumcenter of the neighbor triangle ///
                 dxFirstSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
@@ -502,7 +502,7 @@ public class NewLocation {
 
                 /// DO THE SAME THING FOR THE OTHER DIRECTION ///
                 /// find the third point of the neighbor triangle  ///
-                neighborNotFound = getNeighborsVertex(badotri, largestAngleCorner.x, largestAngleCorner.y,
+                neighborNotFound = getNeighborsVertex(badotri.shallowCopy(), largestAngleCorner.x, largestAngleCorner.y,
                         smallestAngleCorner.x, smallestAngleCorner.y, thirdPoint, neighborotri);
                 /// find the circumcenter of the neighbor triangle ///
                 dxSecondSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
@@ -782,7 +782,7 @@ public class NewLocation {
         // coordinate value of the circumcenter
         myCircumcenter = new Point(torg.x + dx, torg.y + dy);
 
-        delotri = badotri; // save for later
+        delotri = badotri.shallowCopy(); // save for later
         ///////////////// FINDING THE ORIENTATION OF TRIANGLE //////////////////
         // Find the (squared) length of the triangle's shortest edge.  This
         //   serves as a conservative estimate of the insertion radius of the
@@ -953,7 +953,7 @@ public class NewLocation {
             }
             /// RELOCATION	(LOCAL SMOOTHING) ///
             /// check for possible relocation of one of triangle's points ///
-            relocated = doSmoothing(delotri, torg, tdest, tapex, newloc);
+            relocated = doSmoothing(delotri.shallowCopy(), torg, tdest, tapex, newloc);
 
             /// if relocation is possible, delete that vertex and insert a vertex at the new location ///
             if (relocated > 0) {
@@ -1024,7 +1024,7 @@ public class NewLocation {
                 }
 
                 /// find the third point of the neighbor triangle  ///
-                neighborNotFound_first = getNeighborsVertex(badotri, middleAngleCorner.x, middleAngleCorner.y,
+                neighborNotFound_first = getNeighborsVertex(badotri.shallowCopy(), middleAngleCorner.x, middleAngleCorner.y,
                         smallestAngleCorner.x, smallestAngleCorner.y, thirdPoint, neighborotri);
                 /// find the circumcenter of the neighbor triangle ///
                 dxFirstSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
@@ -1306,7 +1306,7 @@ public class NewLocation {
 
                 /// DO THE SAME THING FOR THE OTHER DIRECTION ///
                 /// find the third point of the neighbor triangle  ///
-                neighborNotFound_second = getNeighborsVertex(badotri, largestAngleCorner.x, largestAngleCorner.y,
+                neighborNotFound_second = getNeighborsVertex(badotri.shallowCopy(), largestAngleCorner.x, largestAngleCorner.y,
                         smallestAngleCorner.x, smallestAngleCorner.y, thirdPoint, neighborotri);
                 /// find the circumcenter of the neighbor triangle ///
                 dxSecondSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
@@ -1778,7 +1778,7 @@ public class NewLocation {
         //********************* TRY TO RELOCATE POINT "p" ***************
 
         // get the surrounding points of p, so this gives us the triangles
-        numpoints_p = getStarPoints(badotri, torg, tdest, tapex, 1, points_p);
+        numpoints_p = getStarPoints(badotri.shallowCopy(), torg, tdest, tapex, 1, points_p);
         // check if the points in counterclockwise order
         // 	p1[0] = points_p[0];  p1[1] = points_p[1];
         // 	p2[0] = points_p[2];  p2[1] = points_p[3];
@@ -1822,7 +1822,7 @@ public class NewLocation {
         //********************* TRY TO RELOCATE POINT "q" ***************
 
         // get the surrounding points of q, so this gives us the triangles
-        numpoints_q = getStarPoints(badotri, torg, tdest, tapex, 2, points_q);
+        numpoints_q = getStarPoints(badotri.shallowCopy(), torg, tdest, tapex, 2, points_q);
         // 	// check if the points in counterclockwise order
         // 	v1[0] = points_q[0];  v1[1] = points_q[1];
         // 	v2[0] = points_q[2];  v2[1] = points_q[3];
@@ -1863,7 +1863,7 @@ public class NewLocation {
 
         //********************* TRY TO RELOCATE POINT "q" ***************
         // get the surrounding points of r, so this gives us the triangles
-        numpoints_r = getStarPoints(badotri, torg, tdest, tapex, 3, points_r);
+        numpoints_r = getStarPoints(badotri.shallowCopy(), torg, tdest, tapex, 3, points_r);
         // check if the points in counterclockwise order
         // 	v1[0] = points_r[0];  v1[1] = points_r[1];
         // 	v2[0] = points_r[2];  v2[1] = points_r[3];
@@ -1970,7 +1970,7 @@ public class NewLocation {
                 break;
         }
 
-        tempotri = badotri;
+        tempotri = badotri.shallowCopy();
         // add first point as the end of first edge
         points[numvertices] = second_x;
         numvertices++;
@@ -1981,9 +1981,9 @@ public class NewLocation {
         // until we reach the third point of the beginning triangle
         do {
             // find the neighbor's third point where it is incident to given edge
-            if (!getNeighborsVertex(tempotri, first_x, first_y, second_x, second_y, returnPoint, neighotri)) {
+            if (!getNeighborsVertex(tempotri.shallowCopy(), first_x, first_y, second_x, second_y, returnPoint, neighotri)) {
                 // go to next triangle
-                tempotri = neighotri;
+                tempotri = neighotri.shallowCopy();
                 // now the second point is the neighbor's third vertex
                 second_x = returnPoint[0];
                 second_y = returnPoint[1];
@@ -2120,7 +2120,7 @@ public class NewLocation {
                 break;
         }
         // pointer of the neighbor triangle
-        neighotri = neighbor;
+        neighbor.copy(neighotri);
         return notFound;
     }
 

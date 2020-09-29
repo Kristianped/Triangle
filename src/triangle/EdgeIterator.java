@@ -43,7 +43,7 @@ public class EdgeIterator implements Iterator<Edge> {
                 p1 = tri.org();
                 p2 = tri.dest();
 
-                tri.pivot(sub);
+                sub = tri.pivot();
 
                 // Boundary mark of dummysub is 0, so we don't need to worry about that
                 current = new Edge(p1.id, p2.id, sub.seg.boundary);

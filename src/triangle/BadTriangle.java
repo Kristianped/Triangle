@@ -13,8 +13,12 @@ public class BadTriangle {
     Vertex org, dest, apex;  // Its three vertices
     BadTriangle next;        // Pointer to next bad triangle
 
+    public BadTriangle() {
+        poortri = new Otri();
+    }
+
     @Override
     public String toString() {
-        return String.format("B-TID {0}", poortri.tri.hash);
+        return String.format("B-TID %d", poortri.tri.hash);
     }
 }

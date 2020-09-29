@@ -1,5 +1,16 @@
 package triangle;
 
+/**
+ * Locate triangles in a mesh.
+ * <br><br>
+ * WARNING: This routine is designed for convex triangulations, and will
+ * not generally work after the holes and concavities have been carved.
+ * <br><br>
+ * Based on a paper by Ernst P. Mucke, Isaac Saias, and Binhai Zhu, "Fast
+ * Randomized Point Location Without Preprocessing in Two- and Three-Dimensional
+ * Delaunay Triangulations," Proceedings of the Twelfth Annual Symposium on
+ * Computational Geometry, ACM, May 1996.
+ */
 public class TriangleLocator {
 
     TriangleSampler sampler;
@@ -20,6 +31,7 @@ public class TriangleLocator {
         this.mesh = mesh;
         this.predicates = predicates;
         this.sampler = new TriangleSampler(mesh);
+        recenttri = new Otri();
     }
 
     public void reset() {
@@ -98,36 +110,33 @@ public class TriangleLocator {
      */
     public Enums.LocateResult preciseLocate(Point searchpoint, Otri searchtri, boolean stopatsubsegment) {
         Otri backtracktri = new Otri();
-        Osub checkedge= new Osub();
-        Vertex forg;
-        Vertex fdest;
-        Vertex fapex;
-        double orgorient;
-        double destorient;
+        Osub checkedge = new Osub();
+        Vertex forg, fdest, fapex;
+        double orgorient, destorient;
         boolean moveleft;
 
         // Where are we?
         forg = searchtri.org();
         fdest = searchtri.dest();
         fapex = searchtri.apex();
-
-        while (true) {
+        while (true)
+        {
             // Check whether the apex is the point we seek.
-            if (fapex.x == searchpoint.x && fapex.y == searchpoint.y) {
+            if ((fapex.x == searchpoint.x) && (fapex.y == searchpoint.y))
+            {
                 searchtri.lprev();
                 return Enums.LocateResult.OnVertex;
             }
-
             // Does the point lie on the other side of the line defined by the
             // triangle edge opposite the triangle's destination?
             destorient = predicates.counterClockwise(forg, fapex, searchpoint);
-
             // Does the point lie on the other side of the line defined by the
             // triangle edge opposite the triangle's origin?
             orgorient = predicates.counterClockwise(fapex, fdest, searchpoint);
-
-            if (destorient > 0.0) {
-                if (orgorient > 0.0) {
+            if (destorient > 0.0)
+            {
+                if (orgorient > 0.0)
+                {
                     // Move left if the inner product of (fapex - searchpoint) and
                     // (fdest - forg) is positive.  This is equivalent to drawing
                     // a line perpendicular to the line (forg, fdest) and passing
@@ -135,25 +144,32 @@ public class TriangleLocator {
                     // 'searchpoint' falls on.
                     moveleft = (fapex.x - searchpoint.x) * (fdest.x - forg.x) +
                             (fapex.y - searchpoint.y) * (fdest.y - forg.y) > 0.0;
-                } else {
+                }
+                else
+                {
                     moveleft = true;
                 }
-            } else {
-                if (orgorient > 0.0) {
+            }
+            else
+            {
+                if (orgorient > 0.0)
+                {
                     moveleft = false;
-                } else {
+                }
+                else
+                {
                     // The point we seek must be on the boundary of or inside this
                     // triangle.
-                    if (destorient == 0.0) {
+                    if (destorient == 0.0)
+                    {
                         searchtri.lprev();
                         return Enums.LocateResult.OnEdge;
                     }
-
-                    if (orgorient == 0.0) {
+                    if (orgorient == 0.0)
+                    {
                         searchtri.lnext();
                         return Enums.LocateResult.OnEdge;
                     }
-
                     return Enums.LocateResult.InTriangle;
                 }
             }
@@ -161,29 +177,32 @@ public class TriangleLocator {
             // Move to another triangle. Leave a trace 'backtracktri' in case
             // floating-point roundoff or some such bogey causes us to walk
             // off a boundary of the triangulation.
-            if (moveleft) {
+            if (moveleft)
+            {
                 searchtri.lprev(backtracktri);
                 fdest = fapex;
-            } else {
+            }
+            else
+            {
                 searchtri.lnext(backtracktri);
                 forg = fapex;
             }
-
             backtracktri.sym(searchtri);
 
-            if (mesh.checksegments && stopatsubsegment) {
+            if (mesh.checksegments && stopatsubsegment)
+            {
                 // Check for walking through a subsegment.
-                backtracktri.pivot(checkedge);
-
-                if (checkedge.seg.hash != Mesh.DUMMY) {
+                checkedge = backtracktri.pivot();
+                if (checkedge.seg.hash != Mesh.DUMMY)
+                {
                     // Go back to the last triangle.
                     backtracktri.copy(searchtri);
                     return Enums.LocateResult.Outside;
                 }
             }
-
             // Check for walking right out of the triangulation.
-            if (searchtri.tri.id == Mesh.DUMMY) {
+            if (searchtri.tri.id == Mesh.DUMMY)
+            {
                 // Go back to the last triangle.
                 backtracktri.copy(searchtri);
                 return Enums.LocateResult.Outside;
@@ -231,10 +250,8 @@ public class TriangleLocator {
      */
     public Enums.LocateResult locate(Point searchpoint,  Otri searchtri) {
         Otri sampletri = new Otri();
-        Vertex torg;
-        Vertex tdest;
-        double searchdist;
-        double dist;
+        Vertex torg, tdest;
+        double searchdist, dist;
         double ahead;
 
         // Record the distance from the suggested starting triangle to the
@@ -245,35 +262,39 @@ public class TriangleLocator {
 
         // If a recently encountered triangle has been recorded and has not been
         // deallocated, test it as a good starting point.
-        if (recenttri.tri != null && !Otri.isDead(recenttri.tri)) {
-            torg = recenttri.org();
-
-            if ((torg.x == searchpoint.x) && (torg.y == searchpoint.y)) {
-                recenttri.copy(searchtri);
-                return Enums.LocateResult.OnVertex;
-            }
-
-            dist = (searchpoint.x - torg.x) * (searchpoint.x - torg.x) +
-                    (searchpoint.y - torg.y) * (searchpoint.y - torg.y);
-
-            if (dist < searchdist) {
-                recenttri.copy(searchtri);
-                searchdist = dist;
+        if (recenttri.tri != null)
+        {
+            if (!Otri.isDead(recenttri.tri))
+            {
+                torg = recenttri.org();
+                if ((torg.x == searchpoint.x) && (torg.y == searchpoint.y))
+                {
+                    recenttri.copy(searchtri);
+                    return Enums.LocateResult.OnVertex;
+                }
+                dist = (searchpoint.x - torg.x) * (searchpoint.x - torg.x) +
+                        (searchpoint.y - torg.y) * (searchpoint.y - torg.y);
+                if (dist < searchdist)
+                {
+                    recenttri.copy(searchtri);
+                    searchdist = dist;
+                }
             }
         }
 
-        // TODO: Improve sampling
+        // TODO: Improve sampling.
         sampler.update();
 
-        for (var t : sampler) {
+        for (var t : sampler)
+        {
             sampletri.tri = t;
-
-            if (!Otri.isDead(sampletri.tri)) {
+            if (!Otri.isDead(sampletri.tri))
+            {
                 torg = sampletri.org();
                 dist = (searchpoint.x - torg.x) * (searchpoint.x - torg.x) +
                         (searchpoint.y - torg.y) * (searchpoint.y - torg.y);
-
-                if (dist < searchdist) {
+                if (dist < searchdist)
+                {
                     sampletri.copy(searchtri);
                     searchdist = dist;
                 }
@@ -286,24 +307,29 @@ public class TriangleLocator {
 
         // Check the starting triangle's vertices.
         if ((torg.x == searchpoint.x) && (torg.y == searchpoint.y))
+        {
             return Enums.LocateResult.OnVertex;
-
-        if ((tdest.x == searchpoint.x) && (tdest.y == searchpoint.y)) {
+        }
+        if ((tdest.x == searchpoint.x) && (tdest.y == searchpoint.y))
+        {
             searchtri.lnext();
             return Enums.LocateResult.OnVertex;
         }
 
         // Orient 'searchtri' to fit the preconditions of calling preciselocate().
         ahead = predicates.counterClockwise(torg, tdest, searchpoint);
-
-        if (ahead < 0.0) {
+        if (ahead < 0.0)
+        {
             // Turn around so that 'searchpoint' is to the left of the
             // edge specified by 'searchtri'.
             searchtri.sym();
-        } else if (ahead == 0.0) {
+        }
+        else if (ahead == 0.0)
+        {
             // Check if 'searchpoint' is between 'torg' and 'tdest'.
             if (((torg.x < searchpoint.x) == (searchpoint.x < tdest.x)) &&
-                    ((torg.y < searchpoint.y) == (searchpoint.y < tdest.y))) {
+                    ((torg.y < searchpoint.y) == (searchpoint.y < tdest.y)))
+            {
                 return Enums.LocateResult.OnEdge;
             }
         }

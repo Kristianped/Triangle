@@ -1,5 +1,6 @@
 package triangle;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class ConstraintMesher {
 
     public ConstraintMesher(Mesh mesh, Configuration config) {
         this.mesh = mesh;
-        this.predicates = config.predicates;
+        this.predicates = config.predicates.get();
         this.behavior = mesh.behavior;
         this.locator = mesh.locator;
         this.viri = new ArrayList<>();
@@ -27,7 +28,7 @@ public class ConstraintMesher {
      * @param options Constraint options
      */
     public void apply(IPolygon polygon, ConstraintOptions options) {
-        behavior.poly = polygon.getSegments().size() > 0;
+        behavior.setPoly(polygon.getSegments().size() > 0);
 
         // Copy constraint options
         if (options != null) {
@@ -36,7 +37,7 @@ public class ConstraintMesher {
             behavior.setNoBisect(options.getSegmentSplitting());
 
             if (behavior.isConformingDelaunay())
-                behavior.quality = true;
+                behavior.setQuality(true);
         }
 
         behavior.useRegions = polygon.getRegions().size() > 0;
@@ -55,7 +56,7 @@ public class ConstraintMesher {
             formSkeleton(polygon);
         }
 
-        if (behavior.poly && mesh.triangles.size > 0) {
+        if (behavior.poly && (mesh.triangles.size() > 0)) {
             // Copy holes and regions
             mesh.holes.addAll(polygon.getHoles());
             mesh.regions.addAll(polygon.getRegions());
@@ -71,7 +72,7 @@ public class ConstraintMesher {
      * Spread the area constraints.
      */
     private void carveHoles() {
-        Otri searchTri = new Otri();
+        Otri searchtri = new Otri();
         Vertex searchorg;
         Vertex searchdest;
         Enums.LocateResult intersect;
@@ -80,37 +81,40 @@ public class ConstraintMesher {
 
         var dummytri = mesh.dummytri;
 
-        if (!mesh.behavior.convex) {
+        if (!mesh.behavior.convex)
+        {
             // Mark as infected any unprotected triangles on the boundary.
             // This is one way by which concavities are created.
             infectHull();
         }
 
-        if (!mesh.behavior.noHoles) {
-            // Infect each triangle in which a hole lies
-            for (var hole : mesh.holes) {
-                // Ignore holes that aren't within the bounds of the mesh
-                if (mesh.bounds.contains(hole)) {
+        if (!mesh.behavior.noHoles)
+        {
+            // Infect each triangle in which a hole lies.
+            for (var hole : mesh.holes)
+            {
+                // Ignore holes that aren't within the bounds of the mesh.
+                if (mesh.bounds.contains(hole))
+                {
                     // Start searching from some triangle on the outer boundary.
-                    searchTri.tri = dummytri;
-                    searchTri.orient = 0;
-                    searchTri.sym();
-
+                    searchtri.tri = dummytri;
+                    searchtri.orient = 0;
+                    searchtri.sym();
                     // Ensure that the hole is to the left of this boundary edge;
                     // otherwise, locate() will falsely report that the hole
                     // falls within the starting triangle.
-                    searchorg = searchTri.org();
-                    searchdest = searchTri.dest();
-
-                    if (predicates.counterClockwise(searchorg, searchdest, hole) > 0.0) {
-                        // Find a triangle that contains the hole
-                        intersect = mesh.locator.locate(hole, searchTri);
-
-                        if (intersect != Enums.LocateResult.Outside && !searchTri.isInfected()) {
+                    searchorg = searchtri.org();
+                    searchdest = searchtri.dest();
+                    if (predicates.counterClockwise(searchorg, searchdest, hole) > 0.0)
+                    {
+                        // Find a triangle that contains the hole.
+                        intersect = mesh.locator.locate(hole, searchtri);
+                        if ((intersect != Enums.LocateResult.Outside) && (!searchtri.isInfected()))
+                        {
                             // Infect the triangle. This is done by marking the triangle
                             // as infected and including the triangle in the virus pool.
-                            searchTri.infect();
-                            viri.add(searchTri.tri);
+                            searchtri.infect();
+                            viri.add(searchtri.tri);
                         }
                     }
                 }
@@ -121,62 +125,73 @@ public class ConstraintMesher {
         // work when the triangulation is no longer convex. (Incidentally, this is the reason why
         // regional attributes and area constraints can't be used when refining a preexisting mesh,
         // which might not be convex; they can only be used with a freshly triangulated PSLG.)
-        if (mesh.regions.size() > 0) {
+        if (mesh.regions.size() > 0)
+        {
             int i = 0;
+
             regionTris = new Triangle[mesh.regions.size()];
 
-            // Find the starting triangle for each region
-           for (var region : mesh.regions) {
-               regionTris[i] = dummytri;
+            // Find the starting triangle for each region.
+            for (var region : mesh.regions)
+            {
+                regionTris[i] = dummytri;
+                // Ignore region points that aren't within the bounds of the mesh.
+                if (mesh.bounds.contains(region.point))
+                {
+                    // Start searching from some triangle on the outer boundary.
+                    searchtri.tri = dummytri;
+                    searchtri.orient = 0;
+                    searchtri.sym();
+                    // Ensure that the region point is to the left of this boundary
+                    // edge; otherwise, locate() will falsely report that the
+                    // region point falls within the starting triangle.
+                    searchorg = searchtri.org();
+                    searchdest = searchtri.dest();
+                    if (predicates.counterClockwise(searchorg, searchdest, region.point) > 0.0)
+                    {
+                        // Find a triangle that contains the region point.
+                        intersect = mesh.locator.locate(region.point, searchtri);
+                        if ((intersect != Enums.LocateResult.Outside) && (!searchtri.isInfected()))
+                        {
+                            // Record the triangle for processing after the
+                            // holes have been carved.
+                            regionTris[i] = searchtri.tri;
+                            regionTris[i].label = region.id;
+                            regionTris[i].area = region.area;
+                        }
+                    }
+                }
 
-               // Ignore region points that aren't within the bounds of the mesh
-               if (mesh.bounds.contains(region.point)) {
-                   // Start searching from some triangle on the outer boundary
-                   searchTri.tri = dummytri;
-                   searchTri.orient = 0;
-                   searchTri.sym();
-
-                   // Ensure that the region point is to the left of this boundary
-                   // edge; otherwise, locate() will falsely report that the
-                   // region point falls within the starting triangle.
-                   searchorg = searchTri.org();
-                   searchdest = searchTri.dest();
-
-                   if (predicates.counterClockwise(searchorg, searchdest, region.point) > 0.0) {
-                       // Find a triangle that contains the region point.
-                       intersect = mesh.locator.locate(region.point, searchTri);
-
-                       if (intersect != Enums.LocateResult.Outside && !searchTri.isInfected()) {
-                           // Record the triangle for processing after the
-                           // holes have been carved.
-                           regionTris[i] = searchTri.tri;
-                           regionTris[i].label = region.id;
-                           regionTris[i].area = region.area;
-                       }
-                   }
-               }
-
-               i++;
-           }
+                i++;
+            }
         }
 
         if (viri.size() > 0)
-            plague();   // Carve the holes and concavities.
+        {
+            // Carve the holes and concavities.
+            plague();
+        }
 
-        if (regionTris != null) {
+        if (regionTris != null)
+        {
             var iterator = new RegionIterator(mesh);
 
-            for (int i = 0; i < regionTris.length; i++) {
-                if (regionTris[i].id != Mesh.DUMMY) {
+            for (int i = 0; i < regionTris.length; i++)
+            {
+                if (regionTris[i].id != Mesh.DUMMY)
+                {
                     // Make sure the triangle under consideration still exists.
                     // It may have been eaten by the virus.
                     if (!Otri.isDead(regionTris[i]))
+                    {
+                        // Apply one region's attribute and/or area constraint.
                         iterator.process(regionTris[i]);
+                    }
                 }
             }
         }
 
-        // Free up memory
+        // Free up memory (virus pool should be empty anyway).
         viri.clear();
     }
 
@@ -190,33 +205,46 @@ public class ConstraintMesher {
 
         mesh.insegments = 0;
 
-        if (behavior.poly) {
+        if (behavior.poly)
+        {
             // If the input vertices are collinear, there is no triangulation,
             // so don't try to insert segments.
-            if (mesh.triangles.size == 0)
+            if (mesh.triangles.size() == 0)
+            {
                 return;
+            }
 
             // If segments are to be inserted, compute a mapping
             // from vertices to triangles.
             if (input.getSegments().size() > 0)
+            {
                 mesh.makeVertexMap();
+            }
 
             // Read and insert the segments.
-            for (var seg : input.getSegments()) {
+            for (var seg : input.getSegments())
+            {
                 mesh.insegments++;
 
                 p = seg.getVertex(0);
                 q = seg.getVertex(1);
 
                 if ((p.x == q.x) && (p.y == q.y))
-                    System.err.println("Endpoints of segment (IDs " + p.id + "/" + q.id + ") are coincident: Mesh.formSkeleton()");
+                {
+                    System.err.println("Endpoints of segment (IDs " + p.id + "/" + q.id + ") are coincident.");
+                }
                 else
+                {
                     insertSegment(p, q, seg.getLabel());
+                }
             }
         }
 
         if (behavior.convex || !behavior.poly)
-            markHull(); // Enclose the convex hull with subsegments.
+        {
+            // Enclose the convex hull with subsegments.
+            markHull();
+        }
     }
 
     /**
@@ -229,8 +257,7 @@ public class ConstraintMesher {
         Otri nexttri = new Otri();
         Otri starttri = new Otri();
         Osub hullsubseg = new Osub();
-        Vertex horg;
-        Vertex hdest;
+        Vertex horg, hdest;
 
         var dummytri = mesh.dummytri;
 
@@ -241,41 +268,47 @@ public class ConstraintMesher {
 
         // Remember where we started so we know when to stop.
         hulltri.copy(starttri);
-
         // Go once counterclockwise around the convex hull.
-        do {
+        do
+        {
             // Ignore triangles that are already infected.
-            if (!hulltri.isInfected()) {
+            if (!hulltri.isInfected())
+            {
                 // Is the triangle protected by a subsegment?
-                hulltri.pivot(hullsubseg);
-
-                if (hullsubseg.seg.hash == Mesh.DUMMY) {
+                hullsubseg = hulltri.pivot();
+                if (hullsubseg.seg.hash == Mesh.DUMMY)
+                {
                     // The triangle is not protected; infect it.
-                    if (!hulltri.isInfected()) {
+                    if (!hulltri.isInfected())
+                    {
                         hulltri.infect();
                         viri.add(hulltri.tri);
                     }
-                } else {
+                }
+                else
+                {
                     // The triangle is protected; set boundary markers if appropriate.
-                    if (hullsubseg.seg.boundary == 0) {
+                    if (hullsubseg.seg.boundary == 0)
+                    {
                         hullsubseg.seg.boundary = 1;
                         horg = hulltri.org();
                         hdest = hulltri.dest();
-
                         if (horg.label == 0)
+                        {
                             horg.label = 1;
-
+                        }
                         if (hdest.label == 0)
+                        {
                             hdest.label = 1;
+                        }
                     }
                 }
             }
-
             // To find the next hull edge, go clockwise around the next vertex.
             hulltri.lnext();
             hulltri.oprev(nexttri);
-
-            while (nexttri.tri.id != Mesh.DUMMY) {
+            while (nexttri.tri.id != Mesh.DUMMY)
+            {
                 nexttri.copy(hulltri);
                 hulltri.oprev(nexttri);
             }
@@ -302,8 +335,7 @@ public class ConstraintMesher {
         Otri neighbor = new Otri();
         Osub neighborsubseg = new Osub();
         Vertex testvertex;
-        Vertex norg;
-        Vertex ndest;
+        Vertex norg, ndest;
 
         var dummysub = mesh.dummysub;
         var dummytri = mesh.dummytri;
@@ -312,7 +344,8 @@ public class ConstraintMesher {
 
         // Loop through all the infected triangles, spreading the virus to
         // their neighbors, then to their neighbors' neighbors.
-        for (int i = 0; i < viri.size(); i++) {
+        for (int i = 0; i < viri.size(); i++)
+        {
             // WARNING: Don't use foreach, mesh.viri list may get modified.
 
             testtri.tri = viri.get(i);
@@ -320,26 +353,27 @@ public class ConstraintMesher {
             // to subsegments, setting it to an illegal value.  Hence, we have to
             // temporarily uninfect this triangle so that we can examine its
             // adjacent subsegments.
-            // TODO: Not true in the C# version (so we could skip this).
+            // TODO: Not true in the Java version (so we could skip this).
             testtri.uninfect();
 
             // Check each of the triangle's three neighbors.
-            for (testtri.orient = 0; testtri.orient < 3; testtri.orient++) {
+            for (testtri.orient = 0; testtri.orient < 3; testtri.orient++)
+            {
                 // Find the neighbor.
                 testtri.sym(neighbor);
-
                 // Check for a subsegment between the triangle and its neighbor.
-                testtri.pivot(neighborsubseg);
-
+                neighborsubseg = testtri.pivot();
                 // Check if the neighbor is nonexistent or already infected.
-                if ((neighbor.tri.id == Mesh.DUMMY) || neighbor.isInfected()) {
-                    if (neighborsubseg.seg.hash != Mesh.DUMMY) {
+                if ((neighbor.tri.id == Mesh.DUMMY) || neighbor.isInfected())
+                {
+                    if (neighborsubseg.seg.hash != Mesh.DUMMY)
+                    {
                         // There is a subsegment separating the triangle from its
                         // neighbor, but both triangles are dying, so the subsegment
                         // dies too.
                         mesh.subsegDealloc(neighborsubseg.seg);
-
-                        if (neighbor.tri.id != Mesh.DUMMY) {
+                        if (neighbor.tri.id != Mesh.DUMMY)
+                        {
                             // Make sure the subsegment doesn't get deallocated again
                             // later when the infected neighbor is visited.
                             neighbor.uninfect();
@@ -347,31 +381,37 @@ public class ConstraintMesher {
                             neighbor.infect();
                         }
                     }
-                } else {   // The neighbor exists and is not infected.
-                    if (neighborsubseg.seg.hash == Mesh.DUMMY) {
+                }
+                else
+                {   // The neighbor exists and is not infected.
+                    if (neighborsubseg.seg.hash == Mesh.DUMMY)
+                    {
                         // There is no subsegment protecting the neighbor, so
                         // the neighbor becomes infected.
                         neighbor.infect();
-
                         // Ensure that the neighbor's neighbors will be infected.
                         viri.add(neighbor.tri);
-                    } else {
+                    }
+                    else
+                    {
                         // The neighbor is protected by a subsegment.
                         // Remove this triangle from the subsegment.
                         neighborsubseg.triDissolve(dummytri);
-
                         // The subsegment becomes a boundary.  Set markers accordingly.
                         if (neighborsubseg.seg.boundary == 0)
+                        {
                             neighborsubseg.seg.boundary = 1;
-
+                        }
                         norg = neighbor.org();
                         ndest = neighbor.dest();
-
                         if (norg.label == 0)
+                        {
                             norg.label = 1;
-
+                        }
                         if (ndest.label == 0)
+                        {
                             ndest.label = 1;
+                        }
                     }
                 }
             }
@@ -380,59 +420,65 @@ public class ConstraintMesher {
             testtri.infect();
         }
 
-        for (var virus : viri) {
+        for (var virus : viri)
+        {
             testtri.tri = virus;
 
             // Check each of the three corners of the triangle for elimination.
             // This is done by walking around each vertex, checking if it is
             // still connected to at least one live triangle.
-            for (testtri.orient = 0; testtri.orient < 3; testtri.orient++) {
+            for (testtri.orient = 0; testtri.orient < 3; testtri.orient++)
+            {
                 testvertex = testtri.org();
                 // Check if the vertex has already been tested.
-                if (testvertex != null) {
+                if (testvertex != null)
+                {
                     killorg = true;
-
                     // Mark the corner of the triangle as having been tested.
                     testtri.setOrg(null);
-
                     // Walk counterclockwise about the vertex.
                     testtri.onext(neighbor);
-
                     // Stop upon reaching a boundary or the starting triangle.
-                    while ((neighbor.tri.id != Mesh.DUMMY) && (!neighbor.equals(testtri))) {
-                        if (neighbor.isInfected()) {
+                    while ((neighbor.tri.id != Mesh.DUMMY) &&
+                            (!neighbor.equals(testtri)))
+                    {
+                        if (neighbor.isInfected())
+                        {
                             // Mark the corner of this triangle as having been tested.
                             neighbor.setOrg(null);
-                        } else {
+                        }
+                        else
+                        {
                             // A live triangle.  The vertex survives.
                             killorg = false;
                         }
-
                         // Walk counterclockwise about the vertex.
                         neighbor.onext();
                     }
-
                     // If we reached a boundary, we must walk clockwise as well.
-                    if (neighbor.tri.id == Mesh.DUMMY) {
+                    if (neighbor.tri.id == Mesh.DUMMY)
+                    {
                         // Walk clockwise about the vertex.
                         testtri.oprev(neighbor);
-
                         // Stop upon reaching a boundary.
-                        while (neighbor.tri.id != Mesh.DUMMY) {
-                            if (neighbor.isInfected()) {
+                        while (neighbor.tri.id != Mesh.DUMMY)
+                        {
+                            if (neighbor.isInfected())
+                            {
                                 // Mark the corner of this triangle as having been tested.
                                 neighbor.setOrg(null);
-                            } else {
+                            }
+                            else
+                            {
                                 // A live triangle.  The vertex survives.
                                 killorg = false;
                             }
-
                             // Walk clockwise about the vertex.
                             neighbor.oprev();
                         }
                     }
-
-                    if (killorg) {
+                    if (killorg)
+                    {
                         // Deleting vertex
                         testvertex.type = Enums.VertexType.UndeadVertex;
                         mesh.undeads++;
@@ -442,15 +488,18 @@ public class ConstraintMesher {
 
             // Record changes in the number of boundary edges, and disconnect
             // dead triangles from their neighbors.
-            for (testtri.orient = 0; testtri.orient < 3; testtri.orient++) {
+            for (testtri.orient = 0; testtri.orient < 3; testtri.orient++)
+            {
                 testtri.sym(neighbor);
-
-                if (neighbor.tri.id == Mesh.DUMMY) {
+                if (neighbor.tri.id == Mesh.DUMMY)
+                {
                     // There is no neighboring triangle on this edge, so this edge
                     // is a boundary edge. This triangle is being deleted, so this
                     // boundary edge is deleted.
                     mesh.hullsize--;
-                } else {
+                }
+                else
+                {
                     // Disconnect the triangle from its neighbor.
                     neighbor.dissolve(dummytri);
                     // There is a neighboring triangle on this edge, so this edge
@@ -458,7 +507,6 @@ public class ConstraintMesher {
                     mesh.hullsize++;
                 }
             }
-
             // Return the dead triangle to the pool of triangles.
             mesh.triangleDealloc(testtri.tri);
         }
@@ -482,68 +530,71 @@ public class ConstraintMesher {
     private Enums.FindDirectionResult findDirection(Otri searchtri, Vertex searchpoint) {
         Otri checktri = new Otri();
         Vertex startvertex;
-        Vertex leftvertex;
-        Vertex rightvertex;
-        double leftccw;
-        double rightccw;
-        boolean leftflag;
-        boolean rightflag;
+        Vertex leftvertex, rightvertex;
+        double leftccw, rightccw;
+        boolean leftflag, rightflag;
 
         startvertex = searchtri.org();
         rightvertex = searchtri.dest();
         leftvertex = searchtri.apex();
-
         // Is 'searchpoint' to the left?
         leftccw = predicates.counterClockwise(searchpoint, startvertex, leftvertex);
         leftflag = leftccw > 0.0;
-
         // Is 'searchpoint' to the right?
         rightccw = predicates.counterClockwise(startvertex, searchpoint, rightvertex);
         rightflag = rightccw > 0.0;
-
-        if (leftflag && rightflag) {
+        if (leftflag && rightflag)
+        {
             // 'searchtri' faces directly away from 'searchpoint'. We could go left
             // or right. Ask whether it's a triangle or a boundary on the left.
             searchtri.onext(checktri);
-
             if (checktri.tri.id == Mesh.DUMMY)
+            {
                 leftflag = false;
+            }
             else
+            {
                 rightflag = false;
+            }
         }
-
-        while (leftflag) {
+        while (leftflag)
+        {
             // Turn left until satisfied.
             searchtri.onext();
-
             if (searchtri.tri.id == Mesh.DUMMY)
+            {
                 throw new RuntimeException("Unable to find a triangle on path.");
-
+            }
             leftvertex = searchtri.apex();
             rightccw = leftccw;
             leftccw = predicates.counterClockwise(searchpoint, startvertex, leftvertex);
             leftflag = leftccw > 0.0;
         }
-
-        while (rightflag) {
+        while (rightflag)
+        {
             // Turn right until satisfied.
             searchtri.oprev();
-
             if (searchtri.tri.id == Mesh.DUMMY)
+            {
                 throw new RuntimeException("Unable to find a triangle on path.");
-
+            }
             rightvertex = searchtri.dest();
             leftccw = rightccw;
             rightccw = predicates.counterClockwise(startvertex, searchpoint, rightvertex);
             rightflag = rightccw > 0.0;
         }
-
         if (leftccw == 0.0)
+        {
             return Enums.FindDirectionResult.Leftcollinear;
+        }
         else if (rightccw == 0.0)
+        {
             return Enums.FindDirectionResult.Rightcollinear;
+        }
         else
+        {
             return Enums.FindDirectionResult.Within;
+        }
     }
 
     /**
@@ -561,10 +612,8 @@ public class ConstraintMesher {
     private void segmentIntersection(Otri splittri, Osub splitsubseg, Vertex endpoint2) {
         Osub opposubseg = new Osub();
         Vertex endpoint1;
-        Vertex torg;
-        Vertex tdest;
-        Vertex leftvertex;
-        Vertex rightvertex;
+        Vertex torg, tdest;
+        Vertex leftvertex, rightvertex;
         Vertex newvertex;
         Enums.InsertVertexResult success;
 
@@ -579,7 +628,6 @@ public class ConstraintMesher {
         endpoint1 = splittri.apex();
         torg = splittri.org();
         tdest = splittri.dest();
-
         // Segment intersection formulae; see the Antonio reference.
         tx = tdest.x - torg.x;
         ty = tdest.y - torg.y;
@@ -588,10 +636,10 @@ public class ConstraintMesher {
         etx = torg.x - endpoint2.x;
         ety = torg.y - endpoint2.y;
         denom = ty * ex - tx * ey;
-
         if (denom == 0.0)
+        {
             throw new RuntimeException("Attempt to find intersection of parallel segments.");
-
+        }
         split = (ey * etx - ex * ety) / denom;
 
         // Create the new vertex.
@@ -604,7 +652,7 @@ public class ConstraintMesher {
 
         newvertex.hash = mesh.hash_vtx++;
         newvertex.id = newvertex.hash;
-
+        
         // Interpolate its attributes.
         for (int i = 0; i < mesh.nextras; i++)
         {
@@ -615,30 +663,31 @@ public class ConstraintMesher {
 
         // Insert the intersection vertex.  This should always succeed.
         success = mesh.insertVertex(newvertex, splittri, splitsubseg, false, false);
-
         if (success != Enums.InsertVertexResult.Successful)
+        {
             throw new RuntimeException("Failure to split a segment.");
-
+        }
         // Record a triangle whose origin is the new vertex.
         newvertex.tri = splittri;
         if (mesh.steinerleft > 0)
+        {
             mesh.steinerleft--;
-
+        }
 
         // Divide the segment into two, and correct the segment endpoints.
         splitsubseg.sym();
-        splitsubseg.pivot(opposubseg);
+        opposubseg = splitsubseg.pivotSub();
         splitsubseg.dissolve(dummysub);
         opposubseg.dissolve(dummysub);
-
-        do {
+        do
+        {
             splitsubseg.setSegOrg(newvertex);
-            splitsubseg.next();
+            splitsubseg = splitsubseg.next();
         } while (splitsubseg.seg.hash != Mesh.DUMMY);
-
-        do {
+        do
+        {
             opposubseg.setSegOrg(newvertex);
-            opposubseg.next();
+            opposubseg = opposubseg.next();
         } while (opposubseg.seg.hash != Mesh.DUMMY);
 
         // Inserting the vertex may have caused edge flips.  We wish to rediscover
@@ -647,12 +696,14 @@ public class ConstraintMesher {
 
         rightvertex = splittri.dest();
         leftvertex = splittri.apex();
-
         if ((leftvertex.x == endpoint1.x) && (leftvertex.y == endpoint1.y))
+        {
             splittri.onext();
+        }
         else if ((rightvertex.x != endpoint1.x) || (rightvertex.y != endpoint1.y))
+        {
             throw new RuntimeException("Topological inconsistency after splitting a segment.");
-
+        }
         // 'splittri' should have destination endpoint1.
     }
 
@@ -678,55 +729,57 @@ public class ConstraintMesher {
     private boolean scoutSegment(Otri searchtri, Vertex endpoint2, int newmark) {
         Otri crosstri = new Otri();
         Osub crosssubseg = new Osub();
-        Vertex leftvertex;
-        Vertex rightvertex;
+        Vertex leftvertex, rightvertex;
         Enums.FindDirectionResult collinear;
 
         collinear = findDirection(searchtri, endpoint2);
         rightvertex = searchtri.dest();
         leftvertex = searchtri.apex();
-
         if (((leftvertex.x == endpoint2.x) && (leftvertex.y == endpoint2.y)) ||
-                ((rightvertex.x == endpoint2.x) && (rightvertex.y == endpoint2.y))) {
+                ((rightvertex.x == endpoint2.x) && (rightvertex.y == endpoint2.y)))
+        {
             // The segment is already an edge in the mesh.
             if ((leftvertex.x == endpoint2.x) && (leftvertex.y == endpoint2.y))
+            {
                 searchtri.lprev();
-
+            }
             // Insert a subsegment, if there isn't already one there.
             mesh.insertSubseg(searchtri, newmark);
-
             return true;
         }
-        else if (collinear == Enums.FindDirectionResult.Leftcollinear) {
+        else if (collinear == Enums.FindDirectionResult.Leftcollinear)
+        {
             // We've collided with a vertex between the segment's endpoints.
             // Make the collinear vertex be the triangle's origin.
             searchtri.lprev();
             mesh.insertSubseg(searchtri, newmark);
-
             // Insert the remainder of the segment.
             return scoutSegment(searchtri, endpoint2, newmark);
-        } else if (collinear == Enums.FindDirectionResult.Rightcollinear) {
+        }
+        else if (collinear == Enums.FindDirectionResult.Rightcollinear)
+        {
             // We've collided with a vertex between the segment's endpoints.
             mesh.insertSubseg(searchtri, newmark);
-
             // Make the collinear vertex be the triangle's origin.
             searchtri.lnext();
-
             // Insert the remainder of the segment.
             return scoutSegment(searchtri, endpoint2, newmark);
-        } else {
+        }
+        else
+        {
             searchtri.lnext(crosstri);
-            crosstri.pivot(crosssubseg);
-
+            crosssubseg = crosstri.pivot();
             // Check for a crossing segment.
-            if (crosssubseg.seg.hash == Mesh.DUMMY) {
+            if (crosssubseg.seg.hash == Mesh.DUMMY)
+            {
                 return false;
-            } else {
+            }
+            else
+            {
                 // Insert a vertex at the intersection.
                 segmentIntersection(crosstri, crosssubseg, endpoint2);
                 crosstri.copy(searchtri);
                 mesh.insertSubseg(searchtri, newmark);
-
                 // Insert the remainder of the segment.
                 return scoutSegment(searchtri, endpoint2, newmark);
             }
@@ -771,55 +824,57 @@ public class ConstraintMesher {
         Otri neartri = new Otri();
         Otri fartri = new Otri();
         Osub faredge = new Osub();
-        Vertex nearvertex;
-        Vertex leftvertex;
-        Vertex rightvertex;
-        Vertex farvertex;
+        Vertex nearvertex, leftvertex, rightvertex, farvertex;
 
         fixuptri.lnext(neartri);
         neartri.sym(fartri);
-
         // Check if the edge opposite the origin of fixuptri can be flipped.
         if (fartri.tri.id == Mesh.DUMMY)
+        {
             return;
-
-        neartri.pivot(faredge);
+        }
+        faredge = neartri.pivot();
 
         if (faredge.seg.hash != Mesh.DUMMY)
+        {
             return;
-
+        }
         // Find all the relevant vertices.
         nearvertex = neartri.apex();
         leftvertex = neartri.org();
         rightvertex = neartri.dest();
         farvertex = fartri.apex();
-
         // Check whether the previous polygon vertex is a reflex vertex.
-        if (leftside) {
-            if (predicates.counterClockwise(nearvertex, leftvertex, farvertex) <= 0.0) {
+        if (leftside)
+        {
+            if (predicates.counterClockwise(nearvertex, leftvertex, farvertex) <= 0.0)
+            {
                 // leftvertex is a reflex vertex too. Nothing can
                 // be done until a convex section is found.
                 return;
             }
-        } else {
-            if (predicates.counterClockwise(farvertex, rightvertex, nearvertex) <= 0.0) {
+        }
+        else
+        {
+            if (predicates.counterClockwise(farvertex, rightvertex, nearvertex) <= 0.0)
+            {
                 // rightvertex is a reflex vertex too.  Nothing can
                 // be done until a convex section is found.
                 return;
             }
         }
-
-        if (predicates.counterClockwise(rightvertex, leftvertex, farvertex) > 0.0) {
+        if (predicates.counterClockwise(rightvertex, leftvertex, farvertex) > 0.0)
+        {
             // fartri is not an inverted triangle, and farvertex is not a reflex
             // vertex.  As there are no reflex vertices, fixuptri isn't an
             // inverted triangle, either.  Hence, test the edge between the
             // triangles to ensure it is locally Delaunay.
-            if (predicates.inCircle(leftvertex, farvertex, rightvertex, nearvertex) <= 0.0) {
+            if (predicates.inCircle(leftvertex, farvertex, rightvertex, nearvertex) <= 0.0)
+            {
                 return;
             }
             // Not locally Delaunay; go on to an edge flip.
         }
-
         // else fartri is inverted; remove it from the stack by flipping.
         mesh.flip(neartri);
         fixuptri.lprev();    // Restore the origin of fixuptri after the flip.
@@ -879,8 +934,7 @@ public class ConstraintMesher {
      * by the DelaunayFixup() routine above.
      */
     private void constrainedEdge(Otri starttri, Vertex endpoint2, int newmark) {
-        Otri fixuptri = new Otri();
-        Otri fixuptri2 = new Otri();
+        Otri fixuptri = new Otri(), fixuptri2 = new Otri();
         Osub crosssubseg = new Osub();
         Vertex endpoint1;
         Vertex farvertex;
@@ -891,66 +945,70 @@ public class ConstraintMesher {
         endpoint1 = starttri.org();
         starttri.lnext(fixuptri);
         mesh.flip(fixuptri);
-
         // 'collision' indicates whether we have found a vertex directly
         // between endpoint1 and endpoint2.
         collision = false;
         done = false;
-
-        do {
+        do
+        {
             farvertex = fixuptri.org();
-
             // 'farvertex' is the extreme point of the polygon we are "digging"
             //  to get from endpoint1 to endpoint2.
-            if ((farvertex.x == endpoint2.x) && (farvertex.y == endpoint2.y)) {
+            if ((farvertex.x == endpoint2.x) && (farvertex.y == endpoint2.y))
+            {
                 fixuptri.oprev(fixuptri2);
                 // Enforce the Delaunay condition around endpoint2.
                 delaunayFixup(fixuptri, false);
                 delaunayFixup(fixuptri2, true);
                 done = true;
-            } else {
+            }
+            else
+            {
                 // Check whether farvertex is to the left or right of the segment being
                 // inserted, to decide which edge of fixuptri to dig through next.
                 area = predicates.counterClockwise(endpoint1, endpoint2, farvertex);
-
-                if (area == 0.0) {
+                if (area == 0.0)
+                {
                     // We've collided with a vertex between endpoint1 and endpoint2.
                     collision = true;
                     fixuptri.oprev(fixuptri2);
-
                     // Enforce the Delaunay condition around farvertex.
                     delaunayFixup(fixuptri, false);
                     delaunayFixup(fixuptri2, true);
                     done = true;
-                } else {
-                    if (area > 0.0) {
+                }
+                else
+                {
+                    if (area > 0.0)
+                    {
                         // farvertex is to the left of the segment.
                         fixuptri.oprev(fixuptri2);
-
                         // Enforce the Delaunay condition around farvertex, on the
                         // left side of the segment only.
                         delaunayFixup(fixuptri2, true);
-
                         // Flip the edge that crosses the segment. After the edge is
                         // flipped, one of its endpoints is the fan vertex, and the
                         // destination of fixuptri is the fan vertex.
                         fixuptri.lprev();
-                    } else {
+                    }
+                    else
+                    {
                         // farvertex is to the right of the segment.
                         delaunayFixup(fixuptri, false);
-
                         // Flip the edge that crosses the segment. After the edge is
                         // flipped, one of its endpoints is the fan vertex, and the
                         // destination of fixuptri is the fan vertex.
                         fixuptri.oprev();
                     }
-
                     // Check for two intersecting segments.
-                    fixuptri.pivot(crosssubseg);
+                    crosssubseg = fixuptri.pivot();
 
-                    if (crosssubseg.seg.hash == Mesh.DUMMY) {
+                    if (crosssubseg.seg.hash == Mesh.DUMMY)
+                    {
                         mesh.flip(fixuptri);    // May create inverted triangle at left.
-                    } else {
+                    }
+                    else
+                    {
                         // We've collided with a segment between endpoint1 and endpoint2.
                         collision = true;
                         // Insert a vertex at the intersection.
@@ -960,16 +1018,17 @@ public class ConstraintMesher {
                 }
             }
         } while (!done);
-
         // Insert a subsegment to make the segment permanent.
         mesh.insertSubseg(fixuptri, newmark);
-
         // If there was a collision with an interceding vertex, install another
         // segment connecting that vertex with endpoint2.
-        if (collision) {
+        if (collision)
+        {
             // Insert the remainder of the segment.
             if (!scoutSegment(fixuptri, endpoint2, newmark))
+            {
                 constrainedEdge(fixuptri, endpoint2, newmark);
+            }
         }
     }
 
@@ -977,68 +1036,72 @@ public class ConstraintMesher {
      * Insert a PSLG segment into a triangulation.
      */
     private void insertSegment(Vertex endpoint1, Vertex endpoint2, int newmark) {
-        Otri searchtri1 = new Otri();
-        Otri searchtri2 = new Otri();
+        Otri searchtri1 = new Otri(), searchtri2 = new Otri();
         Vertex checkvertex = null;
 
-        var dummytri = mesh.dummytri;
+        Triangle dummytri = mesh.dummytri;
 
         // Find a triangle whose origin is the segment's first endpoint.
-        searchtri1 = endpoint1.tri;
-
+        searchtri1 = endpoint1.tri.shallowCopy();
         if (searchtri1.tri != null)
+        {
             checkvertex = searchtri1.org();
+        }
 
-        if (checkvertex != endpoint1) {
+        if (checkvertex != endpoint1)
+        {
             // Find a boundary triangle to search from.
             searchtri1.tri = dummytri;
             searchtri1.orient = 0;
             searchtri1.sym();
-
             // Search for the segment's first endpoint by point location.
             if (locator.locate(endpoint1, searchtri1) != Enums.LocateResult.OnVertex)
+            {
                 throw new RuntimeException("Unable to locate PSLG vertex in triangulation.");
-
+            }
         }
-
         // Remember this triangle to improve subsequent point location.
         locator.update(searchtri1);
 
         // Scout the beginnings of a path from the first endpoint
         // toward the second.
         if (scoutSegment(searchtri1, endpoint2, newmark))
-            return; // The segment was easily inserted.
-
+        {
+            // The segment was easily inserted.
+            return;
+        }
         // The first endpoint may have changed if a collision with an intervening
         // vertex on the segment occurred.
         endpoint1 = searchtri1.org();
 
         // Find a triangle whose origin is the segment's second endpoint.
         checkvertex = null;
-        searchtri2 = endpoint2.tri;
-
+        searchtri2 = endpoint2.tri.shallowCopy();
         if (searchtri2.tri != null)
+        {
             checkvertex = searchtri2.org();
-
-        if (checkvertex != endpoint2) {
+        }
+        if (checkvertex != endpoint2)
+        {
             // Find a boundary triangle to search from.
             searchtri2.tri = dummytri;
             searchtri2.orient = 0;
             searchtri2.sym();
-
             // Search for the segment's second endpoint by point location.
             if (locator.locate(endpoint2, searchtri2) != Enums.LocateResult.OnVertex)
+            {
                 throw new RuntimeException("Unable to locate PSLG vertex in triangulation.");
+            }
         }
-
         // Remember this triangle to improve subsequent point location.
         locator.update(searchtri2);
-
         // Scout the beginnings of a path from the second endpoint
         // toward the first.
         if (scoutSegment(searchtri2, endpoint1, newmark))
-            return; // The segment was easily inserted.
-
+        {
+            // The segment was easily inserted.
+            return;
+        }
         // The second endpoint may have changed if a collision with an intervening
         // vertex on the segment occurred.
         endpoint2 = searchtri2.org();
@@ -1059,20 +1122,18 @@ public class ConstraintMesher {
         hulltri.tri = mesh.dummytri;
         hulltri.orient = 0;
         hulltri.sym();
-
         // Remember where we started so we know when to stop.
         hulltri.copy(starttri);
-
         // Go once counterclockwise around the convex hull.
-        do {
+        do
+        {
             // Create a subsegment if there isn't already one here.
             mesh.insertSubseg(hulltri, 1);
-
             // To find the next hull edge, go clockwise around the next vertex.
             hulltri.lnext();
             hulltri.oprev(nexttri);
-
-            while (nexttri.tri.id != Mesh.DUMMY) {
+            while (nexttri.tri.id != Mesh.DUMMY)
+            {
                 nexttri.copy(hulltri);
                 hulltri.oprev(nexttri);
             }

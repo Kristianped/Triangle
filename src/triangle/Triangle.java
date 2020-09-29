@@ -122,6 +122,6 @@ public class Triangle implements ITriangle {
 
     @Override
     public String toString() {
-        return String.format("TID {0}", hash);
+        return String.format("{TID %d}", hash);
     }
 }

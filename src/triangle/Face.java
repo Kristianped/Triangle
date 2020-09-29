@@ -1,6 +1,4 @@
-package triangle.dcel;
-
-import triangle.Point;
+package triangle;
 
 public class Face {
 

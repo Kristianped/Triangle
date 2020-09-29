@@ -50,6 +50,11 @@ public class Point implements Comparable<Point> {
         return (x < o.getX() || (x == o.getX() && y < o.getY())) ? -1 : 1;
     }
 
+    @Override
+    public String toString() {
+        return String.format("ID %d [%4.4f, %4.4f]", id, x, y);
+    }
+
     public int getId() {
         return id;
     }

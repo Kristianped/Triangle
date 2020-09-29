@@ -4,34 +4,34 @@ import java.util.function.Function;
 
 public class QualityOptions {
 
-    private int maxAngle;
-    private int minAngle;
-    private int maxArea;
+    private double maxAngle;
+    private double minAngle;
+    private double maxArea;
     private boolean variableArea;
     private int steinerPoints;
     private Function<Tuple<ITriangle, Double>, Boolean> usertest;
 
-    public int getMaxAngle() {
+    public double getMaxAngle() {
         return maxAngle;
     }
 
-    public void setMaxAngle(int angle) {
+    public void setMaxAngle(double angle) {
         maxAngle = angle;
     }
 
-    public int getMinAngle() {
+    public double getMinAngle() {
         return minAngle;
     }
 
-    public void setMinAngle(int angle) {
+    public void setMinAngle(double angle) {
         minAngle = angle;
     }
 
-    public int getMaxArea() {
+    public double getMaxArea() {
         return maxArea;
     }
 
-    public void setMaxArea(int area) {
+    public void setMaxArea(double area) {
         maxArea = area;
     }
 

@@ -32,6 +32,7 @@ public class Vertex extends Point {
     public Vertex(double x, double y, int mark) {
         super(x, y, mark);
         this.type = Enums.VertexType.InputVertex;
+        tri = new Otri();
     }
 
     /**
@@ -50,6 +51,10 @@ public class Vertex extends Point {
 
     public double[] getAttributes() {
         return attributes;
+    }
+
+    public void setAttributes(double[] attributes) {
+        this.attributes = attributes;
     }
 
     public Enums.VertexType getType() {

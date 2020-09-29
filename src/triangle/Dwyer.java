@@ -8,7 +8,7 @@ public class Dwyer implements ITriangulator {
 
     public boolean useDwyer = true;
 
-    Vertex[] sortArray;
+    Vertex[] sortarray;
     Mesh mesh;
 
     /**
@@ -22,51 +22,54 @@ public class Dwyer implements ITriangulator {
      */
     @Override
     public IMesh triangulate(List<Vertex> points, Configuration config) {
-        this.predicates = config.predicates;
+        this.predicates = config.predicates.get();
+
         this.mesh = new Mesh(config);
         this.mesh.transferNodes(points);
 
-        Otri hullLeft = new Otri();
-        Otri hullRight = new Otri();
+        Otri hullleft = new Otri();
+        Otri hullright = new Otri();
+        int i, j, n = points.size();
 
-        int i;
-        int j;
-        int n = points.size();
-
-        // Allocate an array of pointers to vertices for sorting
-        this.sortArray = new Vertex[n];
+        // Allocate an array of pointers to vertices for sorting.
+        this.sortarray = new Vertex[n];
         i = 0;
 
         for (var v : points)
-            sortArray[i++] = v;
-
-        // Sort the vertices
-        VertexSorter.sort(sortArray);
-
-        // Discard duplicate vertices, which can really mess up the algorithm
-        i = 0;
-
-        for (j = 1; j < n; j++) {
-            if ((sortArray[i].x == sortArray[j].x) && (sortArray[i].y == sortArray[j].y)) {
-                sortArray[j].type = Enums.VertexType.UndeadVertex;
-                mesh.undeads++;
-            } else {
-                i++;
-                sortArray[i] = sortArray[j];
-            }
+        {
+            sortarray[i++] = v;
         }
 
-        i++;
+        // Sort the vertices.
+        VertexSorter.sort(sortarray);
 
-        if (useDwyer) {
+        // Discard duplicate vertices, which can really mess up the algorithm.
+        i = 0;
+        for (j = 1; j < n; j++)
+        {
+            if ((sortarray[i].x == sortarray[j].x) && (sortarray[i].y == sortarray[j].y))
+            {
+
+                sortarray[j].type = Enums.VertexType.UndeadVertex;
+                mesh.undeads++;
+            }
+            else
+            {
+                i++;
+                sortarray[i] = sortarray[j];
+            }
+        }
+        i++;
+        if (useDwyer)
+        {
             // Re-sort the array of vertices to accommodate alternating cuts.
-            VertexSorter.alternateSort(sortArray, i);
+            VertexSorter.alternateSort(sortarray, i);
         }
 
         // Form the Delaunay triangulation.
-        divconqRecurse(0, i - 1, 0, hullLeft, hullRight);
+        divconqRecurse(0, i - 1, 0, hullleft, hullright);
 
-        this.mesh.hullsize = removeGhosts(hullLeft);
+        this.mesh.hullsize = removeGhosts(hullleft);
 
         return this.mesh;
     }
@@ -118,67 +121,59 @@ public class Dwyer implements ITriangulator {
         Otri baseedge = new Otri();
         Vertex innerleftdest;
         Vertex innerrightorg;
-        Vertex innerleftapex;
-        Vertex innerrightapex;
-        Vertex farleftpt;
-        Vertex farrightpt;
-        Vertex farleftapex;
-        Vertex farrightapex;
-        Vertex lowerleft;
-        Vertex lowerright;
-        Vertex upperleft;
-        Vertex upperright;
+        Vertex innerleftapex, innerrightapex;
+        Vertex farleftpt, farrightpt;
+        Vertex farleftapex, farrightapex;
+        Vertex lowerleft, lowerright;
+        Vertex upperleft, upperright;
         Vertex nextapex;
         Vertex checkvertex;
         boolean changemade;
         boolean badedge;
-        boolean leftfinished;
-        boolean rightfinished;
+        boolean leftfinished, rightfinished;
 
         innerleftdest = innerleft.dest();
         innerleftapex = innerleft.apex();
         innerrightorg = innerright.org();
         innerrightapex = innerright.apex();
-
-        // Special treatment for horizontal cuts
-        if (useDwyer && (axis == 1)) {
+        // Special treatment for horizontal cuts.
+        if (useDwyer && (axis == 1))
+        {
             farleftpt = farleft.org();
             farleftapex = farleft.apex();
             farrightpt = farright.dest();
             farrightapex = farright.apex();
-
             // The pointers to the extremal vertices are shifted to point to the
             // topmost and bottommost vertex of each hull, rather than the
             // leftmost and rightmost vertices.
-            while (farleftapex.y < farleftpt.y) {
+            while (farleftapex.y < farleftpt.y)
+            {
                 farleft.lnext();
                 farleft.sym();
                 farleftpt = farleftapex;
                 farleftapex = farleft.apex();
             }
-
             innerleft.sym(checkedge);
             checkvertex = checkedge.apex();
-
-            while (checkvertex.y > innerleftdest.y) {
+            while (checkvertex.y > innerleftdest.y)
+            {
                 checkedge.lnext(innerleft);
                 innerleftapex = innerleftdest;
                 innerleftdest = checkvertex;
                 innerleft.sym(checkedge);
                 checkvertex = checkedge.apex();
             }
-
-            while (innerrightapex.y < innerrightorg.y) {
+            while (innerrightapex.y < innerrightorg.y)
+            {
                 innerright.lnext();
                 innerright.sym();
                 innerrightorg = innerrightapex;
                 innerrightapex = innerright.apex();
             }
-
             farright.sym(checkedge);
             checkvertex = checkedge.apex();
-
-            while (checkvertex.y > farrightpt.y) {
+            while (checkvertex.y > farrightpt.y)
+            {
                 checkedge.lnext(farright);
                 farrightapex = farrightpt;
                 farrightpt = checkvertex;
@@ -186,22 +181,22 @@ public class Dwyer implements ITriangulator {
                 checkvertex = checkedge.apex();
             }
         }
-
         // Find a line tangent to and below both hulls.
-        do {
+        do
+        {
             changemade = false;
-
             // Make innerleftdest the "bottommost" vertex of the left hull.
-            if (predicates.counterClockwise(innerleftdest, innerleftapex, innerrightorg) > 0.0) {
+            if (predicates.counterClockwise(innerleftdest, innerleftapex, innerrightorg) > 0.0)
+            {
                 innerleft.lprev();
                 innerleft.sym();
                 innerleftdest = innerleftapex;
                 innerleftapex = innerleft.apex();
                 changemade = true;
             }
-
             // Make innerrightorg the "bottommost" vertex of the right hull.
-            if (predicates.counterClockwise(innerrightapex, innerrightorg, innerleftdest) > 0.0) {
+            if (predicates.counterClockwise(innerrightapex, innerrightorg, innerleftdest) > 0.0)
+            {
                 innerright.lnext();
                 innerright.sym();
                 innerrightorg = innerrightapex;
@@ -215,7 +210,6 @@ public class Dwyer implements ITriangulator {
         innerright.sym(rightcand);
         // Create the bottom new bounding triangle.
         mesh.makeTriangle(baseedge);
-
         // Connect it to the bounding boxes of the left and right triangulations.
         baseedge.bond(innerleft);
         baseedge.lnext();
@@ -227,39 +221,37 @@ public class Dwyer implements ITriangulator {
 
         // Fix the extreme triangles if necessary.
         farleftpt = farleft.org();
-
         if (innerleftdest == farleftpt)
+        {
             baseedge.lnext(farleft);
-
+        }
         farrightpt = farright.dest();
-
         if (innerrightorg == farrightpt)
+        {
             baseedge.lprev(farright);
-
+        }
         // The vertices of the current knitting edge.
         lowerleft = innerleftdest;
         lowerright = innerrightorg;
-
         // The candidate vertices for knitting.
         upperleft = leftcand.apex();
         upperright = rightcand.apex();
-
         // Walk up the gap between the two triangulations, knitting them together.
-        while (true) {
+        while (true)
+        {
             // Have we reached the top? (This isn't quite the right question,
             // because even though the left triangulation might seem finished now,
             // moving up on the right triangulation might reveal a new vertex of
             // the left triangulation. And vice-versa.)
             leftfinished = predicates.counterClockwise(upperleft, lowerleft, lowerright) <= 0.0;
             rightfinished = predicates.counterClockwise(upperright, lowerleft, lowerright) <= 0.0;
-
-            if (leftfinished && rightfinished) {
+            if (leftfinished && rightfinished)
+            {
                 // Create the top new bounding triangle.
                 mesh.makeTriangle(nextedge);
                 nextedge.setOrg(lowerleft);
                 nextedge.setDest(lowerright);
                 // Apex is intentionally left NULL.
-
                 // Connect it to the bounding boxes of the two triangulations.
                 nextedge.bond(baseedge);
                 nextedge.lnext();
@@ -268,26 +260,27 @@ public class Dwyer implements ITriangulator {
                 nextedge.bond(leftcand);
 
                 // Special treatment for horizontal cuts.
-                if (useDwyer && (axis == 1)) {
+                if (useDwyer && (axis == 1))
+                {
                     farleftpt = farleft.org();
                     farleftapex = farleft.apex();
                     farrightpt = farright.dest();
                     farrightapex = farright.apex();
                     farleft.sym(checkedge);
                     checkvertex = checkedge.apex();
-
                     // The pointers to the extremal vertices are restored to the
                     // leftmost and rightmost vertices (rather than topmost and
                     // bottommost).
-                    while (checkvertex.x < farleftpt.x) {
+                    while (checkvertex.x < farleftpt.x)
+                    {
                         checkedge.lprev(farleft);
                         farleftapex = farleftpt;
                         farleftpt = checkvertex;
                         farleft.sym(checkedge);
                         checkvertex = checkedge.apex();
                     }
-
-                    while (farrightapex.x > farrightpt.x) {
+                    while (farrightapex.x > farrightpt.x)
+                    {
                         farright.lprev();
                         farright.sym();
                         farrightpt = farrightapex;
@@ -296,21 +289,21 @@ public class Dwyer implements ITriangulator {
                 }
                 return;
             }
-
             // Consider eliminating edges from the left triangulation.
-            if (!leftfinished) {
+            if (!leftfinished)
+            {
                 // What vertex would be exposed if an edge were deleted?
                 leftcand.lprev(nextedge);
                 nextedge.sym();
                 nextapex = nextedge.apex();
-
                 // If nextapex is NULL, then no vertex would be exposed; the
                 // triangulation would have been eaten right through.
-                if (nextapex != null) {
+                if (nextapex != null)
+                {
                     // Check whether the edge is Delaunay.
                     badedge = predicates.inCircle(lowerleft, lowerright, upperleft, nextapex) > 0.0;
-
-                    while (badedge) {
+                    while (badedge)
+                    {
                         // Eliminate the edge with an edge flip.  As a result, the
                         // left triangulation will have one more boundary triangle.
                         nextedge.lnext();
@@ -323,7 +316,6 @@ public class Dwyer implements ITriangulator {
                         leftcand.sym(outercasing);
                         nextedge.lprev();
                         nextedge.bond(outercasing);
-
                         // Correct the vertices to reflect the edge flip.
                         leftcand.setOrg(lowerleft);
                         leftcand.setDest(null);
@@ -331,39 +323,39 @@ public class Dwyer implements ITriangulator {
                         nextedge.setOrg(null);
                         nextedge.setDest(upperleft);
                         nextedge.setApex(nextapex);
-
                         // Consider the newly exposed vertex.
                         upperleft = nextapex;
-
                         // What vertex would be exposed if another edge were deleted?
                         sidecasing.copy(nextedge);
                         nextapex = nextedge.apex();
-
-                        if (nextapex != null) {
+                        if (nextapex != null)
+                        {
                             // Check whether the edge is Delaunay.
                             badedge = predicates.inCircle(lowerleft, lowerright, upperleft, nextapex) > 0.0;
-                        } else {
+                        }
+                        else
+                        {
                             // Avoid eating right through the triangulation.
                             badedge = false;
                         }
                     }
                 }
             }
-
             // Consider eliminating edges from the right triangulation.
-            if (!rightfinished) {
+            if (!rightfinished)
+            {
                 // What vertex would be exposed if an edge were deleted?
                 rightcand.lnext(nextedge);
                 nextedge.sym();
                 nextapex = nextedge.apex();
-
                 // If nextapex is NULL, then no vertex would be exposed; the
                 // triangulation would have been eaten right through.
-                if (nextapex != null) {
+                if (nextapex != null)
+                {
                     // Check whether the edge is Delaunay.
                     badedge = predicates.inCircle(lowerleft, lowerright, upperright, nextapex) > 0.0;
-
-                    while (badedge) {
+                    while (badedge)
+                    {
                         // Eliminate the edge with an edge flip.  As a result, the
                         // right triangulation will have one more boundary triangle.
                         nextedge.lprev();
@@ -376,7 +368,6 @@ public class Dwyer implements ITriangulator {
                         rightcand.sym(outercasing);
                         nextedge.lnext();
                         nextedge.bond(outercasing);
-
                         // Correct the vertices to reflect the edge flip.
                         rightcand.setOrg(null);
                         rightcand.setDest(lowerright);
@@ -384,25 +375,27 @@ public class Dwyer implements ITriangulator {
                         nextedge.setOrg(upperright);
                         nextedge.setDest(null);
                         nextedge.setApex(nextapex);
-
                         // Consider the newly exposed vertex.
                         upperright = nextapex;
-
                         // What vertex would be exposed if another edge were deleted?
                         sidecasing.copy(nextedge);
                         nextapex = nextedge.apex();
-
-                        if (nextapex != null) {
+                        if (nextapex != null)
+                        {
                             // Check whether the edge is Delaunay.
                             badedge = predicates.inCircle(lowerleft, lowerright, upperright, nextapex) > 0.0;
-                        } else {
+                        }
+                        else
+                        {
                             // Avoid eating right through the triangulation.
                             badedge = false;
                         }
                     }
                 }
             }
-            if (leftfinished || (!rightfinished && (predicates.inCircle(upperleft, lowerleft, lowerright, upperright) > 0.0))) {
+            if (leftfinished || (!rightfinished &&
+                    (predicates.inCircle(upperleft, lowerleft, lowerright, upperright) > 0.0)))
+            {
                 // Knit the triangulations, adding an edge from 'lowerleft'
                 // to 'upperright'.
                 baseedge.bond(rightcand);
@@ -411,7 +404,9 @@ public class Dwyer implements ITriangulator {
                 lowerright = upperright;
                 baseedge.sym(rightcand);
                 upperright = rightcand.apex();
-            } else {
+            }
+            else
+            {
                 // Knit the triangulations, adding an edge from 'upperleft'
                 // to 'lowerright'.
                 baseedge.bond(leftcand);
@@ -448,19 +443,18 @@ public class Dwyer implements ITriangulator {
         int vertices = right - left + 1;
         int divider;
 
-        if (vertices == 2) {
+        if (vertices == 2)
+        {
             // The triangulation of two vertices is an edge.  An edge is
             // represented by two bounding triangles.
             mesh.makeTriangle(farleft);
-            farleft.setOrg(sortArray[left]);
-            farleft.setDest(sortArray[left + 1]);
+            farleft.setOrg(sortarray[left]);
+            farleft.setDest(sortarray[left + 1]);
             // The apex is intentionally left NULL.
-
             mesh.makeTriangle(farright);
-            farright.setOrg(sortArray[left + 1]);
-            farright.setDest(sortArray[left]);
+            farright.setOrg(sortarray[left + 1]);
+            farright.setDest(sortarray[left]);
             // The apex is intentionally left NULL.
-
             farleft.bond(farright);
             farleft.lprev();
             farright.lnext();
@@ -472,7 +466,9 @@ public class Dwyer implements ITriangulator {
             // Ensure that the origin of 'farleft' is sortarray[0].
             farright.lprev(farleft);
             return;
-        } else if (vertices == 3) {
+        }
+        else if (vertices == 3)
+        {
             // The triangulation of three vertices is either a triangle (with
             // three bounding triangles) or two edges (with four bounding
             // triangles).  In either case, four triangles are created.
@@ -480,20 +476,19 @@ public class Dwyer implements ITriangulator {
             mesh.makeTriangle(tri1);
             mesh.makeTriangle(tri2);
             mesh.makeTriangle(tri3);
-            area = predicates.counterClockwise(sortArray[left], sortArray[left + 1], sortArray[left + 2]);
-
-            if (area == 0.0) {
+            area = predicates.counterClockwise(sortarray[left], sortarray[left + 1], sortarray[left + 2]);
+            if (area == 0.0)
+            {
                 // Three collinear vertices; the triangulation is two edges.
-                midtri.setOrg(sortArray[left]);
-                midtri.setDest(sortArray[left + 1]);
-                tri1.setOrg(sortArray[left + 1]);
-                tri1.setDest(sortArray[left]);
-                tri2.setOrg(sortArray[left + 2]);
-                tri2.setDest(sortArray[left + 1]);
-                tri3.setOrg(sortArray[left + 1]);
-                tri3.setDest(sortArray[left + 2]);
+                midtri.setOrg(sortarray[left]);
+                midtri.setDest(sortarray[left + 1]);
+                tri1.setOrg(sortarray[left + 1]);
+                tri1.setDest(sortarray[left]);
+                tri2.setOrg(sortarray[left + 2]);
+                tri2.setDest(sortarray[left + 1]);
+                tri3.setOrg(sortarray[left + 1]);
+                tri3.setDest(sortarray[left + 2]);
                 // All apices are intentionally left NULL.
-
                 midtri.bond(tri1);
                 tri2.bond(tri3);
                 midtri.lnext();
@@ -508,38 +503,39 @@ public class Dwyer implements ITriangulator {
                 tri3.lprev();
                 midtri.bond(tri1);
                 tri2.bond(tri3);
-
                 // Ensure that the origin of 'farleft' is sortarray[0].
                 tri1.copy(farleft);
-
                 // Ensure that the destination of 'farright' is sortarray[2].
                 tri2.copy(farright);
-            } else {
+            }
+            else
+            {
                 // The three vertices are not collinear; the triangulation is one
                 // triangle, namely 'midtri'.
-                midtri.setOrg(sortArray[left]);
-                tri1.setDest(sortArray[left]);
-                tri3.setOrg(sortArray[left]);
-
+                midtri.setOrg(sortarray[left]);
+                tri1.setDest(sortarray[left]);
+                tri3.setOrg(sortarray[left]);
                 // Apices of tri1, tri2, and tri3 are left NULL.
-                if (area > 0.0) {
+                if (area > 0.0)
+                {
                     // The vertices are in counterclockwise order.
-                    midtri.setDest(sortArray[left + 1]);
-                    tri1.setOrg(sortArray[left + 1]);
-                    tri2.setDest(sortArray[left + 1]);
-                    midtri.setApex(sortArray[left + 2]);
-                    tri2.setOrg(sortArray[left + 2]);
-                    tri3.setDest(sortArray[left + 2]);
-                } else {
-                    // The vertices are in clockwise order.
-                    midtri.setDest(sortArray[left + 2]);
-                    tri1.setOrg(sortArray[left + 2]);
-                    tri2.setDest(sortArray[left + 2]);
-                    midtri.setApex(sortArray[left + 1]);
-                    tri2.setOrg(sortArray[left + 1]);
-                    tri3.setDest(sortArray[left + 1]);
+                    midtri.setDest(sortarray[left + 1]);
+                    tri1.setOrg(sortarray[left + 1]);
+                    tri2.setDest(sortarray[left + 1]);
+                    midtri.setApex(sortarray[left + 2]);
+                    tri2.setOrg(sortarray[left + 2]);
+                    tri3.setDest(sortarray[left + 2]);
                 }
-
+                else
+                {
+                    // The vertices are in clockwise order.
+                    midtri.setDest(sortarray[left + 2]);
+                    tri1.setOrg(sortarray[left + 2]);
+                    tri2.setDest(sortarray[left + 2]);
+                    midtri.setApex(sortarray[left + 1]);
+                    tri2.setOrg(sortarray[left + 1]);
+                    tri3.setDest(sortarray[left + 1]);
+                }
                 // The topology does not depend on how the vertices are ordered.
                 midtri.bond(tri1);
                 midtri.lnext();
@@ -555,19 +551,23 @@ public class Dwyer implements ITriangulator {
                 tri2.lnext();
                 tri3.lprev();
                 tri2.bond(tri3);
-
                 // Ensure that the origin of 'farleft' is sortarray[0].
                 tri1.copy(farleft);
-
                 // Ensure that the destination of 'farright' is sortarray[2].
                 if (area > 0.0)
+                {
                     tri2.copy(farright);
+                }
                 else
+                {
                     farleft.lnext(farright);
+                }
             }
 
             return;
-        } else {
+        }
+        else
+        {
             // Split the vertices in half.
             divider = vertices >> 1;
 

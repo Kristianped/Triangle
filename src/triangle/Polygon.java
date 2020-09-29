@@ -3,6 +3,9 @@ package triangle;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A polygon represented as a planar straight line graph.
+ */
 public class Polygon implements IPolygon {
 
     List<Vertex> points;

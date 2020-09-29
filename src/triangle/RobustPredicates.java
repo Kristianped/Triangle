@@ -25,7 +25,12 @@ public class RobustPredicates implements IPredicates {
         return defaultValue;
     }
 
-    static {
+    public RobustPredicates() {
+        init();
+        allocateWorkspace();
+    }
+
+    private void init() {
         double half;
         double check, lastcheck;
         boolean every_other;
@@ -59,10 +64,9 @@ public class RobustPredicates implements IPredicates {
         iccerrboundA = (10.0 + 96.0 * epsilon) * epsilon;
         iccerrboundB = (4.0 + 48.0 * epsilon) * epsilon;
         iccerrboundC = (44.0 + 576.0 * epsilon) * epsilon * epsilon;
-    }
-
-    public RobustPredicates() {
-        allocateWorkspace();
+        //o3derrboundA = (7.0 + 56.0 * epsilon) * epsilon;
+        //o3derrboundB = (3.0 + 28.0 * epsilon) * epsilon;
+        //o3derrboundC = (26.0 + 288.0 * epsilon) * epsilon * epsilon;
     }
 
     /**
@@ -88,29 +92,44 @@ public class RobustPredicates implements IPredicates {
         det = detleft - detright;
 
         if (Behavior.NoExact)
+        {
             return det;
+        }
 
-        if (detleft > 0.0) {
+        if (detleft > 0.0)
+        {
             if (detright <= 0.0)
+            {
                 return det;
+            }
             else
+            {
                 detsum = detleft + detright;
-        } else if (detleft < 0.0) {
+            }
+        }
+        else if (detleft < 0.0)
+        {
             if (detright >= 0.0)
+            {
                 return det;
+            }
             else
+            {
                 detsum = -detleft - detright;
-        } else {
+            }
+        }
+        else
+        {
             return det;
         }
 
         errbound = ccwerrboundA * detsum;
-
-        if (det <= errbound || -det >= errbound)
+        if ((det >= errbound) || (-det >= errbound))
+        {
             return det;
+        }
 
         Statistic.CounterClockwiseAdaptCount++;
-
         return counterClockwiseAdapt(pa, pb, pc, detsum);
     }
 
@@ -128,24 +147,11 @@ public class RobustPredicates implements IPredicates {
      */
     @Override
     public double inCircle(Point pa, Point pb, Point pc, Point pd) {
-        double adx;
-        double bdx;
-        double cdx;
-        double ady;
-        double bdy;
-        double cdy;
-        double bdxcdy;
-        double cdxbdy;
-        double cdxady;
-        double adxcdy;
-        double adxbdy;
-        double bdxady;
-        double alift;
-        double blift;
-        double clift;
+        double adx, bdx, cdx, ady, bdy, cdy;
+        double bdxcdy, cdxbdy, cdxady, adxcdy, adxbdy, bdxady;
+        double alift, blift, clift;
         double det;
-        double permanent;
-        double errbound;
+        double permanent, errbound;
 
         Statistic.InCircleCount++;
 
@@ -173,18 +179,20 @@ public class RobustPredicates implements IPredicates {
                 + clift * (adxbdy - bdxady);
 
         if (Behavior.NoExact)
+        {
             return det;
+        }
 
         permanent = (Math.abs(bdxcdy) + Math.abs(cdxbdy)) * alift
                 + (Math.abs(cdxady) + Math.abs(adxcdy)) * blift
                 + (Math.abs(adxbdy) + Math.abs(bdxady)) * clift;
         errbound = iccerrboundA * permanent;
-
-        if (det > errbound || -det > errbound)
+        if ((det > errbound) || (-det > errbound))
+        {
             return det;
+        }
 
         Statistic.InCircleAdaptCount++;
-
         return inCircleAdapt(pa, pb, pc, pd, permanent);
     }
 
@@ -207,15 +215,10 @@ public class RobustPredicates implements IPredicates {
      */
     @Override
     public Point findCircumcenter(Point org, Point dest, Point apex, MutableDouble xi, MutableDouble eta) {
-        double xdo;
-        double ydo;
-        double xao;
-        double yao;
-        double dodist;
-        double aodist;
+        double xdo, ydo, xao, yao;
+        double dodist, aodist;
         double denominator;
-        double dx;
-        double dy;
+        double dx, dy;
 
         Statistic.CircumcenterCount++;
 
@@ -227,9 +230,12 @@ public class RobustPredicates implements IPredicates {
         dodist = xdo * xdo + ydo * ydo;
         aodist = xao * xao + yao * yao;
 
-        if (Behavior.NoExact) {
+        if (Behavior.NoExact)
+        {
             denominator = 0.5 / (xdo * yao - xao * ydo);
-        } else {
+        }
+        else
+        {
             // Use the counterclockwise() routine to ensure a positive (and
             // reasonably accurate) result, avoiding any possibility of
             // division by zero.
@@ -264,18 +270,10 @@ public class RobustPredicates implements IPredicates {
      */
     @Override
     public Point findCircumcenter(Point org, Point dest, Point apex, MutableDouble xi, MutableDouble eta, double offconstant) {
-        double xdo;
-        double ydo;
-        double xao;
-        double yao;
-        double dodist;
-        double aodist;
-        double dadist;
+        double xdo, ydo, xao, yao;
+        double dodist, aodist, dadist;
         double denominator;
-        double dx;
-        double dy;
-        double dxoff;
-        double dyoff;
+        double dx, dy, dxoff, dyoff;
 
         Statistic.CircumcenterCount++;
 
@@ -289,9 +287,12 @@ public class RobustPredicates implements IPredicates {
         dadist = (dest.x - apex.x) * (dest.x - apex.x) +
                 (dest.y - apex.y) * (dest.y - apex.y);
 
-        if (Behavior.NoExact) {
+        if (Behavior.NoExact)
+        {
             denominator = 0.5 / (xdo * yao - xao * ydo);
-        } else {
+        }
+        else
+        {
             // Use the counterclockwise() routine to ensure a positive (and
             // reasonably accurate) result, avoiding any possibility of
             // division by zero.
@@ -308,37 +309,48 @@ public class RobustPredicates implements IPredicates {
         // circumcenter's parent. The estimate is used to ensure that
         // the algorithm terminates even if very small angles appear in
         // the input PSLG.
-        if (dodist < aodist && dodist < dadist) {
-            if (offconstant > 0.0) {
+        if ((dodist < aodist) && (dodist < dadist))
+        {
+            if (offconstant > 0.0)
+            {
                 // Find the position of the off-center, as described by Alper Ungor.
                 dxoff = 0.5 * xdo - offconstant * ydo;
                 dyoff = 0.5 * ydo + offconstant * xdo;
                 // If the off-center is closer to the origin than the
                 // circumcenter, use the off-center instead.
-                if (dxoff * dxoff + dyoff * dyoff < dx * dx + dy * dy) {
+                if (dxoff * dxoff + dyoff * dyoff < dx * dx + dy * dy)
+                {
                     dx = dxoff;
                     dy = dyoff;
                 }
             }
-        } else if (aodist < dadist) {
-            if (offconstant > 0.0) {
+        }
+        else if (aodist < dadist)
+        {
+            if (offconstant > 0.0)
+            {
                 dxoff = 0.5 * xao + offconstant * yao;
                 dyoff = 0.5 * yao - offconstant * xao;
                 // If the off-center is closer to the origin than the
                 // circumcenter, use the off-center instead.
-                if (dxoff * dxoff + dyoff * dyoff < dx * dx + dy * dy) {
+                if (dxoff * dxoff + dyoff * dyoff < dx * dx + dy * dy)
+                {
                     dx = dxoff;
                     dy = dyoff;
                 }
             }
-        } else {
-            if (offconstant > 0.0) {
+        }
+        else
+        {
+            if (offconstant > 0.0)
+            {
                 dxoff = 0.5 * (apex.x - dest.x) - offconstant * (apex.y - dest.y);
                 dyoff = 0.5 * (apex.y - dest.y) + offconstant * (apex.x - dest.x);
                 // If the off-center is closer to the destination than the
                 // circumcenter, use the off-center instead.
                 if (dxoff * dxoff + dyoff * dyoff <
-                        (dx - xdo) * (dx - xdo) + (dy - ydo) * (dy - ydo)) {
+                        (dx - xdo) * (dx - xdo) + (dy - ydo) * (dy - ydo))
+                {
                     dx = xdo + dxoff;
                     dy = ydo + dyoff;
                 }
@@ -400,79 +412,45 @@ public class RobustPredicates implements IPredicates {
      * if e has one of these properties, so will h.)
      */
     private int scaleExpansionZeroElim(int elen, double[] e, double b, double[] h) {
-        double q;
-        double sum;
+        double Q, sum;
         double hh;
         double product1;
         double product0;
-        int eindex;
-        int hindex;
+        int eindex, hindex;
         double enow;
         double bvirt;
-        double avirt;
-        double bround;
-        double around;
+        double avirt, bround, around;
         double c;
         double abig;
-        double ahi;
-        double alo;
-        double bhi;
-        double blo;
-        double err1;
-        double err2;
-        double err3;
+        double ahi, alo, bhi, blo;
+        double err1, err2, err3;
 
-        c = (splitter * b);
-        abig = (c - b);
-        bhi = c - abig;
-        blo = b - bhi;
-        q = (e[0] * b);
-        c = (splitter * e[0]);
-        abig = (c - e[0]);
-        ahi = c - abig;
-        alo = e[0] - ahi;
-        err1 = q - (ahi * bhi);
-        err2 = err1 - (alo * bhi);
-        err3 = err2 - (ahi * blo);
-        hh = (alo * blo) - err3;
+        c = (double)(splitter * b); abig = (double)(c - b); bhi = c - abig; blo = b - bhi;
+        Q = (double)(e[0] * b); c = (double)(splitter * e[0]); abig = (double)(c - e[0]); ahi = c - abig; alo = e[0] - ahi; err1 = Q - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); hh = (alo * blo) - err3;
         hindex = 0;
-
         if (hh != 0)
+        {
             h[hindex++] = hh;
-
+        }
         for (eindex = 1; eindex < elen; eindex++)
         {
             enow = e[eindex];
-            product1 = (enow * b);
-            c = (splitter * enow);
-            abig = (c - enow);
-            ahi = c - abig;
-            alo = enow - ahi;
-            err1 = product1 - (ahi * bhi);
-            err2 = err1 - (alo * bhi);
-            err3 = err2 - (ahi * blo);
-            product0 = (alo * blo) - err3;
-            sum = (q + product0);
-            bvirt = (sum - q);
-            avirt = sum - bvirt;
-            bround = product0 - bvirt;
-            around = q - avirt;
-            hh = around + bround;
-
+            product1 = (double)(enow * b); c = (double)(splitter * enow); abig = (double)(c - enow); ahi = c - abig; alo = enow - ahi; err1 = product1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); product0 = (alo * blo) - err3;
+            sum = (double)(Q + product0); bvirt = (double)(sum - Q); avirt = sum - bvirt; bround = product0 - bvirt; around = Q - avirt; hh = around + bround;
             if (hh != 0)
+            {
                 h[hindex++] = hh;
-
-            q = (product1 + sum);
-            bvirt = q - product1;
-            hh = sum - bvirt;
-
+            }
+            Q = (double)(product1 + sum); bvirt = Q - product1; hh = sum - bvirt;
             if (hh != 0)
+            {
                 h[hindex++] = hh;
+            }
         }
-
-        if ((q != 0.0) || (hindex == 0))
-            h[hindex++] = q;
-
+        if ((Q != 0.0) || (hindex == 0))
+        {
+            h[hindex++] = Q;
+        }
         return hindex;
     }
 
@@ -484,107 +462,112 @@ public class RobustPredicates implements IPredicates {
      * maintain the nonoverlapping or nonadjacent properties.
      */
     private int fastExpansionSumZeroElim(int elen, double[] e, int flen, double[] f, double[] h) {
-        double q;
-        double qnew;
+        double Q;
+        double Qnew;
         double hh;
         double bvirt;
-        double avirt;
-        double bround;
-        double around;
+        double avirt, bround, around;
         int eindex, findex, hindex;
         double enow, fnow;
 
         enow = e[0];
         fnow = f[0];
         eindex = findex = 0;
-
-        if ((fnow > enow) == (fnow > -enow)) {
-            q = enow;
+        if ((fnow > enow) == (fnow > -enow))
+        {
+            Q = enow;
             enow = e[++eindex];
-        } else {
-            q = fnow;
+        }
+        else
+        {
+            Q = fnow;
             fnow = f[++findex];
         }
-
         hindex = 0;
-
-        if ((eindex < elen) && (findex < flen)) {
-            if ((fnow > enow) == (fnow > -enow)) {
-                qnew = (double)(enow + q); bvirt = qnew - enow; hh = q - bvirt;
+        if ((eindex < elen) && (findex < flen))
+        {
+            if ((fnow > enow) == (fnow > -enow))
+            {
+                Qnew = (double)(enow + Q); bvirt = Qnew - enow; hh = Q - bvirt;
                 enow = e[++eindex];
-            } else {
-                qnew = (double)(fnow + q); bvirt = qnew - fnow; hh = q - bvirt;
+            }
+            else
+            {
+                Qnew = (double)(fnow + Q); bvirt = Qnew - fnow; hh = Q - bvirt;
                 fnow = f[++findex];
             }
-
-            q = qnew;
-
+            Q = Qnew;
             if (hh != 0.0)
+            {
                 h[hindex++] = hh;
-
-            while ((eindex < elen) && (findex < flen)) {
-                if ((fnow > enow) == (fnow > -enow)) {
-                    qnew = (double)(q + enow);
-                    bvirt = (double)(qnew - q);
-                    avirt = qnew - bvirt;
+            }
+            while ((eindex < elen) && (findex < flen))
+            {
+                if ((fnow > enow) == (fnow > -enow))
+                {
+                    Qnew = (double)(Q + enow);
+                    bvirt = (double)(Qnew - Q);
+                    avirt = Qnew - bvirt;
                     bround = enow - bvirt;
-                    around = q - avirt;
+                    around = Q - avirt;
                     hh = around + bround;
 
                     enow = e[++eindex];
-                } else {
-                    qnew = (double)(q + fnow);
-                    bvirt = (double)(qnew - q);
-                    avirt = qnew - bvirt;
+                }
+                else
+                {
+                    Qnew = (double)(Q + fnow);
+                    bvirt = (double)(Qnew - Q);
+                    avirt = Qnew - bvirt;
                     bround = fnow - bvirt;
-                    around = q - avirt;
+                    around = Q - avirt;
                     hh = around + bround;
 
                     fnow = f[++findex];
                 }
-
-                q = qnew;
-
+                Q = Qnew;
                 if (hh != 0.0)
+                {
                     h[hindex++] = hh;
-
+                }
             }
         }
-
-        while (eindex < elen) {
-            qnew = (double)(q + enow);
-            bvirt = (double)(qnew - q);
-            avirt = qnew - bvirt;
+        while (eindex < elen)
+        {
+            Qnew = (double)(Q + enow);
+            bvirt = (double)(Qnew - Q);
+            avirt = Qnew - bvirt;
             bround = enow - bvirt;
-            around = q - avirt;
+            around = Q - avirt;
             hh = around + bround;
 
             enow = e[++eindex];
-            q = qnew;
-
+            Q = Qnew;
             if (hh != 0.0)
+            {
                 h[hindex++] = hh;
+            }
         }
-
-        while (findex < flen) {
-            qnew = (double)(q + fnow);
-            bvirt = (double)(qnew - q);
-            avirt = qnew - bvirt;
+        while (findex < flen)
+        {
+            Qnew = (double)(Q + fnow);
+            bvirt = (double)(Qnew - Q);
+            avirt = Qnew - bvirt;
             bround = fnow - bvirt;
-            around = q - avirt;
+            around = Q - avirt;
             hh = around + bround;
 
             fnow = f[++findex];
-            q = qnew;
-
+            Q = Qnew;
             if (hh != 0.0)
+            {
                 h[hindex++] = hh;
-
+            }
         }
-
-        if ((q != 0.0) || (hindex == 0))
-            h[hindex++] = q;
-
+        if ((Q != 0.0) || (hindex == 0))
+        {
+            h[hindex++] = Q;
+        }
         return hindex;
     }
 
@@ -640,10 +623,10 @@ public class RobustPredicates implements IPredicates {
 
         det = estimate(4, B);
         errbound = ccwerrboundB * detsum;
-
         if ((det >= errbound) || (-det >= errbound))
+        {
             return det;
-
+        }
 
         bvirt = (double)(pa.x - acx); avirt = acx + bvirt; bround = bvirt - pc.x; around = pa.x - avirt; acxtail = around + bround;
         bvirt = (double)(pb.x - bcx); avirt = bcx + bvirt; bround = bvirt - pc.x; around = pb.x - avirt; bcxtail = around + bround;
@@ -652,16 +635,17 @@ public class RobustPredicates implements IPredicates {
 
         if ((acxtail == 0.0) && (acytail == 0.0)
                 && (bcxtail == 0.0) && (bcytail == 0.0))
+        {
             return det;
-
+        }
 
         errbound = ccwerrboundC * detsum + resulterrbound * ((det) >= 0.0 ? (det) : -(det));
         det += (acx * bcytail + bcy * acxtail)
                 - (acy * bcxtail + bcx * acytail);
-
         if ((det >= errbound) || (-det >= errbound))
+        {
             return det;
-
+        }
 
         s1 = (double)(acxtail * bcy); c = (double)(splitter * acxtail); abig = (double)(c - acxtail); ahi = c - abig; alo = acxtail - ahi; c = (double)(splitter * bcy); abig = (double)(c - bcy); bhi = c - abig; blo = bcy - bhi; err1 = s1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); s0 = (alo * blo) - err3;
         t1 = (double)(acytail * bcx); c = (double)(splitter * acytail); abig = (double)(c - acytail); ahi = c - abig; alo = acytail - ahi; c = (double)(splitter * bcx); abig = (double)(c - bcx); bhi = c - abig; blo = bcx - bhi; err1 = t1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); t0 = (alo * blo) - err3;
@@ -783,9 +767,10 @@ public class RobustPredicates implements IPredicates {
 
         det = estimate(finlength, fin1);
         errbound = iccerrboundB * permanent;
-
         if ((det >= errbound) || (-det >= errbound))
+        {
             return det;
+        }
 
         bvirt = (double)(pa.x - adx); avirt = adx + bvirt; bround = bvirt - pd.x; around = pa.x - avirt; adxtail = around + bround;
         bvirt = (double)(pa.y - ady); avirt = ady + bvirt; bround = bvirt - pd.y; around = pa.y - avirt; adytail = around + bround;
@@ -793,11 +778,11 @@ public class RobustPredicates implements IPredicates {
         bvirt = (double)(pb.y - bdy); avirt = bdy + bvirt; bround = bvirt - pd.y; around = pb.y - avirt; bdytail = around + bround;
         bvirt = (double)(pc.x - cdx); avirt = cdx + bvirt; bround = bvirt - pd.x; around = pc.x - avirt; cdxtail = around + bround;
         bvirt = (double)(pc.y - cdy); avirt = cdy + bvirt; bround = bvirt - pd.y; around = pc.y - avirt; cdytail = around + bround;
-
         if ((adxtail == 0.0) && (bdxtail == 0.0) && (cdxtail == 0.0)
                 && (adytail == 0.0) && (bdytail == 0.0) && (cdytail == 0.0))
+        {
             return det;
-
+        }
 
         errbound = iccerrboundC * permanent + resulterrbound * ((det) >= 0.0 ? (det) : -(det));
         det += ((adx * adx + ady * ady) * ((bdx * cdytail + cdy * bdxtail) - (bdy * cdxtail + cdx * bdytail))
@@ -806,36 +791,38 @@ public class RobustPredicates implements IPredicates {
                 + 2.0 * (bdx * bdxtail + bdy * bdytail) * (cdx * ady - cdy * adx))
                 + ((cdx * cdx + cdy * cdy) * ((adx * bdytail + bdy * adxtail) - (ady * bdxtail + bdx * adytail))
                 + 2.0 * (cdx * cdxtail + cdy * cdytail) * (adx * bdy - ady * bdx));
-
         if ((det >= errbound) || (-det >= errbound))
+        {
             return det;
-
+        }
 
         finnow = fin1;
         finother = fin2;
 
-        if ((bdxtail != 0.0) || (bdytail != 0.0) || (cdxtail != 0.0) || (cdytail != 0.0)) {
+        if ((bdxtail != 0.0) || (bdytail != 0.0) || (cdxtail != 0.0) || (cdytail != 0.0))
+        {
             adxadx1 = (double)(adx * adx); c = (double)(splitter * adx); abig = (double)(c - adx); ahi = c - abig; alo = adx - ahi; err1 = adxadx1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); adxadx0 = (alo * alo) - err3;
             adyady1 = (double)(ady * ady); c = (double)(splitter * ady); abig = (double)(c - ady); ahi = c - abig; alo = ady - ahi; err1 = adyady1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); adyady0 = (alo * alo) - err3;
             _i = (double)(adxadx0 + adyady0); bvirt = (double)(_i - adxadx0); avirt = _i - bvirt; bround = adyady0 - bvirt; around = adxadx0 - avirt; aa[0] = around + bround; _j = (double)(adxadx1 + _i); bvirt = (double)(_j - adxadx1); avirt = _j - bvirt; bround = _i - bvirt; around = adxadx1 - avirt; _0 = around + bround; _i = (double)(_0 + adyady1); bvirt = (double)(_i - _0); avirt = _i - bvirt; bround = adyady1 - bvirt; around = _0 - avirt; aa[1] = around + bround; aa3 = (double)(_j + _i); bvirt = (double)(aa3 - _j); avirt = aa3 - bvirt; bround = _i - bvirt; around = _j - avirt; aa[2] = around + bround;
             aa[3] = aa3;
         }
-
-        if ((cdxtail != 0.0) || (cdytail != 0.0) || (adxtail != 0.0) || (adytail != 0.0)) {
+        if ((cdxtail != 0.0) || (cdytail != 0.0) || (adxtail != 0.0) || (adytail != 0.0))
+        {
             bdxbdx1 = (double)(bdx * bdx); c = (double)(splitter * bdx); abig = (double)(c - bdx); ahi = c - abig; alo = bdx - ahi; err1 = bdxbdx1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); bdxbdx0 = (alo * alo) - err3;
             bdybdy1 = (double)(bdy * bdy); c = (double)(splitter * bdy); abig = (double)(c - bdy); ahi = c - abig; alo = bdy - ahi; err1 = bdybdy1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); bdybdy0 = (alo * alo) - err3;
             _i = (double)(bdxbdx0 + bdybdy0); bvirt = (double)(_i - bdxbdx0); avirt = _i - bvirt; bround = bdybdy0 - bvirt; around = bdxbdx0 - avirt; bb[0] = around + bround; _j = (double)(bdxbdx1 + _i); bvirt = (double)(_j - bdxbdx1); avirt = _j - bvirt; bround = _i - bvirt; around = bdxbdx1 - avirt; _0 = around + bround; _i = (double)(_0 + bdybdy1); bvirt = (double)(_i - _0); avirt = _i - bvirt; bround = bdybdy1 - bvirt; around = _0 - avirt; bb[1] = around + bround; bb3 = (double)(_j + _i); bvirt = (double)(bb3 - _j); avirt = bb3 - bvirt; bround = _i - bvirt; around = _j - avirt; bb[2] = around + bround;
             bb[3] = bb3;
         }
-
-        if ((adxtail != 0.0) || (adytail != 0.0) || (bdxtail != 0.0) || (bdytail != 0.0)) {
+        if ((adxtail != 0.0) || (adytail != 0.0) || (bdxtail != 0.0) || (bdytail != 0.0))
+        {
             cdxcdx1 = (double)(cdx * cdx); c = (double)(splitter * cdx); abig = (double)(c - cdx); ahi = c - abig; alo = cdx - ahi; err1 = cdxcdx1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); cdxcdx0 = (alo * alo) - err3;
             cdycdy1 = (double)(cdy * cdy); c = (double)(splitter * cdy); abig = (double)(c - cdy); ahi = c - abig; alo = cdy - ahi; err1 = cdycdy1 - (ahi * ahi); err3 = err1 - ((ahi + ahi) * alo); cdycdy0 = (alo * alo) - err3;
             _i = (double)(cdxcdx0 + cdycdy0); bvirt = (double)(_i - cdxcdx0); avirt = _i - bvirt; bround = cdycdy0 - bvirt; around = cdxcdx0 - avirt; cc[0] = around + bround; _j = (double)(cdxcdx1 + _i); bvirt = (double)(_j - cdxcdx1); avirt = _j - bvirt; bround = _i - bvirt; around = cdxcdx1 - avirt; _0 = around + bround; _i = (double)(_0 + cdycdy1); bvirt = (double)(_i - _0); avirt = _i - bvirt; bround = cdycdy1 - bvirt; around = _0 - avirt; cc[1] = around + bround; cc3 = (double)(_j + _i); bvirt = (double)(cc3 - _j); avirt = cc3 - bvirt; bround = _i - bvirt; around = _j - avirt; cc[2] = around + bround;
             cc[3] = cc3;
         }
 
-        if (adxtail != 0.0) {
+        if (adxtail != 0.0)
+        {
             axtbclen = scaleExpansionZeroElim(4, bc, adxtail, axtbc);
             temp16alen = scaleExpansionZeroElim(axtbclen, axtbc, 2.0 * adx, temp16a);
 
@@ -850,8 +837,8 @@ public class RobustPredicates implements IPredicates {
             finlength = fastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
             finswap = finnow; finnow = finother; finother = finswap;
         }
-
-        if (adytail != 0.0) {
+        if (adytail != 0.0)
+        {
             aytbclen = scaleExpansionZeroElim(4, bc, adytail, aytbc);
             temp16alen = scaleExpansionZeroElim(aytbclen, aytbc, 2.0 * ady, temp16a);
 
@@ -866,8 +853,8 @@ public class RobustPredicates implements IPredicates {
             finlength = fastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
             finswap = finnow; finnow = finother; finother = finswap;
         }
-
-        if (bdxtail != 0.0) {
+        if (bdxtail != 0.0)
+        {
             bxtcalen = scaleExpansionZeroElim(4, ca, bdxtail, bxtca);
             temp16alen = scaleExpansionZeroElim(bxtcalen, bxtca, 2.0 * bdx, temp16a);
 
@@ -882,8 +869,8 @@ public class RobustPredicates implements IPredicates {
             finlength = fastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
             finswap = finnow; finnow = finother; finother = finswap;
         }
-
-        if (bdytail != 0.0) {
+        if (bdytail != 0.0)
+        {
             bytcalen = scaleExpansionZeroElim(4, ca, bdytail, bytca);
             temp16alen = scaleExpansionZeroElim(bytcalen, bytca, 2.0 * bdy, temp16a);
 
@@ -898,8 +885,8 @@ public class RobustPredicates implements IPredicates {
             finlength = fastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
             finswap = finnow; finnow = finother; finother = finswap;
         }
-
-        if (cdxtail != 0.0) {
+        if (cdxtail != 0.0)
+        {
             cxtablen = scaleExpansionZeroElim(4, ab, cdxtail, cxtab);
             temp16alen = scaleExpansionZeroElim(cxtablen, cxtab, 2.0 * cdx, temp16a);
 
@@ -914,8 +901,8 @@ public class RobustPredicates implements IPredicates {
             finlength = fastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
             finswap = finnow; finnow = finother; finother = finswap;
         }
-
-        if (cdytail != 0.0) {
+        if (cdytail != 0.0)
+        {
             cytablen = scaleExpansionZeroElim(4, ab, cdytail, cytab);
             temp16alen = scaleExpansionZeroElim(cytablen, cytab, 2.0 * cdy, temp16a);
 
@@ -931,9 +918,11 @@ public class RobustPredicates implements IPredicates {
             finswap = finnow; finnow = finother; finother = finswap;
         }
 
-        if ((adxtail != 0.0) || (adytail != 0.0)) {
+        if ((adxtail != 0.0) || (adytail != 0.0))
+        {
             if ((bdxtail != 0.0) || (bdytail != 0.0)
-                    || (cdxtail != 0.0) || (cdytail != 0.0)) {
+                    || (cdxtail != 0.0) || (cdytail != 0.0))
+            {
                 ti1 = (double)(bdxtail * cdy); c = (double)(splitter * bdxtail); abig = (double)(c - bdxtail); ahi = c - abig; alo = bdxtail - ahi; c = (double)(splitter * cdy); abig = (double)(c - cdy); bhi = c - abig; blo = cdy - bhi; err1 = ti1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); ti0 = (alo * blo) - err3;
                 tj1 = (double)(bdx * cdytail); c = (double)(splitter * bdx); abig = (double)(c - bdx); ahi = c - abig; alo = bdx - ahi; c = (double)(splitter * cdytail); abig = (double)(c - cdytail); bhi = c - abig; blo = cdytail - bhi; err1 = tj1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); tj0 = (alo * blo) - err3;
                 _i = (double)(ti0 + tj0); bvirt = (double)(_i - ti0); avirt = _i - bvirt; bround = tj0 - bvirt; around = ti0 - avirt; u[0] = around + bround; _j = (double)(ti1 + _i); bvirt = (double)(_j - ti1); avirt = _j - bvirt; bround = _i - bvirt; around = ti1 - avirt; _0 = around + bround; _i = (double)(_0 + tj1); bvirt = (double)(_i - _0); avirt = _i - bvirt; bround = tj1 - bvirt; around = _0 - avirt; u[1] = around + bround; u3 = (double)(_j + _i); bvirt = (double)(u3 - _j); avirt = u3 - bvirt; bround = _i - bvirt; around = _j - avirt; u[2] = around + bround;
@@ -951,29 +940,32 @@ public class RobustPredicates implements IPredicates {
                 _i = (double)(ti0 - tj0); bvirt = (double)(ti0 - _i); avirt = _i + bvirt; bround = bvirt - tj0; around = ti0 - avirt; bctt[0] = around + bround; _j = (double)(ti1 + _i); bvirt = (double)(_j - ti1); avirt = _j - bvirt; bround = _i - bvirt; around = ti1 - avirt; _0 = around + bround; _i = (double)(_0 - tj1); bvirt = (double)(_0 - _i); avirt = _i + bvirt; bround = bvirt - tj1; around = _0 - avirt; bctt[1] = around + bround; bctt3 = (double)(_j + _i); bvirt = (double)(bctt3 - _j); avirt = bctt3 - bvirt; bround = _i - bvirt; around = _j - avirt; bctt[2] = around + bround;
                 bctt[3] = bctt3;
                 bcttlen = 4;
-            } else {
+            }
+            else
+            {
                 bct[0] = 0.0;
                 bctlen = 1;
                 bctt[0] = 0.0;
                 bcttlen = 1;
             }
 
-            if (adxtail != 0.0) {
+            if (adxtail != 0.0)
+            {
                 temp16alen = scaleExpansionZeroElim(axtbclen, axtbc, adxtail, temp16a);
                 axtbctlen = scaleExpansionZeroElim(bctlen, bct, adxtail, axtbct);
                 temp32alen = scaleExpansionZeroElim(axtbctlen, axtbct, 2.0 * adx, temp32a);
                 temp48len = fastExpansionSumZeroElim(temp16alen, temp16a, temp32alen, temp32a, temp48);
                 finlength = fastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
                 finswap = finnow; finnow = finother; finother = finswap;
-
-                if (bdytail != 0.0) {
+                if (bdytail != 0.0)
+                {
                     temp8len = scaleExpansionZeroElim(4, cc, adxtail, temp8);
                     temp16alen = scaleExpansionZeroElim(temp8len, temp8, bdytail, temp16a);
                     finlength = fastExpansionSumZeroElim(finlength, finnow, temp16alen, temp16a, finother);
                     finswap = finnow; finnow = finother; finother = finswap;
                 }
-
-                if (cdytail != 0.0) {
+                if (cdytail != 0.0)
+                {
                     temp8len = scaleExpansionZeroElim(4, bb, -adxtail, temp8);
                     temp16alen = scaleExpansionZeroElim(temp8len, temp8, cdytail, temp16a);
                     finlength = fastExpansionSumZeroElim(finlength, finnow, temp16alen, temp16a, finother);
@@ -989,14 +981,15 @@ public class RobustPredicates implements IPredicates {
                 finlength = fastExpansionSumZeroElim(finlength, finnow, temp64len, temp64, finother);
                 finswap = finnow; finnow = finother; finother = finswap;
             }
-
-            if (adytail != 0.0) {
+            if (adytail != 0.0)
+            {
                 temp16alen = scaleExpansionZeroElim(aytbclen, aytbc, adytail, temp16a);
                 aytbctlen = scaleExpansionZeroElim(bctlen, bct, adytail, aytbct);
                 temp32alen = scaleExpansionZeroElim(aytbctlen, aytbct, 2.0 * ady, temp32a);
                 temp48len = fastExpansionSumZeroElim(temp16alen, temp16a, temp32alen, temp32a, temp48);
                 finlength = fastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
                 finswap = finnow; finnow = finother; finother = finswap;
+
 
                 temp32alen = scaleExpansionZeroElim(aytbctlen, aytbct, adytail, temp32a);
                 aytbcttlen = scaleExpansionZeroElim(bcttlen, bctt, adytail, aytbctt);
@@ -1008,10 +1001,11 @@ public class RobustPredicates implements IPredicates {
                 finswap = finnow; finnow = finother; finother = finswap;
             }
         }
-
-        if ((bdxtail != 0.0) || (bdytail != 0.0)) {
+        if ((bdxtail != 0.0) || (bdytail != 0.0))
+        {
             if ((cdxtail != 0.0) || (cdytail != 0.0)
-                    || (adxtail != 0.0) || (adytail != 0.0)) {
+                    || (adxtail != 0.0) || (adytail != 0.0))
+            {
                 ti1 = (double)(cdxtail * ady); c = (double)(splitter * cdxtail); abig = (double)(c - cdxtail); ahi = c - abig; alo = cdxtail - ahi; c = (double)(splitter * ady); abig = (double)(c - ady); bhi = c - abig; blo = ady - bhi; err1 = ti1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); ti0 = (alo * blo) - err3;
                 tj1 = (double)(cdx * adytail); c = (double)(splitter * cdx); abig = (double)(c - cdx); ahi = c - abig; alo = cdx - ahi; c = (double)(splitter * adytail); abig = (double)(c - adytail); bhi = c - abig; blo = adytail - bhi; err1 = tj1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); tj0 = (alo * blo) - err3;
                 _i = (double)(ti0 + tj0); bvirt = (double)(_i - ti0); avirt = _i - bvirt; bround = tj0 - bvirt; around = ti0 - avirt; u[0] = around + bround; _j = (double)(ti1 + _i); bvirt = (double)(_j - ti1); avirt = _j - bvirt; bround = _i - bvirt; around = ti1 - avirt; _0 = around + bround; _i = (double)(_0 + tj1); bvirt = (double)(_i - _0); avirt = _i - bvirt; bround = tj1 - bvirt; around = _0 - avirt; u[1] = around + bround; u3 = (double)(_j + _i); bvirt = (double)(u3 - _j); avirt = u3 - bvirt; bround = _i - bvirt; around = _j - avirt; u[2] = around + bround;
@@ -1029,29 +1023,32 @@ public class RobustPredicates implements IPredicates {
                 _i = (double)(ti0 - tj0); bvirt = (double)(ti0 - _i); avirt = _i + bvirt; bround = bvirt - tj0; around = ti0 - avirt; catt[0] = around + bround; _j = (double)(ti1 + _i); bvirt = (double)(_j - ti1); avirt = _j - bvirt; bround = _i - bvirt; around = ti1 - avirt; _0 = around + bround; _i = (double)(_0 - tj1); bvirt = (double)(_0 - _i); avirt = _i + bvirt; bround = bvirt - tj1; around = _0 - avirt; catt[1] = around + bround; catt3 = (double)(_j + _i); bvirt = (double)(catt3 - _j); avirt = catt3 - bvirt; bround = _i - bvirt; around = _j - avirt; catt[2] = around + bround;
                 catt[3] = catt3;
                 cattlen = 4;
-            } else {
+            }
+            else
+            {
                 cat[0] = 0.0;
                 catlen = 1;
                 catt[0] = 0.0;
                 cattlen = 1;
             }
 
-            if (bdxtail != 0.0) {
+            if (bdxtail != 0.0)
+            {
                 temp16alen = scaleExpansionZeroElim(bxtcalen, bxtca, bdxtail, temp16a);
                 bxtcatlen = scaleExpansionZeroElim(catlen, cat, bdxtail, bxtcat);
                 temp32alen = scaleExpansionZeroElim(bxtcatlen, bxtcat, 2.0 * bdx, temp32a);
                 temp48len = fastExpansionSumZeroElim(temp16alen, temp16a, temp32alen, temp32a, temp48);
                 finlength = fastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
                 finswap = finnow; finnow = finother; finother = finswap;
-
-                if (cdytail != 0.0) {
+                if (cdytail != 0.0)
+                {
                     temp8len = scaleExpansionZeroElim(4, aa, bdxtail, temp8);
                     temp16alen = scaleExpansionZeroElim(temp8len, temp8, cdytail, temp16a);
                     finlength = fastExpansionSumZeroElim(finlength, finnow, temp16alen, temp16a, finother);
                     finswap = finnow; finnow = finother; finother = finswap;
                 }
-
-                if (adytail != 0.0) {
+                if (adytail != 0.0)
+                {
                     temp8len = scaleExpansionZeroElim(4, cc, -bdxtail, temp8);
                     temp16alen = scaleExpansionZeroElim(temp8len, temp8, adytail, temp16a);
                     finlength = fastExpansionSumZeroElim(finlength, finnow, temp16alen, temp16a, finother);
@@ -1067,8 +1064,8 @@ public class RobustPredicates implements IPredicates {
                 finlength = fastExpansionSumZeroElim(finlength, finnow, temp64len, temp64, finother);
                 finswap = finnow; finnow = finother; finother = finswap;
             }
-
-            if (bdytail != 0.0) {
+            if (bdytail != 0.0)
+            {
                 temp16alen = scaleExpansionZeroElim(bytcalen, bytca, bdytail, temp16a);
                 bytcatlen = scaleExpansionZeroElim(catlen, cat, bdytail, bytcat);
                 temp32alen = scaleExpansionZeroElim(bytcatlen, bytcat, 2.0 * bdy, temp32a);
@@ -1086,10 +1083,11 @@ public class RobustPredicates implements IPredicates {
                 finswap = finnow; finnow = finother; finother = finswap;
             }
         }
-
-        if ((cdxtail != 0.0) || (cdytail != 0.0)) {
+        if ((cdxtail != 0.0) || (cdytail != 0.0))
+        {
             if ((adxtail != 0.0) || (adytail != 0.0)
-                    || (bdxtail != 0.0) || (bdytail != 0.0)) {
+                    || (bdxtail != 0.0) || (bdytail != 0.0))
+            {
                 ti1 = (double)(adxtail * bdy); c = (double)(splitter * adxtail); abig = (double)(c - adxtail); ahi = c - abig; alo = adxtail - ahi; c = (double)(splitter * bdy); abig = (double)(c - bdy); bhi = c - abig; blo = bdy - bhi; err1 = ti1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); ti0 = (alo * blo) - err3;
                 tj1 = (double)(adx * bdytail); c = (double)(splitter * adx); abig = (double)(c - adx); ahi = c - abig; alo = adx - ahi; c = (double)(splitter * bdytail); abig = (double)(c - bdytail); bhi = c - abig; blo = bdytail - bhi; err1 = tj1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); tj0 = (alo * blo) - err3;
                 _i = (double)(ti0 + tj0); bvirt = (double)(_i - ti0); avirt = _i - bvirt; bround = tj0 - bvirt; around = ti0 - avirt; u[0] = around + bround; _j = (double)(ti1 + _i); bvirt = (double)(_j - ti1); avirt = _j - bvirt; bround = _i - bvirt; around = ti1 - avirt; _0 = around + bround; _i = (double)(_0 + tj1); bvirt = (double)(_i - _0); avirt = _i - bvirt; bround = tj1 - bvirt; around = _0 - avirt; u[1] = around + bround; u3 = (double)(_j + _i); bvirt = (double)(u3 - _j); avirt = u3 - bvirt; bround = _i - bvirt; around = _j - avirt; u[2] = around + bround;
@@ -1107,29 +1105,32 @@ public class RobustPredicates implements IPredicates {
                 _i = (double)(ti0 - tj0); bvirt = (double)(ti0 - _i); avirt = _i + bvirt; bround = bvirt - tj0; around = ti0 - avirt; abtt[0] = around + bround; _j = (double)(ti1 + _i); bvirt = (double)(_j - ti1); avirt = _j - bvirt; bround = _i - bvirt; around = ti1 - avirt; _0 = around + bround; _i = (double)(_0 - tj1); bvirt = (double)(_0 - _i); avirt = _i + bvirt; bround = bvirt - tj1; around = _0 - avirt; abtt[1] = around + bround; abtt3 = (double)(_j + _i); bvirt = (double)(abtt3 - _j); avirt = abtt3 - bvirt; bround = _i - bvirt; around = _j - avirt; abtt[2] = around + bround;
                 abtt[3] = abtt3;
                 abttlen = 4;
-            } else {
+            }
+            else
+            {
                 abt[0] = 0.0;
                 abtlen = 1;
                 abtt[0] = 0.0;
                 abttlen = 1;
             }
 
-            if (cdxtail != 0.0) {
+            if (cdxtail != 0.0)
+            {
                 temp16alen = scaleExpansionZeroElim(cxtablen, cxtab, cdxtail, temp16a);
                 cxtabtlen = scaleExpansionZeroElim(abtlen, abt, cdxtail, cxtabt);
                 temp32alen = scaleExpansionZeroElim(cxtabtlen, cxtabt, 2.0 * cdx, temp32a);
                 temp48len = fastExpansionSumZeroElim(temp16alen, temp16a, temp32alen, temp32a, temp48);
                 finlength = fastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
                 finswap = finnow; finnow = finother; finother = finswap;
-
-                if (adytail != 0.0) {
+                if (adytail != 0.0)
+                {
                     temp8len = scaleExpansionZeroElim(4, bb, cdxtail, temp8);
                     temp16alen = scaleExpansionZeroElim(temp8len, temp8, adytail, temp16a);
                     finlength = fastExpansionSumZeroElim(finlength, finnow, temp16alen, temp16a, finother);
                     finswap = finnow; finnow = finother; finother = finswap;
                 }
-
-                if (bdytail != 0.0) {
+                if (bdytail != 0.0)
+                {
                     temp8len = scaleExpansionZeroElim(4, aa, -cdxtail, temp8);
                     temp16alen = scaleExpansionZeroElim(temp8len, temp8, bdytail, temp16a);
                     finlength = fastExpansionSumZeroElim(finlength, finnow, temp16alen, temp16a, finother);
@@ -1145,14 +1146,15 @@ public class RobustPredicates implements IPredicates {
                 finlength = fastExpansionSumZeroElim(finlength, finnow, temp64len, temp64, finother);
                 finswap = finnow; finnow = finother; finother = finswap;
             }
-
-            if (cdytail != 0.0) {
+            if (cdytail != 0.0)
+            {
                 temp16alen = scaleExpansionZeroElim(cytablen, cytab, cdytail, temp16a);
                 cytabtlen = scaleExpansionZeroElim(abtlen, abt, cdytail, cytabt);
                 temp32alen = scaleExpansionZeroElim(cytabtlen, cytabt, 2.0 * cdy, temp32a);
                 temp48len = fastExpansionSumZeroElim(temp16alen, temp16a, temp32alen, temp32a, temp48);
                 finlength = fastExpansionSumZeroElim(finlength, finnow, temp48len, temp48, finother);
                 finswap = finnow; finnow = finother; finother = finswap;
+
 
                 temp32alen = scaleExpansionZeroElim(cytabtlen, cytabt, cdytail, temp32a);
                 cytabttlen = scaleExpansionZeroElim(abttlen, abtt, cdytail, cytabtt);

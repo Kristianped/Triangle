@@ -1,6 +1,4 @@
-package triangle.voronoi;
-
-import triangle.*;
+package triangle;
 
 public class StandardVoronoi extends VoronoiBase {
 

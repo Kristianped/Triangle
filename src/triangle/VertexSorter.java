@@ -3,24 +3,37 @@ package triangle;
 import triangle.Vertex;
 
 import java.util.Random;
+import java.util.RandomAccess;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class VertexSorter {
 
+    private static final int RANDOM_SEED = 57113;
+
+    Random rand;
     Vertex[] points;
 
-    VertexSorter(Vertex[] points) {
+    VertexSorter(Vertex[] points, int seed) {
         this.points = points;
+        this.rand = new Random(seed);
     }
 
     public static void sort(Vertex[] array) {
-        var qs = new VertexSorter(array);
+        sort(array, RANDOM_SEED);
+    }
+
+    public static void sort(Vertex[] array, int seed) {
+        var qs = new VertexSorter(array, seed);
         qs.quickSort(0, array.length - 1);
     }
 
     public static void alternateSort(Vertex[] array, int length) {
-        var qs = new VertexSorter(array);
-        int divider = length - 1;
+        alternateSort(array, length, RANDOM_SEED);
+    }
+
+    public static void alternateSort(Vertex[] array, int length, int seed) {
+        var qs = new VertexSorter(array, seed);
+        int divider = length >> 1;
 
         // Re-sort the array of vertices to accommodate alternating cuts.
         if (length - divider >= 2) {
@@ -67,7 +80,7 @@ public class VertexSorter {
         }
 
         // Choose a random pivot to split the array
-        pivot = ThreadLocalRandom.current().nextInt(left, right);
+        pivot = rand.nextInt(right - left) + left;
         pivotX = array[pivot].x;
         pivotY = array[pivot].y;
 
@@ -165,7 +178,7 @@ public class VertexSorter {
         }
 
         // Choose a random pivot to split the array.
-        pivot = ThreadLocalRandom.current().nextInt(left, right);
+        pivot = rand.nextInt(right - left) + left;
         pivot1 = array[pivot].x;
         pivot2 = array[pivot].y;
 
@@ -234,7 +247,7 @@ public class VertexSorter {
         }
 
         // Choose a random pivot to split the array.
-        pivot = ThreadLocalRandom.current().nextInt(left, right);
+        pivot = rand.nextInt(right - left) + left;
         pivot1 = array[pivot].y;
         pivot2 = array[pivot].x;
 

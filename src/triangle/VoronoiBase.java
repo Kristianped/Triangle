@@ -1,11 +1,6 @@
-package triangle.voronoi;
+package triangle;
 
-import triangle.*;
-import triangle.dcel.DcelMesh;
-import triangle.dcel.Face;
-import triangle.dcel.HalfEdge;
-import triangle.dcel.DcelVertex;
-
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,69 +28,74 @@ public abstract class VoronoiBase extends DcelMesh {
 
     protected void generate(Mesh mesh) {
         mesh.renumber();
-        edges = new ArrayList<>();
-        rays = new ArrayList<>();
 
-        // Allocate space for Voronoi diagram
-        var vertices = new DcelVertex[mesh.getTriangles().size() + mesh.getHullsize()];
-        var faces = new Face[mesh.getVertices().size()];
+        this.edges = new ArrayList<HalfEdge>();
+        this.rays = new ArrayList<HalfEdge>();
+
+        // Allocate space for Voronoi diagram.
+        var vertices = new DcelVertex[mesh.triangles.size() + mesh.hullsize];
+        var faces = new Face[mesh.vertices.size()];
 
         if (factory == null)
+        {
             factory = new DefaultVoronoiFactory();
+        }
 
         factory.initialize(vertices.length, 2 * mesh.getNumberOfEdges(), faces.length);
 
-        // Compute triangles circumcenters
+        // Compute triangles circumcenters.
         var map = computeVertices(mesh, vertices);
 
-        // Compute all Voronoi faces
-        for (var vertex : mesh.getVertices())
-            faces[vertex.getId()] = factory.createFace(vertex);
+        // Create all Voronoi faces.
+        for (var vertex : mesh.vertices.values())
+        {
+            faces[vertex.id] = factory.createFace(vertex);
+        }
 
         computeEdges(mesh, vertices, faces, map);
 
         // At this point all edges are computed, but the (edge.next) pointers aren't set.
         connectEdges(map);
 
-        this.vertices = new ArrayList<>();
-        Collections.addAll(this.vertices, vertices);
-        this.faces = new ArrayList<>();
-        Collections.addAll(this.faces, faces);
+        this.vertices = new ArrayList<>(Arrays.asList(vertices));
+
+        this.faces = new ArrayList<>(Arrays.asList(faces));
     }
 
     protected List<HalfEdge>[] computeVertices(Mesh mesh, DcelVertex[] vertices) {
         Otri tri = new Otri();
-        MutableDouble xi = new MutableDouble();
-        MutableDouble eta = new MutableDouble();
+        MutableDouble xi = new MutableDouble(), eta = new MutableDouble();
         DcelVertex vertex;
         Point pt;
         int id;
 
-        List<HalfEdge>[] map = new ArrayList[mesh.getTriangles().size()];
+        // Maps all vertices to a list of leaving edges.
+        List<HalfEdge>[] map = new List[mesh.triangles.size()];
 
-        for (var t : mesh.getTriangles()) {
-            id = t.getID();
-            tri.setTriangle(t);
+        // Compue triangle circumcenters
+        for (var t : mesh.triangles)
+        {
+            id = t.id;
+            tri.tri = t;
 
             pt = predicates.findCircumcenter(tri.org(), tri.dest(), tri.apex(), xi, eta);
 
-            vertex = factory.createVertex(pt.getX(), pt.getY());
-            vertex.setId(id);
+            vertex = factory.createVertex(pt.x, pt.y);
+            vertex.id = id;
 
             vertices[id] = vertex;
-            map[id] = new ArrayList<>();
+            map[id] = new ArrayList<HalfEdge>();
         }
 
         return map;
     }
 
     protected void computeEdges(Mesh mesh, DcelVertex[] vertices, Face[] faces, List<HalfEdge>[] map) {
-        Otri tri = new Otri();
-        Otri neighbor = new Otri();
+        Otri tri = new Otri(), neighbor = new Otri();
         Vertex org, dest;
 
         double px, py;
-        int id, nid, count = mesh.getTriangles().size();
+        int id, nid, count = mesh.triangles.size();
 
         Face face, neighborFace;
         HalfEdge edge, twin;
@@ -112,51 +112,58 @@ public abstract class VoronoiBase extends DcelMesh {
         // to the edge, operate on the edge. If there is another adjacent triangle,
         // operate on the edge only if the current triangle has a smaller id than
         // its neighbor. This way, each edge is considered only once.
-        for (var t : mesh.getTriangles()) {
-            id = t.getID();
-            tri.setTriangle(t);
+        for (var t : mesh.triangles)
+        {
+            id = t.id;
 
-            for (int i = 0; i < 3; i++) {
-                tri.setOrient(i);
+            tri.tri = t;
+
+            for (int i = 0; i < 3; i++)
+            {
+                tri.orient = i;
                 tri.sym(neighbor);
 
-                nid = neighbor.getTriangle().getID();
+                nid = neighbor.tri.id;
 
-                if (id < nid || nid < 0) {
+                if (id < nid || nid < 0)
+                {
                     // Get the endpoints of the current triangle edge.
                     org = tri.org();
                     dest = tri.dest();
 
-                    face = faces[org.getId()];
-                    neighborFace = faces[dest.getId()];
+                    face = faces[org.id];
+                    neighborFace = faces[dest.id];
 
                     vertex = vertices[id];
 
                     // For each edge in the triangle mesh, there's a corresponding edge
                     // in the Voronoi diagram, i.e. two half-edges will be created.
-                    if (nid < 0) {
+                    if (nid < 0)
+                    {
                         // Unbounded edge, direction perpendicular to the boundary edge,
                         // pointing outwards.
-                        px = dest.getY() - org.getY();
-                        py = org.getX() - dest.getX();
+                        px = dest.y - org.y;
+                        py = org.x - dest.x;
 
-                        end = factory.createVertex(vertex.getX() + px, vertex.getY() + py);
-                        end.setId(count + j++);
+                        end = factory.createVertex(vertex.x + px, vertex.y + py);
+                        end.id = count + j++;
 
-                        vertices[end.getId()] = end;
+                        vertices[end.id] = end;
 
                         edge = factory.createHalfEdge(end, face);
                         twin = factory.createHalfEdge(vertex, neighborFace);
 
                         // Make (face.edge) always point to an edge that starts at an infinite
                         // vertex. This will allow traversing of unbounded faces.
-                        face.setEdge(edge);
-                        face.setBounded(false);
+                        face.edge = edge;
+                        face.bounded = false;
 
                         map[id].add(twin);
 
                         rays.add(twin);
-                    } else {
+                    }
+                    else
+                    {
                         end = vertices[nid];
 
                         // Create half-edges.
@@ -168,14 +175,14 @@ public abstract class VoronoiBase extends DcelMesh {
                         map[id].add(twin);
                     }
 
-                    vertex.setLeaving(twin);
-                    end.setLeaving(edge);
+                    vertex.leaving = twin;
+                    end.leaving = edge;
 
-                    edge.setTwin(twin);
-                    twin.setTwin(edge);
+                    edge.twin = twin;
+                    twin.twin = edge;
 
-                    edge.setId(k++);
-                    twin.setId(k++);
+                    edge.id = k++;
+                    twin.id = k++;
 
                     this.edges.add(edge);
                     this.edges.add(twin);
@@ -188,20 +195,24 @@ public abstract class VoronoiBase extends DcelMesh {
         int length = map.length;
 
         // For each half-edge, find its successor in the connected face.
-        for (var edge : this.edges) {
-            var face = edge.getFace().getGenerator().getId();
+        for (var edge : this.edges)
+        {
+            var face = edge.face.generator.id;
 
             // The id of the dest vertex of current edge.
-            int id = edge.getTwin().getOrigin().getId();
+            int id = edge.twin.origin.id;
 
             // The edge origin can also be an infinite vertex. Sort them out
             // by checking the id.
-            if (id < length) {
+            if (id < length)
+            {
                 // Look for the edge that is connected to the current face. Each
                 // Voronoi vertex has degree 3, so this loop is actually O(1).
-                for (var next : map[id]) {
-                    if (next.getFace().getGenerator().getId() == face) {
-                        edge.setNext(next);
+                for (var next : map[id])
+                {
+                    if (next.face.generator.id == face)
+                    {
+                        edge.next = next;
                         break;
                     }
                 }
@@ -211,15 +222,21 @@ public abstract class VoronoiBase extends DcelMesh {
 
     @Override
     protected Iterable<IEdge> enumerateEdges() {
-        List<IEdge> edges = new ArrayList<>(this.edges.size() / 2);
+        var edges = new ArrayList<IEdge>(this.edges.size() / 2);
 
-        for (var edge : this.edges) {
-            var twin = edge.getTwin();
+        for (var edge : this.edges)
+        {
+            var twin = edge.twin;
 
+            // Report edge only once.
             if (twin == null)
-                edges.add(new Edge(edge.getOrigin().getId(), edge.getNext().getOrigin().getId()));
-            else if (edge.getId() < twin.getId())
-                edges.add(new Edge(edge.getOrigin().getId(), twin.getOrigin().getId()));
+            {
+                edges.add(new Edge(edge.origin.id, edge.next.origin.id));
+            }
+            else if (edge.id < twin.id)
+            {
+                edges.add(new Edge(edge.origin.id, twin.origin.id));
+            }
         }
 
         return edges;

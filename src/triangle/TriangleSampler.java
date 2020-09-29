@@ -1,10 +1,14 @@
 package triangle;
 
 import java.util.Iterator;
+import java.util.Random;
 
 public class TriangleSampler implements Iterable<Triangle> {
 
+    private final int RANDOM_SEED = 110503;
+
     private Mesh mesh;
+    private Random random;
 
     private int samples = 1;
 
@@ -12,11 +16,12 @@ public class TriangleSampler implements Iterable<Triangle> {
 
     public TriangleSampler(Mesh mesh) {
         this.mesh = mesh;
+        this.random = new Random(RANDOM_SEED);
     }
 
     @Override
     public Iterator<Triangle> iterator() {
-        return mesh.triangles.sample(samples).iterator();
+        return mesh.triangles.sample(samples, random).iterator();
     }
 
     /**
@@ -31,7 +36,7 @@ public class TriangleSampler implements Iterable<Triangle> {
      * Update sampling parameters if mesh changed
      */
     public void update() {
-        int count = mesh.triangles.count;
+        int count = mesh.triangles.size();
 
         if (triangleCount != count) {
             triangleCount = count;

@@ -17,6 +17,6 @@ public class BadSubSeg {
 
     @Override
     public String toString() {
-        return String.format("B-SID {0}", subseg.seg.hash);
+        return String.format("B-SID %d", subseg.seg.hash);
     }
 }

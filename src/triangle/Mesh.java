@@ -82,7 +82,7 @@ public class Mesh implements IMesh {
         vertices = new HashMap<>();
         subsegs = new HashMap<>();
 
-        triangles = config.trianglePool;
+        triangles = config.trianglePool.get();
 
         flipstack = new ArrayDeque<>();
 
@@ -91,7 +91,7 @@ public class Mesh implements IMesh {
 
         steinerleft = -1;
 
-        this.predicates = config.predicates;
+        this.predicates = config.predicates.get();
 
         this.locator = new TriangleLocator(this, predicates);
     }
@@ -109,7 +109,8 @@ public class Mesh implements IMesh {
 
         // Set up 'dummytri', the 'triangle' that occupies "outer space."
         dummytri = new Triangle();
-        dummytri.hash = dummytri.id = DUMMY;
+        dummytri.hash = DUMMY;
+        dummytri.id = DUMMY;
 
         // Initialize the three adjoining triangles to be "outer space." These
         // will eventually be changed by various bonding operations, but their
@@ -134,6 +135,10 @@ public class Mesh implements IMesh {
         return (3 * triangles.size() + hullsize) / 2;
     }
 
+    public int getAttributesPerVertex() {
+        return nextras;
+    }
+
     public boolean isPolygon() {
         return insegments > 3;
     }
@@ -149,6 +154,12 @@ public class Mesh implements IMesh {
     public int getHullsize() {
         return hullsize;
     }
+
+    public Behavior getBehavior() { return behavior; }
+
+    public int getUndeads() { return undeads; }
+
+    public int getDimensions() { return mesh_dim; }
 
     @Override
     public Collection<Vertex> getVertices() {
@@ -219,7 +230,11 @@ public class Mesh implements IMesh {
 
         for (var item : triangles)
             item.id = id++;
+
+
     }
+    
+    
 
     @Override
     public void refine(QualityOptions quality, boolean delaunay) {
@@ -318,19 +333,21 @@ public class Mesh implements IMesh {
         // Simple heuristic to check if ids are already set.  We assume that if the
         // first two vertex ids are distinct, then all input vertices have pairwise
         // distinct ids.
-        boolean userId = v.getId() != points.get(1).getId();
+        boolean userId = (v.id != points.get(1).id);
 
         for (var p : points) {
             if (userId) {
                 p.hash = p.id;
 
                 // Make sure the hash counter gets updated.
-                hash_vtx = Math.max(p.hashCode() + 1, hash_vtx);
+                hash_vtx = Math.max(p.hash + 1, hash_vtx);
             } else {
-                p.hash = p.id = hash_vtx++;
+                p.hash = hash_vtx;
+                p.id = hash_vtx;
+                hash_vtx++;
             }
 
-            this.vertices.put(p.hashCode(), p);
+            this.vertices.put(p.hash, p);
             this.bounds.expand(p);
         }
     }
@@ -351,18 +368,17 @@ public class Mesh implements IMesh {
 
         for (var t : this.triangles) {
             tri.tri = t;
-
             // Check all three vertices of the triangle
             for (tri.orient = 0; tri.orient < 3; tri.orient++) {
                 triorg = tri.org();
-                triorg.tri = tri;
+                triorg.tri = tri.shallowCopy();
             }
         }
     }
 
     /**
      * Create a new triangle with orientation zero
-     * @param newotri Reference to the new triangle
+     * @param newotri to the new triangle
      */
     void makeTriangle(Otri newotri) {
         Triangle tri = triangles.get();
@@ -381,7 +397,7 @@ public class Mesh implements IMesh {
 
     /**
      * Create a new subsegment with orientation zero
-     * @param newsubseg Reference to the new subsegment
+     * @param newsubseg to the new subsegment
      */
     public void makeSegment(Osub newsubseg) {
         var seg = new SubSegment();
@@ -462,7 +478,7 @@ public class Mesh implements IMesh {
         Otri toplcasing = new Otri();
         Otri toprcasing = new Otri();
         Otri testtri = new Otri();
-
+        
         Osub botlsubseg = new Osub();
         Osub botrsubseg = new Osub();
         Osub toplsubseg = new Osub();
@@ -472,75 +488,78 @@ public class Mesh implements IMesh {
         Osub rightsubseg = new Osub();
         Osub newsubseg = new Osub();
         BadSubSeg encroached;
-
+        //FlipStacker newflip;
         Vertex first;
-        Vertex leftvertex;
-        Vertex rightvertex;
-        Vertex botvertex;
-        Vertex topvertex;
-        Vertex farvertex;
-        Vertex segmentorg;
-        Vertex segmentdest;
-
+        Vertex leftvertex, rightvertex, botvertex, topvertex, farvertex;
+        Vertex segmentorg, segmentdest;
         int region;
         double area;
         Enums.InsertVertexResult success;
         Enums.LocateResult intersect;
-
         boolean doflip;
         boolean mirrorflag;
         boolean enq;
 
-        if (splitseg.seg == null) {
+        if (splitseg.seg == null)
+        {
             // Find the location of the vertex to be inserted.  Check if a good
             // starting triangle has already been provided by the caller.
-            if (searchtri.tri.id == DUMMY) {
-                // Find a boundary triangle
+            if (searchtri.tri.id == DUMMY)
+            {
+                // Find a boundary triangle.
                 horiz.tri = dummytri;
                 horiz.orient = 0;
                 horiz.sym();
 
-                // Search for a triangle containing 'newvertex'
+                // Search for a triangle containing 'newvertex'.
                 intersect = locator.locate(newvertex, horiz);
-            } else {
-                // Start searching from the triangle provided by the caller
+            }
+            else
+            {
+                // Start searching from the triangle provided by the caller.
                 searchtri.copy(horiz);
                 intersect = locator.preciseLocate(newvertex, horiz, true);
             }
-        } else {
+        }
+        else
+        {
             // The calling routine provides the subsegment in which
-            // the vertex is inserted
+            // the vertex is inserted.
             searchtri.copy(horiz);
             intersect = Enums.LocateResult.OnEdge;
         }
 
-        if (intersect == Enums.LocateResult.OnVertex) {
+        if (intersect == Enums.LocateResult.OnVertex)
+        {
             // There's already a vertex there.  Return in 'searchtri' a triangle
             // whose origin is the existing vertex.
             horiz.copy(searchtri);
             locator.update(horiz);
             return Enums.InsertVertexResult.Duplicate;
         }
-
-        if (intersect == Enums.LocateResult.OnEdge || intersect == Enums.LocateResult.Outside) {
+        if ((intersect == Enums.LocateResult.OnEdge) || (intersect == Enums.LocateResult.Outside))
+        {
             // The vertex falls on an edge or boundary.
-            if (checksegments && splitseg.seg == null) {
+            if (checksegments && (splitseg.seg == null))
+            {
                 // Check whether the vertex falls on a subsegment.
-                horiz.pivot(brokensubseg);
-
-                if (brokensubseg.seg.hash != DUMMY) {
+                brokensubseg = horiz.pivot();
+                
+                if (brokensubseg.seg.hash != DUMMY)
+                {
                     // The vertex falls on a subsegment, and hence will not be inserted.
-                    if (segmentflaws) {
+                    if (segmentflaws)
+                    {
                         enq = behavior.noBisect != 2;
-
-                        if (enq && behavior.noBisect == 1) {
+                        if (enq && (behavior.noBisect == 1))
+                        {
                             // This subsegment may be split only if it is an
                             // internal boundary.
                             horiz.sym(testtri);
                             enq = testtri.tri.id != DUMMY;
                         }
-
-                        if (enq) {
+                        if (enq)
+                        {
                             // Add the subsegment to the list of encroached subsegments.
                             encroached = new BadSubSeg();
                             encroached.subseg = brokensubseg;
@@ -550,7 +569,6 @@ public class Mesh implements IMesh {
                             qualityMesher.addBadSubseg(encroached);
                         }
                     }
-
                     // Return a handle whose primary edge contains the vertex,
                     //   which has not been inserted.
                     horiz.copy(searchtri);
@@ -566,16 +584,17 @@ public class Mesh implements IMesh {
             horiz.sym(topright);
             // Is there a second triangle?  (Or does this edge lie on a boundary?)
             mirrorflag = topright.tri.id != DUMMY;
-
-            if (mirrorflag) {
+            if (mirrorflag)
+            {
                 topright.lnext();
                 topright.sym(toprcasing);
                 makeTriangle(newtopright);
-            } else {
+            }
+            else
+            {
                 // Splitting a boundary edge increases the number of boundary edges.
                 hullsize++;
             }
-
             makeTriangle(newbotright);
 
             // Set the vertices of changed and new triangles.
@@ -587,25 +606,28 @@ public class Mesh implements IMesh {
             newbotright.setApex(newvertex);
             horiz.setOrg(newvertex);
 
-            // Set the region of a new triangle
+            // Set the region of a new triangle.
             newbotright.tri.label = botright.tri.label;
 
-            if (behavior.varArea) {
+            if (behavior.varArea)
+            {
                 // Set the area constraint of a new triangle.
                 newbotright.tri.area = botright.tri.area;
             }
 
-            if (mirrorflag) {
+            if (mirrorflag)
+            {
                 topvertex = topright.dest();
                 newtopright.setOrg(rightvertex);
                 newtopright.setDest(topvertex);
                 newtopright.setApex(newvertex);
                 topright.setOrg(newvertex);
 
-                // Set the region of another new triangle
+                // Set the region of another new triangle.
                 newtopright.tri.label = topright.tri.label;
 
-                if (behavior.varArea) {
+                if (behavior.varArea)
+                {
                     // Set the area constraint of another new triangle.
                     newtopright.tri.area = topright.tri.area;
                 }
@@ -613,31 +635,35 @@ public class Mesh implements IMesh {
 
             // There may be subsegments that need to be bonded
             // to the new triangle(s).
-            if (checksegments) {
-                botright.pivot(botrsubseg);
+            if (checksegments)
+            {
+                botrsubseg = botright.pivot();
 
-                if (botrsubseg.seg.hash != DUMMY) {
+                if (botrsubseg.seg.hash != DUMMY)
+                {
                     botright.segDissolve(dummysub);
                     newbotright.segBond(botrsubseg);
                 }
 
-                if (mirrorflag) {
-                    topright.pivot(toprsubseg);
-
-                    if (toprsubseg.seg.hash != DUMMY) {
+                if (mirrorflag)
+                {
+                    toprsubseg = topright.pivot();
+                    if (toprsubseg.seg.hash != DUMMY)
+                    {
                         topright.segDissolve(dummysub);
                         newtopright.segBond(toprsubseg);
                     }
                 }
             }
 
-            // Bond the new triangle(s) to the surrounding triangle
+            // Bond the new triangle(s) to the surrounding triangles.
             newbotright.bond(botrcasing);
             newbotright.lprev();
             newbotright.bond(botright);
             newbotright.lprev();
 
-            if (mirrorflag) {
+            if (mirrorflag)
+            {
                 newtopright.bond(toprcasing);
                 newtopright.lnext();
                 newtopright.bond(topright);
@@ -645,15 +671,17 @@ public class Mesh implements IMesh {
                 newtopright.bond(newbotright);
             }
 
-            if (splitseg.seg != null) {
+            if (splitseg.seg != null)
+            {
                 // Split the subsegment into two.
                 splitseg.setDest(newvertex);
                 segmentorg = splitseg.segOrg();
                 segmentdest = splitseg.segDest();
                 splitseg.sym();
-                splitseg.pivot(rightsubseg);
+                rightsubseg = splitseg.pivotSub();
                 insertSubseg(newbotright, splitseg.seg.boundary);
-                newbotright.pivot(newsubseg);
+                newsubseg = newbotright.pivot();
+
                 newsubseg.setSegOrg(segmentorg);
                 newsubseg.setSegDest(segmentdest);
                 splitseg.bond(newsubseg);
@@ -663,19 +691,25 @@ public class Mesh implements IMesh {
 
                 // Transfer the subsegment's boundary marker to the vertex if required.
                 if (newvertex.label == 0)
+                {
                     newvertex.label = splitseg.seg.boundary;
+                }
             }
 
-            if (checkquality) {
+            if (checkquality)
+            {
                 flipstack.clear();
-                flipstack.push(new Otri()); // Dummy flip
-                flipstack.push(horiz);
+
+                flipstack.push(new Otri()); // Dummy flip (see UndoVertex)
+                flipstack.push(horiz.shallowCopy());
             }
 
             // Position 'horiz' on the first edge to check for
             // the Delaunay property.
             horiz.lnext();
-        } else {
+        }
+        else
+        {
             // Insert the vertex in a triangle, splitting it into three.
             horiz.lnext(botleft);
             horiz.lprev(botright);
@@ -696,12 +730,13 @@ public class Mesh implements IMesh {
             newbotright.setApex(newvertex);
             horiz.setApex(newvertex);
 
-            // Set the region of the new triangles
+            // Set the region of the new triangles.
             newbotleft.tri.label = horiz.tri.label;
             newbotright.tri.label = horiz.tri.label;
 
-            if (behavior.varArea) {
-                // Set the area constraint of the new triangles
+            if (behavior.varArea)
+            {
+                // Set the area constraint of the new triangles.
                 area = horiz.tri.area;
                 newbotleft.tri.area = area;
                 newbotright.tri.area = area;
@@ -709,22 +744,23 @@ public class Mesh implements IMesh {
 
             // There may be subsegments that need to be bonded
             // to the new triangles.
-            if (checksegments) {
-                botleft.pivot(botlsubseg);
-
-                if (botlsubseg.seg.hash != DUMMY) {
+            if (checksegments)
+            {
+                botlsubseg = botleft.pivot();
+                if (botlsubseg.seg.hash != DUMMY)
+                {
                     botleft.segDissolve(dummysub);
                     newbotleft.segBond(botlsubseg);
                 }
-                botright.pivot(botrsubseg);
-
-                if (botrsubseg.seg.hash != DUMMY) {
+                botrsubseg = botright.pivot();
+                if (botrsubseg.seg.hash != DUMMY)
+                {
                     botright.segDissolve(dummysub);
                     newbotright.segBond(botrsubseg);
                 }
             }
 
-            // Bond the new triangles to the surrounding triangles
+            // Bond the new triangles to the surrounding triangles.
             newbotleft.bond(botlcasing);
             newbotright.bond(botrcasing);
             newbotleft.lnext();
@@ -735,9 +771,10 @@ public class Mesh implements IMesh {
             newbotright.lprev();
             botright.bond(newbotright);
 
-            if (checkquality) {
+            if (checkquality)
+            {
                 flipstack.clear();
-                flipstack.push(horiz);
+                flipstack.push(horiz.shallowCopy());
             }
         }
 
@@ -745,73 +782,98 @@ public class Mesh implements IMesh {
         // subsegment is found.
         success = Enums.InsertVertexResult.Successful;
 
-        if (newvertex.tri.tri != null) {
+        if (newvertex.tri.tri != null)
+        {
             // Store the coordinates of the triangle that contains newvertex.
             newvertex.tri.setOrg(rightvertex);
             newvertex.tri.setDest(leftvertex);
             newvertex.tri.setApex(botvertex);
         }
 
-        // Circle around the newly inserted vertex, checking each edge opposite it
-        // for the Delaunay property. Non-Delaunay edges are flipped. 'horiz' is
+        // Circle around the newly inserted vertex, checking each edge opposite it 
+        // for the Delaunay property. Non-Delaunay edges are flipped. 'horiz' is 
         // always the edge being checked. 'first' marks where to stop circling.
         first = horiz.org();
         rightvertex = first;
         leftvertex = horiz.dest();
-
-        // Circle until finished
-        while (true) {
-            // By default, the edge will be flipped
+        // Circle until finished.
+        while (true)
+        {
+            // By default, the edge will be flipped.
             doflip = true;
 
-            if (checksegments) {
+            if (checksegments)
+            {
                 // Check for a subsegment, which cannot be flipped.
-                horiz.pivot(checksubseg);
-
-                if (checksubseg.seg.hash != DUMMY) {
+                checksubseg = horiz.pivot();
+                if (checksubseg.seg.hash != DUMMY)
+                {
                     // The edge is a subsegment and cannot be flipped.
                     doflip = false;
 
-                    if (segmentflaws) {
+                    if (segmentflaws)
+                    {
                         // Does the new vertex encroach upon this subsegment?
                         if (qualityMesher.checkSeg4Encroach(checksubseg) > 0)
+                        {
                             success = Enums.InsertVertexResult.Encroaching;
+                        }
                     }
                 }
             }
 
-            if (doflip) {
-                // Check if the edge is a boundary edge
+            if (doflip)
+            {
+                // Check if the edge is a boundary edge.
                 horiz.sym(top);
-
-                if (top.tri.id == DUMMY) {
+                if (top.tri.id == DUMMY)
+                {
                     // The edge is a boundary edge and cannot be flipped.
                     doflip = false;
-                } else {
+                }
+                else
+                {
                     // Find the vertex on the other side of the edge.
                     farvertex = top.apex();
-
                     // In the incremental Delaunay triangulation algorithm, any of
                     // 'leftvertex', 'rightvertex', and 'farvertex' could be vertices
                     // of the triangular bounding box. These vertices must be
                     // treated as if they are infinitely distant, even though their
                     // "coordinates" are not.
-                    if (leftvertex == infvertex1 || leftvertex == infvertex2 || leftvertex == infvertex3) {
+                    if ((leftvertex == infvertex1) || (leftvertex == infvertex2) ||
+                            (leftvertex == infvertex3))
+                    {
                         // 'leftvertex' is infinitely distant. Check the convexity of
                         // the boundary of the triangulation. 'farvertex' might be
                         // infinite as well, but trust me, this same condition should
                         // be applied.
                         doflip = predicates.counterClockwise(newvertex, rightvertex, farvertex) > 0.0;
-                    } else if (rightvertex == infvertex1 || rightvertex == infvertex2 || rightvertex == infvertex3) {
+                    }
+                    else if ((rightvertex == infvertex1) ||
+                            (rightvertex == infvertex2) ||
+                            (rightvertex == infvertex3))
+                    {
+                        // 'rightvertex' is infinitely distant. Check the convexity of
+                        // the boundary of the triangulation. 'farvertex' might be
+                        // infinite as well, but trust me, this same condition should
+                        // be applied.
+                        doflip = predicates.counterClockwise(farvertex, leftvertex, newvertex) > 0.0;
+                    }
+                    else if ((farvertex == infvertex1) ||
+                            (farvertex == infvertex2) ||
+                            (farvertex == infvertex3))
+                    {
                         // 'farvertex' is infinitely distant and cannot be inside
                         // the circumcircle of the triangle 'horiz'.
                         doflip = false;
-                    } else {
+                    }
+                    else
+                    {
                         // Test whether the edge is locally Delaunay.
                         doflip = predicates.inCircle(leftvertex, newvertex, rightvertex, farvertex) > 0.0;
                     }
-
-                    if (doflip) {
+                    if (doflip)
+                    {
                         // We made it! Flip the edge 'horiz' by rotating its containing
                         // quadrilateral (the two triangles adjacent to 'horiz').
                         // Identify the casing of the quadrilateral.
@@ -823,39 +885,51 @@ public class Mesh implements IMesh {
                         botleft.sym(botlcasing);
                         horiz.lprev(botright);
                         botright.sym(botrcasing);
-
                         // Rotate the quadrilateral one-quarter turn counterclockwise.
                         topleft.bond(botlcasing);
                         botleft.bond(botrcasing);
                         botright.bond(toprcasing);
                         topright.bond(toplcasing);
-
-                        if (checksegments) {
+                        if (checksegments)
+                        {
                             // Check for subsegments and rebond them to the quadrilateral.
-                            topleft.pivot(toplsubseg);
-                            botleft.pivot(botlsubseg);
-                            botright.pivot(botrsubseg);
-                            topright.pivot(toprsubseg);
+                            toplsubseg = topleft.pivot();
+                            botlsubseg = botleft.pivot();
+                            botrsubseg = botright.pivot();
+                            toprsubseg = topright.pivot();
 
                             if (toplsubseg.seg.hash == DUMMY)
+                            {
                                 topright.segDissolve(dummysub);
+                            }
                             else
+                            {
                                 topright.segBond(toplsubseg);
-
+                            }
                             if (botlsubseg.seg.hash == DUMMY)
+                            {
                                 topleft.segDissolve(dummysub);
+                            }
                             else
+                            {
                                 topleft.segBond(botlsubseg);
-
+                            }
                             if (botrsubseg.seg.hash == DUMMY)
+                            {
                                 botleft.segDissolve(dummysub);
+                            }
                             else
+                            {
                                 botleft.segBond(botrsubseg);
-
+                            }
                             if (toprsubseg.seg.hash == DUMMY)
+                            {
                                 botright.segDissolve(dummysub);
+                            }
                             else
+                            {
                                 botright.segBond(toprsubseg);
+                            }
                         }
                         // New vertex assignments for the rotated quadrilateral.
                         horiz.setOrg(farvertex);
@@ -871,10 +945,14 @@ public class Mesh implements IMesh {
                         top.tri.label = region;
                         horiz.tri.label = region;
 
-                        if (behavior.varArea) {
-                            if (top.tri.area <= 0.0 || horiz.tri.area <= 0.0) {
+                        if (behavior.varArea)
+                        {
+                            if ((top.tri.area <= 0.0) || (horiz.tri.area <= 0.0))
+                            {
                                 area = -1.0;
-                            } else {
+                            }
+                            else
+                            {
                                 // Take the average of the two triangles' area constraints.
                                 // This prevents small area constraints from migrating a
                                 // long, long way from their original location due to flips.
@@ -886,7 +964,9 @@ public class Mesh implements IMesh {
                         }
 
                         if (checkquality)
-                            flipstack.push(horiz);
+                        {
+                            flipstack.push(horiz.shallowCopy());
+                        }
 
                         // On the next iterations, consider the two edges that were exposed (this
                         // is, are now visible to the newly inserted vertex) by the edge flip.
@@ -895,10 +975,11 @@ public class Mesh implements IMesh {
                     }
                 }
             }
-
-            if (!doflip) {
+            if (!doflip)
+            {
                 // The handle 'horiz' is accepted as locally Delaunay.
-                if (triflaws) {
+                if (triflaws)
+                {
                     // Check the triangle 'horiz' for quality.
                     qualityMesher.testTriangle(horiz);
                 }
@@ -906,11 +987,11 @@ public class Mesh implements IMesh {
                 // Look for the next edge around the newly inserted vertex.
                 horiz.lnext();
                 horiz.sym(testtri);
-
                 // Check for finishing a complete revolution about the new vertex, or
                 // falling outside of the triangulation. The latter will happen when
                 // a vertex is inserted at a boundary.
-                if (leftvertex == first || testtri.tri.id == DUMMY) {
+                if ((leftvertex == first) || (testtri.tri.id == DUMMY))
+                {
                     // We're done. Return a triangle whose origin is the new vertex.
                     horiz.lnext(searchtri);
 
@@ -937,29 +1018,29 @@ public class Mesh implements IMesh {
     void insertSubseg(Otri tri, int subsegmark) {
         Otri oppotri = new Otri();
         Osub newsubseg = new Osub();
-        Vertex triorg;
-        Vertex tridest;
+        Vertex triorg, tridest;
 
         triorg = tri.org();
         tridest = tri.dest();
-
         // Mark vertices if possible.
         if (triorg.label == 0)
+        {
             triorg.label = subsegmark;
-
-        if (tridest.label== 0)
+        }
+        if (tridest.label == 0)
+        {
             tridest.label = subsegmark;
-
+        }
         // Check if there's already a subsegment here.
-        tri.pivot(newsubseg);
-        if (newsubseg.seg.hash == DUMMY) {
+        newsubseg = tri.pivot();
+        if (newsubseg.seg.hash == DUMMY)
+        {
             // Make new subsegment and initialize its vertices.
             makeSegment(newsubseg);
             newsubseg.setOrg(tridest);
             newsubseg.setDest(triorg);
             newsubseg.setSegOrg(tridest);
             newsubseg.setSegDest(triorg);
-
             // Bond new subsegment to the two triangles it is sandwiched between.
             // Note that the facing triangle 'oppotri' might be equal to 'dummytri'
             // (outer space), but the new subsegment is bonded to it all the same.
@@ -968,7 +1049,9 @@ public class Mesh implements IMesh {
             newsubseg.sym();
             oppotri.segBond(newsubseg);
             newsubseg.seg.boundary = subsegmark;
-        } else if (newsubseg.seg.boundary == 0) {
+        }
+        else if (newsubseg.seg.boundary == 0)
+        {
             newsubseg.seg.boundary = subsegmark;
         }
     }
@@ -1016,24 +1099,14 @@ public class Mesh implements IMesh {
      * @param flipedge Handle to the edge that will be flipped
      */
     void flip(Otri flipedge) {
-        Otri botleft = new Otri();
-        Otri botright = new Otri();
-        Otri topleft = new Otri();
-        Otri topright = new Otri();
+        Otri botleft = new Otri(), botright = new Otri();
+        Otri topleft = new Otri(), topright = new Otri();
         Otri top = new Otri();
-        Otri botlcasing = new Otri();
-        Otri botrcasing = new Otri();
-        Otri toplcasing = new Otri();
-        Otri toprcasing = new Otri();
-
-        Osub botlsubseg = new Osub();
-        Osub botrsubseg = new Osub();
-        Osub toplsubseg = new Osub();
-        Osub toprsubseg = new Osub();
-
-        Vertex leftvertex;
-        Vertex rightvertex;
-        Vertex botvertex;
+        Otri botlcasing = new Otri(), botrcasing = new Otri();
+        Otri toplcasing = new Otri(), toprcasing = new Otri();
+        Osub botlsubseg = new Osub(), botrsubseg = new Osub();
+        Osub toplsubseg = new Osub(), toprsubseg = new Osub();
+        Vertex leftvertex, rightvertex, botvertex;
         Vertex farvertex;
 
         // Identify the vertices of the quadrilateral.
@@ -1053,7 +1126,7 @@ public class Mesh implements IMesh {
 
         //if (checksegments)
         //{
-        //    flipedge.SegPivot(ref toplsubseg);
+        //    flipedge.SegPivot(toplsubseg);
         //    if (toplsubseg.ss != Segment.Empty)
         //    {
         //        logger.Error("Attempt to flip a segment.", "Mesh.Flip()");
@@ -1073,39 +1146,55 @@ public class Mesh implements IMesh {
         botleft.sym(botlcasing);
         flipedge.lprev(botright);
         botright.sym(botrcasing);
-
         // Rotate the quadrilateral one-quarter turn counterclockwise.
         topleft.bond(botlcasing);
         botleft.bond(botrcasing);
         botright.bond(toprcasing);
         topright.bond(toplcasing);
 
-        if (checksegments) {
+        if (checksegments)
+        {
             // Check for subsegments and rebond them to the quadrilateral.
-            topleft.pivot(toplsubseg);
-            botleft.pivot(botlsubseg);
-            botright.pivot(botrsubseg);
-            topright.pivot(toprsubseg);
+            toplsubseg = topleft.pivot();
+            botlsubseg = botleft.pivot();
+            botrsubseg = botright.pivot();
+            toprsubseg = topright.pivot();
 
             if (toplsubseg.seg.hash == DUMMY)
+            {
                 topright.segDissolve(dummysub);
+            }
             else
+            {
                 topright.segBond(toplsubseg);
+            }
 
             if (botlsubseg.seg.hash == DUMMY)
+            {
                 topleft.segDissolve(dummysub);
+            }
             else
+            {
                 topleft.segBond(botlsubseg);
+            }
 
             if (botrsubseg.seg.hash == DUMMY)
+            {
                 botleft.segDissolve(dummysub);
+            }
             else
+            {
                 botleft.segBond(botrsubseg);
+            }
 
             if (toprsubseg.seg.hash == DUMMY)
+            {
                 botright.segDissolve(dummysub);
+            }
             else
+            {
                 botright.segBond(toprsubseg);
+            }
         }
 
         // New vertex assignments for the rotated quadrilateral.
@@ -1129,24 +1218,14 @@ public class Mesh implements IMesh {
      * (Hence, the two triangles have rotated clockwise.)
      */
     void unflip(Otri flipedge) {
-        Otri botleft = new Otri();
-        Otri botright = new Otri();
-        Otri topleft = new Otri();
-        Otri topright = new Otri();
+        Otri botleft = new Otri(), botright = new Otri();
+        Otri topleft = new Otri(), topright = new Otri();
         Otri top = new Otri();
-        Otri botlcasing = new Otri();
-        Otri botrcasing = new Otri();
-        Otri toplcasing = new Otri();
-        Otri toprcasing = new Otri();
-
-        Osub botlsubseg = new Osub();
-        Osub botrsubseg = new Osub();
-        Osub toplsubseg = new Osub();
-        Osub toprsubseg = new Osub();
-
-        Vertex leftvertex;
-        Vertex rightvertex;
-        Vertex botvertex;
+        Otri botlcasing = new Otri(), botrcasing = new Otri();
+        Otri toplcasing = new Otri(), toprcasing = new Otri();
+        Osub botlsubseg = new Osub(), botrsubseg = new Osub();
+        Osub toplsubseg = new Osub(), toprsubseg = new Osub();
+        Vertex leftvertex, rightvertex, botvertex;
         Vertex farvertex;
 
         // Identify the vertices of the quadrilateral.
@@ -1166,39 +1245,52 @@ public class Mesh implements IMesh {
         botleft.sym(botlcasing);
         flipedge.lprev(botright);
         botright.sym(botrcasing);
-
         // Rotate the quadrilateral one-quarter turn clockwise.
         topleft.bond(toprcasing);
         botleft.bond(toplcasing);
         botright.bond(botlcasing);
         topright.bond(botrcasing);
 
-        if (checksegments) {
+        if (checksegments)
+        {
             // Check for subsegments and rebond them to the quadrilateral.
-            topleft.pivot(toplsubseg);
-            botleft.pivot(botlsubseg);
-            botright.pivot(botrsubseg);
-            topright.pivot(toprsubseg);
+            toplsubseg = topleft.pivot();
+            botlsubseg = botleft.pivot();
+            botrsubseg = botright.pivot();
+            toprsubseg = topright.pivot();
 
             if (toplsubseg.seg.hash == DUMMY)
+            {
                 botleft.segDissolve(dummysub);
+            }
             else
+            {
                 botleft.segBond(toplsubseg);
-
+            }
             if (botlsubseg.seg.hash == DUMMY)
+            {
                 botright.segDissolve(dummysub);
+            }
             else
+            {
                 botright.segBond(botlsubseg);
-
+            }
             if (botrsubseg.seg.hash == DUMMY)
+            {
                 topright.segDissolve(dummysub);
+            }
             else
-                toprcasing.segBond(botrsubseg);
-
+            {
+                topright.segBond(botrsubseg);
+            }
             if (toprsubseg.seg.hash == DUMMY)
+            {
                 topleft.segDissolve(dummysub);
+            }
             else
+            {
                 topleft.segBond(toprsubseg);
+            }
         }
 
         // New vertex assignments for the rotated quadrilateral.
@@ -1273,14 +1365,13 @@ public class Mesh implements IMesh {
         Otri testtri = new Otri();
         Otri besttri = new Otri();
         Otri tempedge = new Otri();
-        Vertex leftbasevertex;
-        Vertex rightbasevertex;
+        Vertex leftbasevertex, rightbasevertex;
         Vertex testvertex;
         Vertex bestvertex;
 
         int bestnumber = 1;
 
-        // Identify the base vertices
+        // Identify the base vertices.
         leftbasevertex = lastedge.apex();
         rightbasevertex = firstedge.dest();
 
@@ -1289,25 +1380,28 @@ public class Mesh implements IMesh {
         bestvertex = besttri.dest();
         besttri.copy(testtri);
 
-        for (int i = 2; i <= edgecount - 2; i++) {
+        for (int i = 2; i <= edgecount - 2; i++)
+        {
             testtri.onext();
             testvertex = testtri.dest();
-
             // Is this a better vertex?
-            if (predicates.inCircle(leftbasevertex, rightbasevertex, bestvertex, testvertex) > 0.0) {
+            if (predicates.inCircle(leftbasevertex, rightbasevertex, bestvertex, testvertex) > 0.0)
+            {
                 testtri.copy(besttri);
                 bestvertex = testvertex;
                 bestnumber = i;
             }
         }
 
-        if (bestnumber > 1) {
+        if (bestnumber > 1)
+        {
             // Recursively triangulate the smaller polygon on the right.
             besttri.oprev(tempedge);
             triangulatePolygon(firstedge, tempedge, bestnumber + 1, true, triflaws);
         }
 
-        if (bestnumber < edgecount - 2) {
+        if (bestnumber < edgecount - 2)
+        {
             // Recursively triangulate the smaller polygon on the left.
             besttri.sym(tempedge);
             triangulatePolygon(besttri, lastedge, edgecount - bestnumber, true, triflaws);
@@ -1315,18 +1409,18 @@ public class Mesh implements IMesh {
             tempedge.sym(besttri);
         }
 
-        if (doflip) {
-            // Do one final edge flip
+        if (doflip)
+        {
+            // Do one final edge flip.
             flip(besttri);
-
-            if (triflaws) {
+            if (triflaws)
+            {
                 // Check the quality of the newly committed triangle.
                 besttri.sym(testtri);
                 qualityMesher.testTriangle(testtri);
             }
         }
-
-        // Return the base triangle
+        // Return the base triangle.
         besttri.copy(lastedge);
     }
 
@@ -1342,17 +1436,11 @@ public class Mesh implements IMesh {
      */
     void deleteVertex(Otri deltri) {
         Otri countingtri = new Otri();
-        Otri firstedge = new Otri();
-        Otri lastedge = new Otri();
+        Otri firstedge = new Otri(), lastedge = new Otri();
         Otri deltriright = new Otri();
-        Otri lefttri = new Otri();
-        Otri righttri = new Otri();
-        Otri leftcasing = new Otri();
-        Otri rightcasing = new Otri();
-
-        Osub leftsubseg = new Osub();
-        Osub rightsubseg = new Osub();
-
+        Otri lefttri = new Otri(), righttri = new Otri();
+        Otri leftcasing = new Otri(), rightcasing = new Otri();
+        Osub leftsubseg = new Osub(), rightsubseg = new Osub();
         Vertex delvertex;
         Vertex neworg;
         int edgecount;
@@ -1361,16 +1449,17 @@ public class Mesh implements IMesh {
 
         vertexDealloc(delvertex);
 
-        // Count the degree of the vertex being deleted
+        // Count the degree of the vertex being deleted.
         deltri.onext(countingtri);
         edgecount = 1;
-
-        while (!deltri.equals(countingtri)) {
+        while (!deltri.equals(countingtri))
+        {
             edgecount++;
             countingtri.onext();
         }
 
-        if (edgecount > 3) {
+        if (edgecount > 3)
+        {
             // Triangulate the polygon defined by the union of all triangles
             // adjacent to the vertex being deleted.  Check the quality of
             // the resulting triangles.
@@ -1378,8 +1467,7 @@ public class Mesh implements IMesh {
             deltri.oprev(lastedge);
             triangulatePolygon(firstedge, lastedge, edgecount, false, behavior.noBisect == 0);
         }
-
-        // Splice out two triangles
+        // Splice out two triangles.
         deltri.lprev(deltriright);
         deltri.dnext(lefttri);
         lefttri.sym(leftcasing);
@@ -1387,21 +1475,24 @@ public class Mesh implements IMesh {
         righttri.sym(rightcasing);
         deltri.bond(leftcasing);
         deltriright.bond(rightcasing);
-        lefttri.pivot(leftsubseg);
-
+        leftsubseg = lefttri.pivot();
         if (leftsubseg.seg.hash != DUMMY)
+        {
             deltri.segBond(leftsubseg);
-
-        righttri.pivot(rightsubseg);
+        }
+        rightsubseg = righttri.pivot();
         if (rightsubseg.seg.hash != DUMMY)
+        {
             deltriright.segBond(rightsubseg);
+        }
 
         // Set the new origin of 'deltri' and check its quality.
         neworg = lefttri.org();
         deltri.setOrg(neworg);
-
         if (behavior.noBisect == 0)
+        {
             qualityMesher.testTriangle(deltri);
+        }
 
         // Delete the two spliced-out triangles.
         triangleDealloc(lefttri.tri);
@@ -1418,24 +1509,17 @@ public class Mesh implements IMesh {
      */
     void undoVertex() {
         Otri fliptri;
-        Otri botleft = new Otri();
-        Otri botright = new Otri();
-        Otri topright = new Otri();
-        Otri botlcasing = new Otri();
-        Otri botrcasing = new Otri();
-        Otri toprcasing = new Otri();
+
+        Otri botleft = new Otri(), botright = new Otri(), topright = new Otri();
+        Otri botlcasing = new Otri(), botrcasing = new Otri(), toprcasing = new Otri();
         Otri gluetri = new Otri();
-
-        Osub botlsubseg = new Osub();
-        Osub botrsubseg = new Osub();
-        Osub toprsubseg = new Osub();
-
-        Vertex botvertex;
-        Vertex rightvertex;
+        Osub botlsubseg = new Osub(), botrsubseg = new Osub(), toprsubseg = new Osub();
+        Vertex botvertex, rightvertex;
 
         // Walk through the list of transformations (flips and a vertex insertion)
         // in the reverse of the order in which they were done, and undo them.
-        while (flipstack.size() > 0) {
+        while (flipstack.size() > 0)
+        {
             // Find a triangle involved in the last unreversed transformation.
             fliptri = flipstack.pop();
 
@@ -1443,7 +1527,8 @@ public class Mesh implements IMesh {
             // triangle into three (by inserting a vertex in the triangle), a
             // bisection of two triangles into four (by inserting a vertex in an
             // edge), or an edge flip.
-            if (flipstack.size() == 0) {
+            if (flipstack.size() == 0)
+            {
                 // Restore a triangle that was split into three triangles,
                 // so it is again one triangle.
                 fliptri.dprev(botleft);
@@ -1457,17 +1542,19 @@ public class Mesh implements IMesh {
                 fliptri.setApex(botvertex);
                 fliptri.lnext();
                 fliptri.bond(botlcasing);
-                botleft.pivot(botlsubseg);
+                botlsubseg = botleft.pivot();
                 fliptri.segBond(botlsubseg);
                 fliptri.lnext();
                 fliptri.bond(botrcasing);
-                botright.pivot(botrsubseg);
+                botrsubseg = botright.pivot();
                 fliptri.segBond(botrsubseg);
 
                 // Delete the two spliced-out triangles.
                 triangleDealloc(botleft.tri);
                 triangleDealloc(botright.tri);
-            } else if (flipstack.peek().tri == null) { // dummy flip
+            }
+            else if (flipstack.peek().tri == null) // Dummy flip
+            {
                 // Restore two triangles that were split into four triangles,
                 // so they are again two triangles.
                 fliptri.lprev(gluetri);
@@ -1478,29 +1565,33 @@ public class Mesh implements IMesh {
 
                 fliptri.setOrg(rightvertex);
                 gluetri.bond(botrcasing);
-                botright.pivot(botrsubseg);
+                botrsubseg = botright.pivot();
                 gluetri.segBond(botrsubseg);
 
-                // Delete the spliced-out triangle
+                // Delete the spliced-out triangle.
                 triangleDealloc(botright.tri);
 
-                if (gluetri.tri.id != DUMMY) {
+                fliptri.sym(gluetri);
+                if (gluetri.tri.id != DUMMY)
+                {
                     gluetri.lnext();
                     gluetri.dnext(topright);
                     topright.sym(toprcasing);
 
                     gluetri.setOrg(rightvertex);
                     gluetri.bond(toprcasing);
-                    topright.pivot(toprsubseg);
+                    toprsubseg = topright.pivot();
                     gluetri.segBond(toprsubseg);
 
-                    // Delete the spliced-out triangle
+                    // Delete the spliced-out triangle.
                     triangleDealloc(topright.tri);
                 }
 
                 flipstack.clear();
-            } else {
-                // Undo an edge flip
+            }
+            else
+            {
+                // Undo an edge flip.
                 unflip(fliptri);
             }
         }

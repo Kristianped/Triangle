@@ -18,14 +18,19 @@ public class SubSegment implements ISegment {
 
         // Initialize the two adjoining subsegments to be omnipresent subsegment
         subsegs = new Osub[2];
+        subsegs[0] = new Osub();
+        subsegs[1] = new Osub();
+
 
         // Initialize the two adjoining triangles to be "outer space"
         triangles = new Otri[2];
+        triangles[0] = new Otri();
+        triangles[1] = new Otri();
     }
 
     @Override
     public String toString() {
-        return String.format("SID {0}", hash);
+        return String.format("SID %d", hash);
     }
 
     @Override

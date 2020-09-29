@@ -29,7 +29,7 @@ public class TrianglePool implements Collection<Triangle> {
         pool = new Triangle[n][];
         pool[0] = new Triangle[BLOCKSIZE];
 
-        stack = new ArrayDeque<>();
+        stack = new ArrayDeque<>(BLOCKSIZE);
     }
 
     /**
@@ -95,9 +95,9 @@ public class TrianglePool implements Collection<Triangle> {
      * Samples a number of triangles from the pool
      * @param k - The number of triangles to sample
      */
-    Iterable<Triangle> sample(int k) {
+    Iterable<Triangle> sample(int k, Random random) {
         int i;
-        int count = this.count;
+        int count = this.size();
 
         if (k > count)
             k = count;
@@ -106,10 +106,10 @@ public class TrianglePool implements Collection<Triangle> {
         Triangle t;
 
         while (k > 0) {
-            i = ThreadLocalRandom.current().nextInt(0, count);
+            i = random.nextInt(count);
             t = pool[i / BLOCKSIZE][i % BLOCKSIZE];
 
-            if (t.hashCode() >= 0) {
+            if (t.hash >= 0) {
                 k--;
                 list.add(t);
             }
@@ -119,9 +119,9 @@ public class TrianglePool implements Collection<Triangle> {
     }
 
     private void cleanup(Triangle triangle) {
-        triangle.setLabel(0);
-        triangle.setArea(0);
-        triangle.setInfected(false);
+        triangle.label = 0;
+        triangle.area = 0.0;
+        triangle.infected = false;
 
         triangle.reset();
     }
@@ -151,12 +151,12 @@ public class TrianglePool implements Collection<Triangle> {
             return false;
 
         Triangle item = (Triangle) o;
-        int i = item.hashCode();
+        int i = item.hash;
 
         if (i < 0 || i > size)
             return false;
 
-        return pool[i / BLOCKSIZE][i % BLOCKSIZE].hashCode() >= 0;
+        return pool[i / BLOCKSIZE][i % BLOCKSIZE].hash >= 0;
     }
 
     @Override
@@ -166,7 +166,14 @@ public class TrianglePool implements Collection<Triangle> {
 
     @Override
     public Object[] toArray() {
-        throw new UnsupportedOperationException("Not implemented");
+        Object[] array = new Object[size()];
+        int i = 0;
+        Iterator<Triangle> iterator = iterator();
+
+        while (iterator.hasNext())
+            array[i++] = iterator.next();
+
+        return array;
     }
 
     @Override
@@ -235,7 +242,7 @@ public class TrianglePool implements Collection<Triangle> {
         int index, offset;
 
         public Enumerator(TrianglePool pool) {
-            this.count = pool.count;
+            this.count = pool.size();
             this.pool = pool.pool;
             index = 0;
             offset = 0;

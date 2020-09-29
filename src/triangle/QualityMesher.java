@@ -1,13 +1,13 @@
 package triangle;
 
+import java.time.format.TextStyle;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Queue;
 
 public class QualityMesher {
 
     IPredicates predicates;
-    Deque<BadSubSeg> badSubSegs;
+    Deque<BadSubSeg> badsubsegs;
     BadTriQueue queue;
     Mesh mesh;
     Behavior behavior;
@@ -19,11 +19,11 @@ public class QualityMesher {
     Triangle newvertex_tri;
 
     public QualityMesher(Mesh mesh, Configuration config) {
-        badSubSegs = new ArrayDeque<>();
+        badsubsegs = new ArrayDeque<>();
         queue = new BadTriQueue();
 
         this.mesh = mesh;
-        this.predicates = config.predicates;
+        this.predicates = config.predicates.get();
 
         this.behavior = mesh.behavior;
 
@@ -40,15 +40,15 @@ public class QualityMesher {
     public void apply(QualityOptions quality, boolean delaunay) {
         // Copy quality options
         if (quality != null) {
-            behavior.quality = true;
+            behavior.setQuality(true);
 
-            behavior.minAngle = quality.getMinAngle();
-            behavior.maxAngle = quality.getMaxAngle();
-            behavior.maxArea = quality.getMaxArea();
-            behavior.usertest = quality.getUsertest();
-            behavior.varArea = quality.isVariableArea();
+            behavior.setMinAngle(quality.getMinAngle());
+            behavior.setMaxAngle(quality.getMaxAngle());
+            behavior.setMaxArea(quality.getMaxArea());
+            behavior.setUsertest(quality.getUsertest());
+            behavior.setVarArea(quality.isVariableArea());
 
-            behavior.conformDel = behavior.conformDel || delaunay;
+            behavior.setConforminDelaunay(behavior.conformDel || delaunay);
 
             mesh.steinerleft = quality.getSteinerPoints() == 0 ? -1 : quality.getSteinerPoints();
         }
@@ -57,7 +57,7 @@ public class QualityMesher {
         if (!behavior.poly) {
             // Be careful not to allocate space for element area constraints that
             // will never be assigned any value (other than the default -1.0).
-            behavior.varArea = false;
+            behavior.setVarArea(false);
         }
 
         // Ensure that no vertex can be mistaken for a triangular bounding
@@ -79,7 +79,7 @@ public class QualityMesher {
      * @param badseg Bad subsegment
      */
     public void addBadSubseg(BadSubSeg badseg) {
-        badSubSegs.addLast(badseg);
+        badsubsegs.addLast(badseg);
     }
 
     public int checkSeg4Encroach(Osub testsubseg) {
@@ -89,26 +89,21 @@ public class QualityMesher {
         double dotproduct;
         int encroached;
         int sides;
-        Vertex eorg;
-        Vertex edest;
-        Vertex eapex;
+        Vertex eorg, edest, eapex;
 
         encroached = 0;
         sides = 0;
 
         eorg = testsubseg.org();
         edest = testsubseg.dest();
-
         // Check one neighbor of the subsegment.
-        testsubseg.pivot(neighbortri);
-
+        neighbortri = testsubseg.pivotTri();
         // Does the neighbor exist, or is this a boundary edge?
-        if (neighbortri.tri.id != Mesh.DUMMY) {
+        if (neighbortri.tri.id != Mesh.DUMMY)
+        {
             sides++;
-
             // Find a vertex opposite this subsegment.
             eapex = neighbortri.apex();
-
             // Check whether the apex is in the diametral lens of the subsegment
             // (the diametral circle if 'conformdel' is set).  A dot product
             // of two sides of the triangle is used to check whether the angle
@@ -116,8 +111,8 @@ public class QualityMesher {
             // lenses; 90 degrees for diametral circles).
             dotproduct = (eorg.x - eapex.x) * (edest.x - eapex.x) +
                     (eorg.y - eapex.y) * (edest.y - eapex.y);
-
             if (dotproduct < 0.0)
+            {
                 if (behavior.conformDel ||
                         (dotproduct * dotproduct >=
                                 (2.0 * behavior.goodAngle - 1.0) * (2.0 * behavior.goodAngle - 1.0) *
@@ -125,26 +120,26 @@ public class QualityMesher {
                                                 (eorg.y - eapex.y) * (eorg.y - eapex.y)) *
                                         ((edest.x - eapex.x) * (edest.x - eapex.x) +
                                                 (edest.y - eapex.y) * (edest.y - eapex.y))))
+                {
                     encroached = 1;
+                }
+            }
         }
-
         // Check the other neighbor of the subsegment.
         testsubseg.sym(testsym);
-        testsym.pivot(neighbortri);
-
+        neighbortri = testsym.pivotTri();
         // Does the neighbor exist, or is this a boundary edge?
-        if (neighbortri.tri.id != Mesh.DUMMY) {
+        if (neighbortri.tri.id != Mesh.DUMMY)
+        {
             sides++;
-
             // Find the other vertex opposite this subsegment.
             eapex = neighbortri.apex();
-
             // Check whether the apex is in the diametral lens of the subsegment
             // (or the diametral circle, if 'conformdel' is set).
             dotproduct = (eorg.x - eapex.x) * (edest.x - eapex.x) +
                     (eorg.y - eapex.y) * (edest.y - eapex.y);
-
             if (dotproduct < 0.0)
+            {
                 if (behavior.conformDel ||
                         (dotproduct * dotproduct >=
                                 (2.0 * behavior.goodAngle - 1.0) * (2.0 * behavior.goodAngle - 1.0) *
@@ -152,24 +147,31 @@ public class QualityMesher {
                                                 (eorg.y - eapex.y) * (eorg.y - eapex.y)) *
                                         ((edest.x - eapex.x) * (edest.x - eapex.x) +
                                                 (edest.y - eapex.y) * (edest.y - eapex.y))))
+                {
                     encroached += 2;
+                }
+            }
         }
 
-        if (encroached > 0 && (behavior.noBisect == 0 || ((behavior.noBisect == 1) && (sides == 2)))) {
+        if (encroached > 0 && (behavior.noBisect == 0 || ((behavior.noBisect == 1) && (sides == 2))))
+        {
             // Add the subsegment to the list of encroached subsegments.
             // Be sure to get the orientation right.
             encroachedseg = new BadSubSeg();
-
-            if (encroached == 1) {
-                encroachedseg.subseg = testsubseg;
+            if (encroached == 1)
+            {
+                encroachedseg.subseg = testsubseg.shallowCopy();
                 encroachedseg.org = eorg;
                 encroachedseg.dest = edest;
-            } else {
-                encroachedseg.subseg = testsym;
+            }
+            else
+            {
+                encroachedseg.subseg = testsym.shallowCopy();
                 encroachedseg.org = edest;
                 encroachedseg.dest = eorg;
             }
-            badSubSegs.add(encroachedseg);
+            
+            badsubsegs.add(encroachedseg);
         }
 
         return encroached;
@@ -184,35 +186,15 @@ public class QualityMesher {
      * @param testtri Triangle to check
      */
     public void testTriangle(Otri testtri) {
-        Otri tri1 = new Otri();
-        Otri tri2 = new Otri();
+        Otri tri1 = new Otri(), tri2 = new Otri();
         Osub testsub = new Osub();
-        Vertex torg;
-        Vertex tdest;
-        Vertex tapex;
-        Vertex base1;
-        Vertex base2;
-        Vertex org1;
-        Vertex dest1;
-        Vertex org2;
-        Vertex dest2;
+        Vertex torg, tdest, tapex;
+        Vertex base1, base2;
+        Vertex org1, dest1, org2, dest2;
         Vertex joinvertex;
-        double dxod;
-        double dyod;
-        double dxda;
-        double dyda;
-        double dxao;
-        double dyao;
-        double dxod2;
-        double dyod2;
-        double dxda2;
-        double dyda2;
-        double dxao2;
-        double dyao2;
-        double apexlen;
-        double orglen;
-        double destlen;
-        double minedge;
+        double dxod, dyod, dxda, dyda, dxao, dyao;
+        double dxod2, dyod2, dxda2, dyda2, dxao2, dyao2;
+        double apexlen, orglen, destlen, minedge;
         double angle;
         double area;
         double dist1, dist2;
@@ -234,36 +216,37 @@ public class QualityMesher {
         dyda2 = dyda * dyda;
         dxao2 = dxao * dxao;
         dyao2 = dyao * dyao;
-
         // Find the lengths of the triangle's three edges.
         apexlen = dxod2 + dyod2;
         orglen = dxda2 + dyda2;
         destlen = dxao2 + dyao2;
 
-        if ((apexlen < orglen) && (apexlen < destlen)) {
+        if ((apexlen < orglen) && (apexlen < destlen))
+        {
             // The edge opposite the apex is shortest.
             minedge = apexlen;
-
             // Find the square of the cosine of the angle at the apex.
             angle = dxda * dxao + dyda * dyao;
             angle = angle * angle / (orglen * destlen);
             base1 = torg;
             base2 = tdest;
             testtri.copy(tri1);
-        } else if (orglen < destlen) {
+        }
+        else if (orglen < destlen)
+        {
             // The edge opposite the origin is shortest.
             minedge = orglen;
-
             // Find the square of the cosine of the angle at the origin.
             angle = dxod * dxao + dyod * dyao;
             angle = angle * angle / (apexlen * destlen);
             base1 = tdest;
             base2 = tapex;
             testtri.lnext(tri1);
-        } else {
+        }
+        else
+        {
             // The edge opposite the destination is shortest.
             minedge = destlen;
-
             // Find the square of the cosine of the angle at the destination.
             angle = dxod * dxda + dyod * dyda;
             angle = angle * angle / (apexlen * orglen);
@@ -276,39 +259,48 @@ public class QualityMesher {
         {
             // Check whether the area is larger than permitted.
             area = 0.5 * (dxod * dyda - dyod * dxda);
-
-            if (behavior.fixedArea && (area > behavior.maxArea)) {
+            if (behavior.fixedArea && (area > behavior.maxArea))
+            {
                 // Add this triangle to the list of bad triangles.
-                queue.enqueue(testtri, minedge, tapex, torg, tdest);
+                queue.enqueue(testtri.shallowCopy(), minedge, tapex, torg, tdest);
                 return;
             }
 
             // Nonpositive area constraints are treated as unconstrained.
-            if ((behavior.varArea) && (area > testtri.tri.area) && (testtri.tri.area > 0.0)) {
+            if ((behavior.varArea) && (area > testtri.tri.area) && (testtri.tri.area > 0.0))
+            {
                 // Add this triangle to the list of bad triangles.
-                queue.enqueue(testtri, minedge, tapex, torg, tdest);
+                queue.enqueue(testtri.shallowCopy(), minedge, tapex, torg, tdest);
                 return;
             }
 
             // Check whether the user thinks this triangle is too large.
-            if ((behavior.usertest != null) && behavior.usertest.apply(new Tuple<>(testtri.tri, area))) {
-                queue.enqueue(testtri, minedge, tapex, torg, tdest);
+            Tuple<ITriangle, Double> test = new Tuple<>(testtri.tri, area);
+
+            if ((behavior.usertest != null) &&  behavior.usertest.apply(test))
+            {
+                queue.enqueue(testtri.shallowCopy(), minedge, tapex, torg, tdest);
                 return;
             }
         }
 
         // find the maximum edge and accordingly the pqr orientation
-        if ((apexlen > orglen) && (apexlen > destlen)) {
+        if ((apexlen > orglen) && (apexlen > destlen))
+        {
             // The edge opposite the apex is longest.
             // maxedge = apexlen;
             // Find the cosine of the angle at the apex.
             maxangle = (orglen + destlen - apexlen) / (2 * Math.sqrt(orglen * destlen));
-        } else if (orglen > destlen) {
+        }
+        else if (orglen > destlen)
+        {
             // The edge opposite the origin is longest.
             // maxedge = orglen;
             // Find the cosine of the angle at the origin.
             maxangle = (apexlen + destlen - orglen) / (2 * Math.sqrt(apexlen * destlen));
-        } else {
+        }
+        else
+        {
             // The edge opposite the destination is longest.
             // maxedge = destlen;
             // Find the cosine of the angle at the destination.
@@ -316,7 +308,8 @@ public class QualityMesher {
         }
 
         // Check whether the angle is smaller than permitted.
-        if ((angle > behavior.goodAngle) || (maxangle < behavior.maxGoodAngle && behavior.maxAngle != 0.0)) {
+        if ((angle > behavior.goodAngle) || (maxangle < behavior.maxGoodAngle && behavior.maxAngle != 0.0))
+        {
             // Use the rules of Miller, Pav, and Walkington to decide that certain
             // triangles should not be split, even if they have bad angles.
             // A skinny triangle is not split if its shortest edge subtends a
@@ -327,60 +320,62 @@ public class QualityMesher {
             // the two segments meet.
             // First, check if both points lie in segment interiors.
             if ((base1.type == Enums.VertexType.SegmentVertex) &&
-                    (base2.type == Enums.VertexType.SegmentVertex)) {
+                    (base2.type == Enums.VertexType.SegmentVertex))
+            {
                 // Check if both points lie in a common segment. If they do, the
                 // skinny triangle is enqueued to be split as usual.
-                tri1.pivot(testsub);
-
-                if (testsub.seg.hash == Mesh.DUMMY) {
+                testsub = tri1.pivot();
+                if (testsub.seg.hash == Mesh.DUMMY)
+                {
                     // No common segment.  Find a subsegment that contains 'torg'.
                     tri1.copy(tri2);
-
-                    do {
+                    do
+                    {
                         tri1.oprev();
-                        tri1.pivot(testsub);
+                        testsub = tri1.pivot();
                     } while (testsub.seg.hash == Mesh.DUMMY);
-
                     // Find the endpoints of the containing segment.
                     org1 = testsub.segOrg();
                     dest1 = testsub.segDest();
-
                     // Find a subsegment that contains 'tdest'.
-                    do {
+                    do
+                    {
                         tri2.dnext();
-                        tri2.pivot(testsub);
+                        testsub = tri2.pivot();
                     } while (testsub.seg.hash == Mesh.DUMMY);
-
                     // Find the endpoints of the containing segment.
                     org2 = testsub.segOrg();
                     dest2 = testsub.segDest();
-
                     // Check if the two containing segments have an endpoint in common.
                     joinvertex = null;
-
                     if ((dest1.x == org2.x) && (dest1.y == org2.y))
+                    {
                         joinvertex = dest1;
-
+                    }
                     else if ((org1.x == dest2.x) && (org1.y == dest2.y))
+                    {
                         joinvertex = org1;
-
-                    if (joinvertex != null) {
+                    }
+                    if (joinvertex != null)
+                    {
                         // Compute the distance from the common endpoint (of the two
                         // segments) to each of the endpoints of the shortest edge.
                         dist1 = ((base1.x - joinvertex.x) * (base1.x - joinvertex.x) +
                                 (base1.y - joinvertex.y) * (base1.y - joinvertex.y));
                         dist2 = ((base2.x - joinvertex.x) * (base2.x - joinvertex.x) +
                                 (base2.y - joinvertex.y) * (base2.y - joinvertex.y));
-
                         // If the two distances are equal, don't split the triangle.
                         if ((dist1 < 1.001 * dist2) && (dist1 > 0.999 * dist2))
-                            return; // Return now to avoid enqueueing the bad triangle.
+                        {
+                            // Return now to avoid enqueueing the bad triangle.
+                            return;
+                        }
                     }
                 }
             }
 
             // Add this triangle to the list of bad triangles.
-            queue.enqueue(testtri, minedge, tapex, torg, tdest);
+            queue.enqueue(testtri.shallowCopy(), minedge, tapex, torg, tdest);
         }
     }
 
@@ -415,38 +410,34 @@ public class QualityMesher {
         Osub testsh = new Osub();
         Osub currentenc = new Osub();
         BadSubSeg seg;
-        Vertex eorg;
-        Vertex edest;
-        Vertex eapex;
+        Vertex eorg, edest, eapex;
         Vertex newvertex;
         Enums.InsertVertexResult success;
-        double segmentlength;
-        double nearestpoweroftwo;
+        double segmentlength, nearestpoweroftwo;
         double split;
-        double multiplier;
-        double divisor;
-        boolean acuteorg;
-        boolean acuteorg2;
-        boolean acutedest;
-        boolean acutedest2;
+        double multiplier, divisor;
+        boolean acuteorg, acuteorg2, acutedest, acutedest2;
 
         // Note that steinerleft == -1 if an unlimited number
         // of Steiner points is allowed.
-        while (badSubSegs.size() > 0) {
+        while (badsubsegs.size() > 0)
+        {
             if (mesh.steinerleft == 0)
+            {
                 break;
+            }
 
-            seg = badSubSegs.pollFirst();
+            seg = badsubsegs.poll();
 
             currentenc = seg.subseg;
             eorg = currentenc.org();
             edest = currentenc.dest();
-
             // Make sure that this segment is still the same segment it was
             // when it was determined to be encroached.  If the segment was
             // enqueued multiple times (because several newly inserted
             // vertices encroached it), it may have already been split.
-            if (!Osub.isDead(currentenc.seg) && (eorg == seg.org) && (edest == seg.dest)) {
+            if (!Osub.isDead(currentenc.seg) && (eorg == seg.org) && (edest == seg.dest))
+            {
                 // To decide where to split a segment, we need to know if the
                 // segment shares an endpoint with an adjacent segment.
                 // The concern is that, if we simply split every encroached
@@ -463,27 +454,27 @@ public class QualityMesher {
                 // concentric circles for later splittings.)
 
                 // Is the origin shared with another segment?
-                currentenc.pivot(enctri);
+                enctri = currentenc.pivotTri();
                 enctri.lnext(testtri);
-                testtri.pivot(testsh);
+                testsh = testtri.pivot();
                 acuteorg = testsh.seg.hash != Mesh.DUMMY;
-
                 // Is the destination shared with another segment?
                 testtri.lnext();
-                testtri.pivot(testsh);
+                testsh = testtri.pivot();
                 acutedest = testsh.seg.hash != Mesh.DUMMY;
 
                 // If we're using Chew's algorithm (rather than Ruppert's)
                 // to define encroachment, delete free vertices from the
                 // subsegment's diametral circle.
-                if (!behavior.conformDel && !acuteorg && !acutedest) {
+                if (!behavior.conformDel && !acuteorg && !acutedest)
+                {
                     eapex = enctri.apex();
-
                     while ((eapex.type == Enums.VertexType.FreeVertex) &&
                             ((eorg.x - eapex.x) * (edest.x - eapex.x) +
-                                    (eorg.y - eapex.y) * (edest.y - eapex.y) < 0.0)) {
+                                    (eorg.y - eapex.y) * (edest.y - eapex.y) < 0.0))
+                    {
                         mesh.deleteVertex(testtri);
-                        currentenc.pivot(enctri);
+                        enctri = currentenc.pivotTri();
                         eapex = enctri.apex();
                         enctri.lprev(testtri);
                     }
@@ -491,27 +482,27 @@ public class QualityMesher {
 
                 // Now, check the other side of the segment, if there's a triangle there.
                 enctri.sym(testtri);
-
-                if (testtri.tri.id != Mesh.DUMMY) {
+                if (testtri.tri.id != Mesh.DUMMY)
+                {
                     // Is the destination shared with another segment?
                     testtri.lnext();
-                    testtri.pivot(testsh);
+                    testsh = testtri.pivot();
                     acutedest2 = testsh.seg.hash != Mesh.DUMMY;
                     acutedest = acutedest || acutedest2;
-
                     // Is the origin shared with another segment?
                     testtri.lnext();
-                    testtri.pivot(testsh);
+                    testsh = testtri.pivot();
                     acuteorg2 = testsh.seg.hash != Mesh.DUMMY;
                     acuteorg = acuteorg || acuteorg2;
 
                     // Delete free vertices from the subsegment's diametral circle.
-                    if (!behavior.conformDel && !acuteorg2 && !acutedest2) {
+                    if (!behavior.conformDel && !acuteorg2 && !acutedest2)
+                    {
                         eapex = testtri.org();
-
                         while ((eapex.type == Enums.VertexType.FreeVertex) &&
                                 ((eorg.x - eapex.x) * (edest.x - eapex.x) +
-                                        (eorg.y - eapex.y) * (edest.y - eapex.y) < 0.0)) {
+                                        (eorg.y - eapex.y) * (edest.y - eapex.y) < 0.0))
+                        {
                             mesh.deleteVertex(testtri);
                             enctri.sym(testtri);
                             eapex = testtri.apex();
@@ -522,25 +513,30 @@ public class QualityMesher {
 
                 // Use the concentric circles if exactly one endpoint is shared
                 // with another adjacent segment.
-                if (acuteorg || acutedest) {
+                if (acuteorg || acutedest)
+                {
                     segmentlength = Math.sqrt((edest.x - eorg.x) * (edest.x - eorg.x) +
                             (edest.y - eorg.y) * (edest.y - eorg.y));
                     // Find the power of two that most evenly splits the segment.
                     // The worst case is a 2:1 ratio between subsegment lengths.
                     nearestpoweroftwo = 1.0;
-
                     while (segmentlength > 3.0 * nearestpoweroftwo)
+                    {
                         nearestpoweroftwo *= 2.0;
-
+                    }
                     while (segmentlength < 1.5 * nearestpoweroftwo)
+                    {
                         nearestpoweroftwo *= 0.5;
-
+                    }
                     // Where do we split the segment?
                     split = nearestpoweroftwo / segmentlength;
-
                     if (acutedest)
+                    {
                         split = 1.0 - split;
-                } else {
+                    }
+                }
+                else
+                {
                     // If we're not worried about adjacent segments, split
                     // this segment in the middle.
                     split = 0.5;
@@ -561,24 +557,26 @@ public class QualityMesher {
 
                 mesh.vertices.put(newvertex.hash, newvertex);
                 // Interpolate attributes.
-                for (int i = 0; i < mesh.nextras; i++) {
+                for (int i = 0; i < mesh.nextras; i++)
+                {
                     newvertex.attributes[i] = eorg.attributes[i]
                             + split * (edest.attributes[i] - eorg.attributes[i]);
                 }
 
-                if (!Behavior.NoExact) {
+                if (!Behavior.NoExact)
+                {
                     // Roundoff in the above calculation may yield a 'newvertex'
                     // that is not precisely collinear with 'eorg' and 'edest'.
                     // Improve collinearity by one step of iterative refinement.
                     multiplier = predicates.counterClockwise(eorg, edest, newvertex);
                     divisor = ((eorg.x - edest.x) * (eorg.x - edest.x) +
                             (eorg.y - edest.y) * (eorg.y - edest.y));
-
-                    if ((multiplier != 0.0) && (divisor != 0.0)) {
+                    if ((multiplier != 0.0) && (divisor != 0.0))
+                    {
                         multiplier = multiplier / divisor;
                         // Watch out for NANs.
-
-                        if (!Double.isNaN(multiplier)) {
+                        if (!Double.isNaN(multiplier))
+                        {
                             newvertex.x += multiplier * (edest.y - eorg.y);
                             newvertex.y += multiplier * (eorg.x - edest.x);
                         }
@@ -588,24 +586,26 @@ public class QualityMesher {
                 // Check whether the new vertex lies on an endpoint.
                 if (((newvertex.x == eorg.x) && (newvertex.y == eorg.y)) ||
                         ((newvertex.x == edest.x) && (newvertex.y == edest.y)))
+                {
                     throw new RuntimeException("Ran out of precision");
-
+                }
                 // Insert the splitting vertex.  This should always succeed.
                 success = mesh.insertVertex(newvertex, enctri, currentenc, true, triflaws);
-
                 if ((success != Enums.InsertVertexResult.Successful) && (success != Enums.InsertVertexResult.Encroaching))
+                {
                     throw new RuntimeException("Failure to split a segment.");
-
+                }
                 if (mesh.steinerleft > 0)
+                {
                     mesh.steinerleft--;
-
+                }
                 // Check the two new subsegments to see if they're encroached.
                 checkSeg4Encroach(currentenc);
-                currentenc.next();
+                currentenc = currentenc.next();
                 checkSeg4Encroach(currentenc);
             }
 
-            // Set subsegment's origin to NULL. This makes it possible to detect dead
+            // Set subsegment's origin to NULL. This makes it possible to detect dead 
             // badsubsegs when traversing the list of all badsubsegs.
             seg.org = null;
         }
@@ -632,16 +632,13 @@ public class QualityMesher {
      */
     private void splitTriangle(BadTriangle badtri) {
         Otri badotri = new Otri();
-        Vertex borg;
-        Vertex bdest;
-        Vertex bapex;
+        Vertex borg, bdest, bapex;
         Point newloc; // Location of the new vertex
-        MutableDouble xi = new MutableDouble(0);
-        MutableDouble eta = new MutableDouble(0);
+        MutableDouble xi = new MutableDouble(), eta = new MutableDouble();
         Enums.InsertVertexResult success;
         boolean errorflag;
 
-        badotri = badtri.poortri;
+        badotri = badtri.poortri.shallowCopy();
         borg = badotri.org();
         bdest = badotri.dest();
         bapex = badotri.apex();
@@ -650,26 +647,34 @@ public class QualityMesher {
         // when it was tested and determined to be of bad quality.
         // Subsequent transformations may have made it a different triangle.
         if (!Otri.isDead(badotri.tri) && (borg == badtri.org) &&
-                (bdest == badtri.dest) && (bapex == badtri.apex)) {
+                (bdest == badtri.dest) && (bapex == badtri.apex))
+        {
             errorflag = false;
             // Create a new vertex at the triangle's circumcenter.
 
             // Using the original (simpler) Steiner point location method
             // for mesh refinement.
-            // TODO: NewLocation doesn't work for refinement. Why? Maybe
+            // TODO: NewLocation doesn't work for refinement. Why? Maybe 
             // reset VertexType?
             if (behavior.fixedArea || behavior.varArea)
+            {
                 newloc = predicates.findCircumcenter(borg, bdest, bapex, xi, eta, behavior.offconstant);
+            }
             else
-                newloc = newLocation.findLocation(borg, bdest, bapex, xi, eta, true, badotri);
+            {
+                Otri copy = badotri.shallowCopy();
+                newloc = newLocation.findLocation(borg, bdest, bapex, xi, eta, true, copy);
+            }
 
             // Check whether the new vertex lies on a triangle vertex.
             if (((newloc.x == borg.x) && (newloc.y == borg.y)) ||
                     ((newloc.x == bdest.x) && (newloc.y == bdest.y)) ||
-                    ((newloc.x == bapex.x) && (newloc.y == bapex.y))) {
-                System.err.println("New vertex falls on existing vertex.: Quality.SplitTriangle()");
+                    ((newloc.x == bapex.x) && (newloc.y == bapex.y)))
+            {
                 errorflag = true;
-            } else {
+            }
+            else
+            {
                 // The new vertex must be in the interior, and therefore is a
                 // free vertex with a marker of zero.
                 Vertex newvertex = new Vertex(newloc.x, newloc.y, 0
@@ -686,7 +691,9 @@ public class QualityMesher {
                 // negative.  Roundoff error might prevent eta from being
                 // negative when it should be, so I test eta against xi.)
                 if (eta.getValue() < xi.getValue())
+                {
                     badotri.lprev();
+                }
 
                 // Assign triangle for attributes interpolation.
                 newvertex.tri.tri = newvertex_tri;
@@ -696,39 +703,44 @@ public class QualityMesher {
                 Osub tmp = new Osub();
                 success = mesh.insertVertex(newvertex, badotri, tmp, true, true);
 
-                if (success == Enums.InsertVertexResult.Successful) {
+                if (success == Enums.InsertVertexResult.Successful)
+                {
                     newvertex.hash = mesh.hash_vtx++;
                     newvertex.id = newvertex.hash;
-
                     if (mesh.nextras > 0)
+                    {
                         Interpolation.interpolateAttributes(newvertex, newvertex.tri.tri, mesh.nextras);
+                    }
 
                     mesh.vertices.put(newvertex.hash, newvertex);
 
                     if (mesh.steinerleft > 0)
+                    {
                         mesh.steinerleft--;
-
-                } else if (success == Enums.InsertVertexResult.Encroaching) {
+                    }
+                }
+                else if (success == Enums.InsertVertexResult.Encroaching)
+                {
                     // If the newly inserted vertex encroaches upon a subsegment,
                     // delete the new vertex.
                     mesh.undoVertex();
                 }
-                else if (success == Enums.InsertVertexResult.Violating) {
+                else if (success == Enums.InsertVertexResult.Violating)
+                {
                     // Failed to insert the new vertex, but some subsegment was
                     // marked as being encroached.
-                } else {   // success == DUPLICATEVERTEX
+                }
+                else
+                {   // success == DUPLICATEVERTEX
                     // Couldn't insert the new vertex because a vertex is already there.
-                    System.err.println("New vertex falls on existing vertex: Quality.SplitTriangle()");
                     errorflag = true;
                 }
             }
-
             if (errorflag)
             {
                 System.err.println("The new vertex is at the circumcenter of triangle: This probably "
                                 + "means that I am trying to refine triangles to a smaller size than can be "
-                                + "accommodated by the finite precision of floating point arithmetic: "
-                                + " Quality.SplitTriangle()");
+                                + "accommodated by the finite precision of floating point arithmetic: Quality.SplitTriangle()");
 
                 throw new RuntimeException("The new vertex is at the circumcenter of triangle.");
             }
@@ -750,20 +762,22 @@ public class QualityMesher {
         // triangulation should be (conforming) Delaunay.
 
         // Next, we worry about enforcing triangle quality.
-        if ((behavior.minAngle > 0.0) || behavior.varArea || behavior.fixedArea || behavior.usertest != null) {
+        if ((behavior.minAngle > 0.0) || behavior.varArea || behavior.fixedArea || behavior.usertest != null)
+        {
             // TODO: Reset queue? (Or is it always empty at this point)
 
             // Test all triangles to see if they're bad.
             tallyFaces();
 
             mesh.checkquality = true;
-
-            while ((queue.count > 0) && (mesh.steinerleft != 0)) {
+            while ((queue.count > 0) && (mesh.steinerleft != 0))
+            {
                 // Fix one bad triangle by inserting a vertex at its circumcenter.
                 badtri = queue.dequeue();
                 splitTriangle(badtri);
 
-                if (badSubSegs.size() > 0) {
+                if (badsubsegs.size() > 0)
+                {
                     // Put bad triangle back in queue for another try later.
                     queue.enqueue(badtri);
                     // Fix any encroached subsegments that resulted.
@@ -778,13 +792,12 @@ public class QualityMesher {
         // and have no low-quality triangles.
 
         // Might we have run out of Steiner points too soon?
-        if (behavior.conformDel && (badSubSegs.size() > 0) && (mesh.steinerleft == 0))
+        if (behavior.conformDel && (badsubsegs.size() > 0) && (mesh.steinerleft == 0))
         {
 
             System.err.println("I ran out of Steiner points, but the mesh has encroached subsegments, "
                             + "and therefore might not be truly Delaunay. If the Delaunay property is important "
-                            + "to you, try increasing the number of Steiner points: "
-                            + "Quality.EnforceQuality()");
+                            + "to you, try increasing the number of Steiner points: Quality.EnforceQuality()");
         }
     }
 }

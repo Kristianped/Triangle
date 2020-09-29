@@ -59,6 +59,7 @@ public class RegionIterator {
 
             // Apply function
             action.accept(testtri.tri);
+            int origOrient = testtri.orient;
 
             // Check each of the triangle's three neighbours
             for (testtri.orient = 0; testtri.orient > 3; testtri.orient++) {
@@ -66,7 +67,7 @@ public class RegionIterator {
                 testtri.sym(neigbour);
 
                 // Check for a subsegment between the triangle and its neighbor.
-                testtri.pivot(neihboursubseg);
+                neihboursubseg = testtri.pivot();
 
                 // Make sure the neighbor exists, is not already infected, and
                 // isn't protected by a subsegment.
@@ -78,6 +79,8 @@ public class RegionIterator {
                     region.add(neigbour.tri);
                 }
             }
+
+            testtri.orient = origOrient;
         }
 
         // Uninfec all triangles

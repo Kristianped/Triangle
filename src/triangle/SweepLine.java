@@ -21,7 +21,7 @@ public class SweepLine implements ITriangulator {
 
     @Override
     public IMesh triangulate(List<Vertex> points, Configuration config) {
-        this.predicates = config.predicates;
+        this.predicates = config.predicates.get();
 
         this.mesh = new Mesh(config);
         this.mesh.transferNodes(points);
@@ -29,8 +29,6 @@ public class SweepLine implements ITriangulator {
         // Nonexistent x value used as a flag to mark circle events in sweepline
         // Delaunay algorithm.
         xminextreme = 10 * mesh.bounds.left() - 9 * mesh.bounds.right();
-
-        SweepEvent[] eventheap;
 
         SweepEvent nextevent;
         SweepEvent newevent;
@@ -48,15 +46,14 @@ public class SweepLine implements ITriangulator {
         Vertex connectvertex;
         Vertex leftvertex, midvertex, rightvertex;
         double lefttest, righttest;
-        MutableInt heapsize;
+        int heapsize;
         boolean check4events;
         MutableBoolean farrightflag = new MutableBoolean();
-
-        splaynodes = new ArrayList<>();
+        splaynodes = new ArrayList<SplayNode>();
         splayroot = null;
 
-        heapsize = new MutableInt(points.size());
-        eventheap = new SweepEvent[(3 * heapsize.getValue()) / 2];
+        heapsize = points.size();
+        SweepEvent[] eventheap = new SweepEvent[(3 * heapsize) / 2];
         createHeap(eventheap);//, out events, out freeevents);
 
         mesh.makeTriangle(lefttri);
@@ -70,26 +67,25 @@ public class SweepLine implements ITriangulator {
         lefttri.bond(righttri);
         firstvertex = eventheap[0].vertexEvent;
 
-        heapDelete(eventheap, heapsize.getValue(), 0);
-        heapsize.decrement();
-
-        do {
-            if (heapsize.getValue() == 0) {
-                System.err.println("Input vertices are all identical: SweepLine.Triangulate()");
+        heapDelete(eventheap, heapsize, 0);
+        heapsize--;
+        do
+        {
+            if (heapsize == 0)
+            {
                 throw new RuntimeException("Input vertices are all identical.");
             }
-
             secondvertex = eventheap[0].vertexEvent;
-            heapDelete(eventheap, heapsize.getValue(), 0);
-            heapsize.decrement();
-
+            heapDelete(eventheap, heapsize, 0);
+            heapsize--;
             if ((firstvertex.x == secondvertex.x) &&
-                    (firstvertex.y == secondvertex.y)) {
+                    (firstvertex.y == secondvertex.y))
+            {
                 secondvertex.type = Enums.VertexType.UndeadVertex;
                 mesh.undeads++;
             }
-        } while ((firstvertex.x == secondvertex.x) && (firstvertex.y == secondvertex.y));
-
+        } while ((firstvertex.x == secondvertex.x) &&
+                (firstvertex.y == secondvertex.y));
         lefttri.setOrg(firstvertex);
         lefttri.setDest(secondvertex);
         righttri.setOrg(secondvertex);
@@ -97,57 +93,64 @@ public class SweepLine implements ITriangulator {
         lefttri.lprev(bottommost);
         lastvertex = secondvertex;
 
-        while (heapsize.getValue() > 0) {
+        while (heapsize > 0)
+        {
             nextevent = eventheap[0];
-            heapDelete(eventheap, heapsize.getValue(), 0);
-            heapsize.decrement();
+            heapDelete(eventheap, heapsize, 0);
+            heapsize--;
             check4events = true;
-
-            if (nextevent.xkey < mesh.bounds.left()) {
-                fliptri = nextevent.otriEvent;
+            if (nextevent.xkey < mesh.bounds.left())
+            {
+                fliptri = nextevent.otriEvent.shallowCopy();
                 fliptri.oprev(farlefttri);
-                check4DeadEvent(farlefttri, eventheap, heapsize);
+                heapsize = check4DeadEvent(farlefttri, eventheap, heapsize);
                 fliptri.onext(farrighttri);
-                check4DeadEvent(farrighttri, eventheap, heapsize);
+               heapsize =  check4DeadEvent(farrighttri, eventheap, heapsize);
 
                 if (farlefttri.equals(bottommost))
+                {
                     fliptri.lprev(bottommost);
-
+                }
                 mesh.flip(fliptri);
                 fliptri.setApex(null);
                 fliptri.lprev(lefttri);
                 fliptri.lnext(righttri);
                 lefttri.sym(farlefttri);
 
-                if (randomnation(SAMPLERATE) == 0) {
+                if (randomnation(SAMPLERATE) == 0)
+                {
                     fliptri.sym();
                     leftvertex = fliptri.dest();
                     midvertex = fliptri.apex();
                     rightvertex = fliptri.org();
-                    splayroot = circleTopInsert(splayroot, lefttri, leftvertex, midvertex, rightvertex, nextevent.ykey);
+                    splayroot = circleTopInsert(splayroot, lefttri.shallowCopy(), leftvertex, midvertex, rightvertex, nextevent.ykey);
                 }
-            } else {
+            }
+            else
+            {
                 nextvertex = nextevent.vertexEvent;
-
                 if ((nextvertex.x == lastvertex.x) &&
-                        (nextvertex.y == lastvertex.y)) {
+                        (nextvertex.y == lastvertex.y))
+                {
                     nextvertex.type = Enums.VertexType.UndeadVertex;
                     mesh.undeads++;
                     check4events = false;
-                } else {
+                }
+                else
+                {
                     lastvertex = nextvertex;
 
-                    splayroot = frontLocate(splayroot, bottommost, nextvertex, searchtri, farrightflag);
+                    splayroot = frontLocate(splayroot, bottommost.shallowCopy(), nextvertex, searchtri, farrightflag);
 
-                    //bottommost.Copy(ref searchtri);
+                    //bottommost.Copy(searchtri);
                     //farrightflag = false;
-                    //while (!farrightflag && RightOfHyperbola(ref searchtri, nextvertex))
+                    //while (!farrightflag && RightOfHyperbola(searchtri, nextvertex))
                     //{
                     //    searchtri.OnextSelf();
                     //    farrightflag = searchtri.Equal(bottommost);
                     //}
 
-                    check4DeadEvent(searchtri, eventheap, heapsize);
+                    heapsize = check4DeadEvent(searchtri, eventheap, heapsize);
 
                     searchtri.copy(farrighttri);
                     searchtri.sym(farlefttri);
@@ -166,49 +169,53 @@ public class SweepLine implements ITriangulator {
                     righttri.lprev();
                     lefttri.bond(farlefttri);
                     righttri.bond(farrighttri);
-
                     if (!farrightflag.getValue() && farrighttri.equals(bottommost))
+                    {
                         lefttri.copy(bottommost);
+                    }
 
-                    if (randomnation(SAMPLERATE) == 0) {
-                        splayroot = splayInsert(splayroot, lefttri, nextvertex);
-                    } else if (randomnation(SAMPLERATE) == 0) {
+                    if (randomnation(SAMPLERATE) == 0)
+                    {
+                        splayroot = splayInsert(splayroot, lefttri.shallowCopy(), nextvertex);
+                    }
+                    else if (randomnation(SAMPLERATE) == 0)
+                    {
                         righttri.lnext(inserttri);
-                        splayroot = splayInsert(splayroot, inserttri, nextvertex);
+                        splayroot = splayInsert(splayroot, inserttri.shallowCopy(), nextvertex);
                     }
                 }
             }
 
-            if (check4events) {
+            if (check4events)
+            {
                 leftvertex = farlefttri.apex();
                 midvertex = lefttri.dest();
                 rightvertex = lefttri.apex();
                 lefttest = predicates.counterClockwise(leftvertex, midvertex, rightvertex);
-
-                if (lefttest > 0.0) {
+                if (lefttest > 0.0)
+                {
                     newevent = new SweepEvent();
 
                     newevent.xkey = xminextreme;
                     newevent.ykey = circleTop(leftvertex, midvertex, rightvertex, lefttest);
-                    newevent.otriEvent = lefttri;
-                    heapInsert(eventheap, heapsize.getValue(), newevent);
-                    heapsize.increment();
+                    newevent.otriEvent = lefttri.shallowCopy();
+                    heapInsert(eventheap, heapsize, newevent);
+                    heapsize++;
                     lefttri.setOrg(new SweepEventVertex(newevent));
                 }
-
                 leftvertex = righttri.apex();
                 midvertex = righttri.org();
                 rightvertex = farrighttri.apex();
                 righttest = predicates.counterClockwise(leftvertex, midvertex, rightvertex);
-
-                if (righttest > 0.0) {
+                if (righttest > 0.0)
+                {
                     newevent = new SweepEvent();
 
                     newevent.xkey = xminextreme;
                     newevent.ykey = circleTop(leftvertex, midvertex, rightvertex, righttest);
-                    newevent.otriEvent = farrighttri;
-                    heapInsert(eventheap, heapsize.getValue(), newevent);
-                    heapsize.increment();
+                    newevent.otriEvent = farrighttri.shallowCopy();
+                    heapInsert(eventheap, heapsize, newevent);
+                    heapsize++;
                     farrighttri.setOrg(new SweepEventVertex(newevent));
                 }
             }
@@ -224,11 +231,13 @@ public class SweepLine implements ITriangulator {
 
     void createHeap(SweepEvent[] eventheap) {
         Vertex thisvertex;
+        int maxevents;
         int i;
         SweepEvent evt;
-        i = 0;
 
-        for (var v : mesh.vertices.values()) {
+        i = 0;
+        for (var v : mesh.vertices.values())
+        {
             thisvertex = v;
             evt = new SweepEvent();
             evt.vertexEvent = thisvertex;
@@ -248,15 +257,17 @@ public class SweepLine implements ITriangulator {
         eventy = newevent.ykey;
         eventnum = heapsize;
         notdone = eventnum > 0;
-
-        while (notdone) {
+        while (notdone)
+        {
             parent = (eventnum - 1) >> 1;
-
             if ((heap[parent].ykey < eventy) ||
                     ((heap[parent].ykey == eventy)
-                            && (heap[parent].xkey <= eventx))) {
+                            && (heap[parent].xkey <= eventx)))
+            {
                 notdone = false;
-            } else {
+            }
+            else
+            {
                 heap[eventnum] = heap[parent];
                 heap[eventnum].heapposition = eventnum;
 
@@ -264,7 +275,6 @@ public class SweepLine implements ITriangulator {
                 notdone = eventnum > 0;
             }
         }
-
         heap[eventnum] = newevent;
         newevent.heapposition = eventnum;
     }
@@ -281,27 +291,34 @@ public class SweepLine implements ITriangulator {
         eventy = thisevent.ykey;
         leftchild = 2 * eventnum + 1;
         notdone = leftchild < heapsize;
-
-        while (notdone) {
+        while (notdone)
+        {
             if ((heap[leftchild].ykey < eventy) ||
                     ((heap[leftchild].ykey == eventy)
-                            && (heap[leftchild].xkey < eventx))) {
+                            && (heap[leftchild].xkey < eventx)))
+            {
                 smallest = leftchild;
-            } else {
+            }
+            else
+            {
                 smallest = eventnum;
             }
-
             rightchild = leftchild + 1;
-
-            if (rightchild < heapsize && ((heap[rightchild].ykey < heap[smallest].ykey) ||
-                    ((heap[rightchild].ykey == heap[smallest].ykey)
-                            && (heap[rightchild].xkey < heap[smallest].xkey)))) {
-                smallest = rightchild;
+            if (rightchild < heapsize)
+            {
+                if ((heap[rightchild].ykey < heap[smallest].ykey) ||
+                        ((heap[rightchild].ykey == heap[smallest].ykey)
+                                && (heap[rightchild].xkey < heap[smallest].xkey)))
+                {
+                    smallest = rightchild;
+                }
             }
-
-            if (smallest == eventnum) {
+            if (smallest == eventnum)
+            {
                 notdone = false;
-            } else {
+            }
+            else
+            {
                 heap[eventnum] = heap[smallest];
                 heap[eventnum].heapposition = eventnum;
                 heap[smallest] = thisevent;
@@ -321,19 +338,21 @@ public class SweepLine implements ITriangulator {
         boolean notdone;
 
         moveevent = heap[heapsize - 1];
-
-        if (eventnum > 0) {
+        if (eventnum > 0)
+        {
             eventx = moveevent.xkey;
             eventy = moveevent.ykey;
-
-            do {
+            do
+            {
                 parent = (eventnum - 1) >> 1;
-
                 if ((heap[parent].ykey < eventy) ||
                         ((heap[parent].ykey == eventy)
-                                && (heap[parent].xkey <= eventx))) {
+                                && (heap[parent].xkey <= eventx)))
+                {
                     notdone = false;
-                } else {
+                }
+                else
+                {
                     heap[eventnum] = heap[parent];
                     heap[eventnum].heapposition = eventnum;
 
@@ -342,7 +361,6 @@ public class SweepLine implements ITriangulator {
                 }
             } while (notdone);
         }
-
         heap[eventnum] = moveevent;
         moveevent.heapposition = eventnum;
         heapify(heap, heapsize - 1, eventnum);
@@ -356,112 +374,136 @@ public class SweepLine implements ITriangulator {
         boolean rightofroot, rightofchild;
 
         if (splaytree == null)
+        {
             return null;
-
+        }
         checkvertex = splaytree.keyedge.dest();
-
-        if (checkvertex == splaytree.keydest) {
+        if (checkvertex == splaytree.keydest)
+        {
             rightofroot = rightOfHyperbola(splaytree.keyedge, searchpoint);
-
-            if (rightofroot) {
+            if (rightofroot)
+            {
                 splaytree.keyedge.copy(searchtri);
                 child = splaytree.rchild;
-            } else {
+            }
+            else
+            {
                 child = splaytree.lchild;
             }
-
             if (child == null)
+            {
                 return splaytree;
-
+            }
             checkvertex = child.keyedge.dest();
-
-            if (checkvertex != child.keydest) {
+            if (checkvertex != child.keydest)
+            {
                 child = splay(child, searchpoint, searchtri);
-
-                if (child == null) {
+                if (child == null)
+                {
                     if (rightofroot)
+                    {
                         splaytree.rchild = null;
+                    }
                     else
+                    {
                         splaytree.lchild = null;
-
+                    }
                     return splaytree;
                 }
             }
             rightofchild = rightOfHyperbola(child.keyedge, searchpoint);
-
-            if (rightofchild) {
+            if (rightofchild)
+            {
                 child.keyedge.copy(searchtri);
                 grandchild = splay(child.rchild, searchpoint, searchtri);
                 child.rchild = grandchild;
-            } else {
+            }
+            else
+            {
                 grandchild = splay(child.lchild, searchpoint, searchtri);
                 child.lchild = grandchild;
             }
-
-            if (grandchild == null) {
-                if (rightofroot) {
+            if (grandchild == null)
+            {
+                if (rightofroot)
+                {
                     splaytree.rchild = child.lchild;
                     child.lchild = splaytree;
-                } else {
+                }
+                else
+                {
                     splaytree.lchild = child.rchild;
                     child.rchild = splaytree;
                 }
-
                 return child;
             }
-
-            if (rightofchild) {
-                if (rightofroot) {
+            if (rightofchild)
+            {
+                if (rightofroot)
+                {
                     splaytree.rchild = child.lchild;
                     child.lchild = splaytree;
-                } else {
+                }
+                else
+                {
                     splaytree.lchild = grandchild.rchild;
                     grandchild.rchild = splaytree;
                 }
-
                 child.rchild = grandchild.lchild;
                 grandchild.lchild = child;
-            } else {
-                if (rightofroot) {
+            }
+            else
+            {
+                if (rightofroot)
+                {
                     splaytree.rchild = grandchild.lchild;
                     grandchild.lchild = splaytree;
-                } else {
+                }
+                else
+                {
                     splaytree.lchild = child.rchild;
                     child.rchild = splaytree;
                 }
-
                 child.lchild = grandchild.rchild;
                 grandchild.rchild = child;
             }
-
             return grandchild;
-        } else {
+        }
+        else
+        {
             lefttree = splay(splaytree.lchild, searchpoint, searchtri);
             righttree = splay(splaytree.rchild, searchpoint, searchtri);
 
             splaynodes.remove(splaytree);
-
-            if (lefttree == null) {
+            if (lefttree == null)
+            {
                 return righttree;
-            } else if (righttree == null) {
+            }
+            else if (righttree == null)
+            {
                 return lefttree;
-            } else if (lefttree.rchild == null) {
+            }
+            else if (lefttree.rchild == null)
+            {
                 lefttree.rchild = righttree.lchild;
                 righttree.lchild = lefttree;
                 return righttree;
-            } else if (righttree.lchild == null) {
+            }
+            else if (righttree.lchild == null)
+            {
                 righttree.lchild = lefttree.rchild;
                 lefttree.rchild = righttree;
                 return lefttree;
-            } else {
+            }
+            else
+            {
                 //      printf("Holy Toledo!!!\n");
                 leftright = lefttree.rchild;
-
                 while (leftright.rchild != null)
+                {
                     leftright = leftright.rchild;
-
+                }
                 leftright.rchild = righttree;
-
                 return lefttree;
             }
         }
@@ -474,34 +516,38 @@ public class SweepLine implements ITriangulator {
         splaynodes.add(newsplaynode);
         newkey.copy(newsplaynode.keyedge);
         newsplaynode.keydest = newkey.dest();
-
-        if (splayroot == null) {
+        if (splayroot == null)
+        {
             newsplaynode.lchild = null;
             newsplaynode.rchild = null;
-        } else if (rightOfHyperbola(splayroot.keyedge, searchpoint)) {
+        }
+        else if (rightOfHyperbola(splayroot.keyedge, searchpoint))
+        {
             newsplaynode.lchild = splayroot;
             newsplaynode.rchild = splayroot.rchild;
             splayroot.rchild = null;
-        } else {
+        }
+        else
+        {
             newsplaynode.lchild = splayroot.lchild;
             newsplaynode.rchild = splayroot;
             splayroot.lchild = null;
         }
-
         return newsplaynode;
     }
 
     SplayNode frontLocate(SplayNode splayroot, Otri bottommost, Vertex searchvertex, Otri searchtri, MutableBoolean farright) {
-        boolean farrightflag = false;
+        boolean farrightflag;
 
         bottommost.copy(searchtri);
         splayroot = splay(splayroot, searchvertex, searchtri);
 
-        while (!farrightflag && rightOfHyperbola(searchtri, searchvertex)) {
+        farrightflag = false;
+        while (!farrightflag && rightOfHyperbola(searchtri, searchvertex))
+        {
             searchtri.onext();
             farrightflag = searchtri.equals(bottommost);
         }
-
         farright.setValue(farrightflag);
 
         return splayroot;
@@ -523,8 +569,7 @@ public class SweepLine implements ITriangulator {
         bclen2 = xbc * xbc + ybc * ybc;
         searchpoint.x = pc.x - (yac * bclen2 - ybc * aclen2) / (2.0 * ccwabc);
         searchpoint.y = topy;
-
-        return splayInsert(splay(splayroot, searchpoint, dummytri), newkey, searchpoint);
+        return splayInsert(splay(splayroot, searchpoint, dummytri), newkey.shallowCopy(), searchpoint);
     }
 
     boolean rightOfHyperbola(Otri fronttri, Point newsite) {
@@ -535,26 +580,30 @@ public class SweepLine implements ITriangulator {
 
         leftvertex = fronttri.dest();
         rightvertex = fronttri.apex();
-
         if ((leftvertex.y < rightvertex.y) ||
                 ((leftvertex.y == rightvertex.y) &&
-                        (leftvertex.x < rightvertex.x))) {
+                        (leftvertex.x < rightvertex.x)))
+        {
             if (newsite.x >= rightvertex.x)
+            {
                 return true;
-        } else {
-            if (newsite.x <= leftvertex.x)
-                return false;
+            }
         }
-
+        else
+        {
+            if (newsite.x <= leftvertex.x)
+            {
+                return false;
+            }
+        }
         dxa = leftvertex.x - newsite.x;
         dya = leftvertex.y - newsite.y;
         dxb = rightvertex.x - newsite.x;
         dyb = rightvertex.y - newsite.y;
-
         return dya * (dxb * dxb + dyb * dyb) > dyb * (dxa * dxa + dya * dya);
     }
 
-    void check4DeadEvent(Otri checktri, SweepEvent[] eventheap, MutableInt heapsize) {
+    int check4DeadEvent(Otri checktri, SweepEvent[] eventheap, int heapsize) {
         SweepEvent deadevent;
         SweepEventVertex eventvertex;
         int eventnum = -1;
@@ -565,10 +614,12 @@ public class SweepLine implements ITriangulator {
             deadevent = eventvertex.evt;
             eventnum = deadevent.heapposition;
 
-            heapDelete(eventheap, heapsize.getValue(), eventnum);
-            heapsize.decrement();
+            heapDelete(eventheap, heapsize, eventnum);
+            heapsize--;
             checktri.setOrg(null);
         }
+
+        return heapsize;
     }
 
     double circleTop(Vertex pa, Vertex pb, Vertex pc, double ccwabc) {
@@ -604,12 +655,11 @@ public class SweepLine implements ITriangulator {
         startghost.lprev(searchedge);
         searchedge.sym();
         dummytri.neighbors[0] = searchedge;
-
         // Remove the bounding box and count the convex hull edges.
         startghost.copy(dissolveedge);
         hullsize = 0;
-
-        do {
+        do
+        {
             hullsize++;
             dissolveedge.lnext(deadtriangle);
             dissolveedge.lprev();
@@ -617,17 +667,20 @@ public class SweepLine implements ITriangulator {
 
             // If no PSLG is involved, set the boundary markers of all the vertices
             // on the convex hull.  If a PSLG is used, this step is done later.
-            // Watch out for the case where all the input vertices are collinear.
-            if (noPoly && dissolveedge.tri.id != Mesh.DUMMY) {
-                markorg = dissolveedge.org();
-
-                if (markorg.label == 0)
-                    markorg.label = 1;
+            if (noPoly)
+            {
+                // Watch out for the case where all the input vertices are collinear.
+                if (dissolveedge.tri.id != Mesh.DUMMY)
+                {
+                    markorg = dissolveedge.org();
+                    if (markorg.label == 0)
+                    {
+                        markorg.label = 1;
+                    }
+                }
             }
-
             // Remove a bounding triangle from a convex hull triangle.
             dissolveedge.dissolve(dummytri);
-
             // Find the next bounding triangle.
             deadtriangle.sym(dissolveedge);
 
@@ -654,6 +707,10 @@ class SweepEvent {
     public Vertex vertexEvent;    // Vertex event.
     public Otri otriEvent;        // Circle event.
     public int heapposition;      // Marks this event's position in the heap.
+
+    public SweepEvent() {
+        otriEvent = new Otri();
+    }
 }
 
 /**
@@ -687,4 +744,8 @@ class SplayNode {
     public Otri keyedge;              // Lprev of an edge on the front.
     public Vertex keydest;            // Used to verify that splay node is still live.
     public SplayNode lchild, rchild;  // Children in splay tree.
+
+    public SplayNode() {
+        keyedge = new Otri();
+    }
 }

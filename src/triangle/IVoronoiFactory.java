@@ -1,9 +1,9 @@
-package triangle.voronoi;
+package triangle;
 
 import triangle.Vertex;
-import triangle.dcel.Face;
-import triangle.dcel.HalfEdge;
-import triangle.dcel.DcelVertex;
+import triangle.Face;
+import triangle.HalfEdge;
+import triangle.DcelVertex;
 
 public interface IVoronoiFactory {
 

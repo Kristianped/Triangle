@@ -51,28 +51,32 @@ public class Behavior {
     private void update() {
         quality = true;
 
-        if (minAngle < 0 || minAngle > 60) {
+        if (this.minAngle < 0 || this.minAngle > 60) {
             minAngle = 0;
             quality = false;
             System.out.println("Invalid quality options (minimum angle)");
         }
 
-        if (maxAngle != 0 && (maxAngle < 60 || maxAngle > 180)) {
+        if ((this.maxAngle != 0.0) && (this.maxAngle < 60 || this.maxAngle > 180)) {
             maxAngle = 0;
             quality = false;
             System.out.println("Invalid quality options (maximum angle)");
         }
 
-        useSegments = poly || quality || convex;
-        goodAngle = Math.cos(minAngle * Math.PI / 180.0);
-        maxGoodAngle = Math.cos(maxAngle * Math.PI / 180.0);
+        this.useSegments = this.poly || this.quality || this.convex;
+        this.goodAngle = Math.cos(this.minAngle * Math.PI / 180.0);
+        this.maxGoodAngle = Math.cos(this.maxAngle * Math.PI / 180.0);
 
-        if (goodAngle == 1)
-            offconstant = 0;
+        if (this.goodAngle == 1.0)
+        {
+            this.offconstant = 0.0;
+        }
         else
-            offconstant = 0.475 * Math.sqrt((1.0 + goodAngle) / (1.0 - goodAngle));
+        {
+            this.offconstant = 0.475 * Math.sqrt((1.0 + this.goodAngle) / (1.0 - this.goodAngle));
+        }
 
-        goodAngle *= goodAngle;
+        this.goodAngle *= this.goodAngle;
 
 
     }
@@ -188,5 +192,9 @@ public class Behavior {
 
     public void setJettison(boolean value) {
         jettison = value;
+    }
+
+    public boolean isUseRegions() {
+        return useRegions;
     }
 }

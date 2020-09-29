@@ -1,7 +1,4 @@
-package triangle.dcel;
-
-import triangle.Edge;
-import triangle.IEdge;
+package triangle;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,68 +28,112 @@ public class DcelMesh {
     }
 
     public boolean isConsistent(boolean closed, int depth) {
-        for (var vertex : vertices) {
-            if (vertex.getId() < 0)
+        // Check vertices for null pointers.
+        for (var vertex : vertices)
+        {
+            if (vertex.id < 0)
+            {
                 continue;
+            }
 
             if (vertex.leaving == null)
+            {
                 return false;
+            }
 
-            if (vertex.leaving.origin.getId() != vertex.getId())
+            if (vertex.leaving.origin.id != vertex.id)
+            {
                 return false;
+            }
         }
 
-        for (var face : faces) {
+        // Check faces for null pointers.
+        for (var face : faces)
+        {
             if (face.id < 0)
+            {
                 continue;
+            }
 
             if (face.edge == null)
+            {
                 return false;
+            }
 
             if (face.id != face.edge.face.id)
+            {
                 return false;
+            }
         }
 
-        for (var edge : edges) {
+        // Check half-edges for null pointers.
+        for (var edge : edges)
+        {
             if (edge.id < 0)
+            {
                 continue;
+            }
 
             if (edge.twin == null)
+            {
                 return false;
+            }
 
             if (edge.origin == null)
+            {
                 return false;
+            }
 
             if (edge.face == null)
+            {
                 return false;
+            }
 
             if (closed && edge.next == null)
+            {
                 return false;
+            }
         }
 
-        for (var edge : edges) {
+        // Check half-edges (topology).
+        for (var edge : edges)
+        {
             if (edge.id < 0)
+            {
                 continue;
+            }
 
             var twin = edge.twin;
             var next = edge.next;
 
             if (edge.id != twin.twin.id)
+            {
                 return false;
+            }
 
-            if (closed) {
-                if (next.origin.getId() != twin.origin.getId())
+            if (closed)
+            {
+                if (next.origin.id != twin.origin.id)
+                {
                     return false;
+                }
 
-                if (next.twin.next.origin.getId() != edge.twin.origin.getId())
+                if (next.twin.next.origin.id != edge.twin.origin.id)
+                {
                     return false;
+                }
             }
         }
 
-        if (closed && depth > 0) {
-            for (var face : faces) {
+        if (closed && depth > 0)
+        {
+            // Check if faces are closed.
+            for (var face : faces)
+            {
                 if (face.id < 0)
+                {
                     continue;
+                }
 
                 var edge = face.edge;
                 var next = edge.next;
@@ -100,13 +141,16 @@ public class DcelMesh {
                 int id = edge.id;
                 int k = 0;
 
-                while (next.id != id && k < depth) {
+                while (next.id != id && k < depth)
+                {
                     next = next.next;
                     k++;
                 }
 
                 if (next.id != id)
+                {
                     return false;
+                }
             }
         }
 
@@ -114,22 +158,29 @@ public class DcelMesh {
     }
 
     public void resolveBoundaryEdges() {
-        Map<Integer, HalfEdge> map = new HashMap<>();
+        // Maps vertices to leaving boundary edge.
+        var map = new HashMap<Integer, HalfEdge>();
 
-        for (var edge : edges) {
-            if (edge.twin == null) {
+        // TODO: parallel?
+        for (var edge : this.edges)
+        {
+            if (edge.twin == null)
+            {
                 var twin = edge.twin = new HalfEdge(edge.next.origin, Face.Empty);
                 twin.twin = edge;
-                map.put(twin.origin.getId(), twin);
+
+                map.put(twin.origin.id, twin);
             }
         }
 
         int j = edges.size();
 
-        for (var edge : map.values()) {
+        for (var edge : map.values())
+        {
             edge.id = j++;
-            edge.next = map.get(edge.twin.origin.getId());
-            edges.add(edge);
+            edge.next = map.get(edge.twin.origin.id);
+
+            this.edges.add(edge);
         }
     }
 
@@ -139,13 +190,17 @@ public class DcelMesh {
      * @return - List containing all the edges.
      */
     protected Iterable<IEdge> enumerateEdges() {
-        List<IEdge> edges = new ArrayList<>(this.edges.size() / 2);
+        var edges = new ArrayList<IEdge>(this.edges.size() / 2);
 
-        for (var edge : this.edges) {
+        for (var edge : this.edges)
+        {
             var twin = edge.twin;
 
+            // Report edge only once.
             if (edge.id < twin.id)
-                edges.add(new Edge(edge.origin.getId(), twin.origin.getId()));
+            {
+                edges.add(new Edge(edge.origin.id, twin.origin.id));
+            }
         }
 
         return edges;
