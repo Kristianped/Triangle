@@ -1,5 +1,9 @@
 package triangle;
 
+import triangle.dcel.DcelVertex;
+import triangle.dcel.Face;
+import triangle.dcel.HalfEdge;
+
 import java.lang.reflect.Array;
 import java.util.Arrays;
 

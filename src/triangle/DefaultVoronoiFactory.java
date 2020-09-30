@@ -1,5 +1,9 @@
 package triangle;
 
+import triangle.dcel.DcelVertex;
+import triangle.dcel.Face;
+import triangle.dcel.HalfEdge;
+
 public class DefaultVoronoiFactory implements IVoronoiFactory {
     @Override
     public void initialize(int vertexCount, int edgeCount, int faceCount) {

@@ -1,9 +1,11 @@
-package triangle;
+package triangle.dcel;
+
+import triangle.Edge;
+import triangle.IEdge;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DcelMesh {
 
@@ -31,7 +33,7 @@ public class DcelMesh {
         // Check vertices for null pointers.
         for (var vertex : vertices)
         {
-            if (vertex.id < 0)
+            if (vertex.getId() < 0)
             {
                 continue;
             }
@@ -41,7 +43,7 @@ public class DcelMesh {
                 return false;
             }
 
-            if (vertex.leaving.origin.id != vertex.id)
+            if (vertex.leaving.origin.getId() != vertex.getId())
             {
                 return false;
             }
@@ -50,7 +52,7 @@ public class DcelMesh {
         // Check faces for null pointers.
         for (var face : faces)
         {
-            if (face.id < 0)
+            if (face.getId() < 0)
             {
                 continue;
             }
@@ -60,7 +62,7 @@ public class DcelMesh {
                 return false;
             }
 
-            if (face.id != face.edge.face.id)
+            if (face.getId() != face.edge.face.getId())
             {
                 return false;
             }
@@ -69,7 +71,7 @@ public class DcelMesh {
         // Check half-edges for null pointers.
         for (var edge : edges)
         {
-            if (edge.id < 0)
+            if (edge.getId() < 0)
             {
                 continue;
             }
@@ -98,7 +100,7 @@ public class DcelMesh {
         // Check half-edges (topology).
         for (var edge : edges)
         {
-            if (edge.id < 0)
+            if (edge.getId() < 0)
             {
                 continue;
             }
@@ -106,19 +108,19 @@ public class DcelMesh {
             var twin = edge.twin;
             var next = edge.next;
 
-            if (edge.id != twin.twin.id)
+            if (edge.getId() != twin.twin.getId())
             {
                 return false;
             }
 
             if (closed)
             {
-                if (next.origin.id != twin.origin.id)
+                if (next.origin.getId() != twin.origin.getId())
                 {
                     return false;
                 }
 
-                if (next.twin.next.origin.id != edge.twin.origin.id)
+                if (next.twin.next.origin.getId() != edge.twin.origin.getId())
                 {
                     return false;
                 }
@@ -130,7 +132,7 @@ public class DcelMesh {
             // Check if faces are closed.
             for (var face : faces)
             {
-                if (face.id < 0)
+                if (face.getId() < 0)
                 {
                     continue;
                 }
@@ -138,16 +140,16 @@ public class DcelMesh {
                 var edge = face.edge;
                 var next = edge.next;
 
-                int id = edge.id;
+                int id = edge.getId();
                 int k = 0;
 
-                while (next.id != id && k < depth)
+                while (next.getId() != id && k < depth)
                 {
                     next = next.next;
                     k++;
                 }
 
-                if (next.id != id)
+                if (next.getId() != id)
                 {
                     return false;
                 }
@@ -169,7 +171,7 @@ public class DcelMesh {
                 var twin = edge.twin = new HalfEdge(edge.next.origin, Face.Empty);
                 twin.twin = edge;
 
-                map.put(twin.origin.id, twin);
+                map.put(twin.origin.getId(), twin);
             }
         }
 
@@ -177,8 +179,8 @@ public class DcelMesh {
 
         for (var edge : map.values())
         {
-            edge.id = j++;
-            edge.next = map.get(edge.twin.origin.id);
+            edge.setId(j++);
+            edge.next = map.get(edge.twin.origin.getId());
 
             this.edges.add(edge);
         }
@@ -197,9 +199,9 @@ public class DcelMesh {
             var twin = edge.twin;
 
             // Report edge only once.
-            if (edge.id < twin.id)
+            if (edge.getId() < twin.getId())
             {
-                edges.add(new Edge(edge.origin.id, twin.origin.id));
+                edges.add(new Edge(edge.origin.getId(), twin.origin.getId()));
             }
         }
 

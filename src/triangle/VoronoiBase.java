@@ -1,9 +1,12 @@
 package triangle;
 
-import java.lang.reflect.Array;
+import triangle.dcel.DcelMesh;
+import triangle.dcel.DcelVertex;
+import triangle.dcel.Face;
+import triangle.dcel.HalfEdge;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class VoronoiBase extends DcelMesh {
@@ -80,7 +83,7 @@ public abstract class VoronoiBase extends DcelMesh {
 
             pt = predicates.findCircumcenter(tri.org(), tri.dest(), tri.apex(), xi, eta);
 
-            vertex = factory.createVertex(pt.x, pt.y);
+            vertex = factory.createVertex(pt.getX(), pt.getY());
             vertex.id = id;
 
             vertices[id] = vertex;
@@ -142,10 +145,10 @@ public abstract class VoronoiBase extends DcelMesh {
                     {
                         // Unbounded edge, direction perpendicular to the boundary edge,
                         // pointing outwards.
-                        px = dest.y - org.y;
-                        py = org.x - dest.x;
+                        px = dest.getY() - org.getY();
+                        py = org.getX() - dest.getX();
 
-                        end = factory.createVertex(vertex.x + px, vertex.y + py);
+                        end = factory.createVertex(vertex.getX() + px, vertex.getY() + py);
                         end.id = count + j++;
 
                         vertices[end.id] = end;
@@ -155,8 +158,8 @@ public abstract class VoronoiBase extends DcelMesh {
 
                         // Make (face.edge) always point to an edge that starts at an infinite
                         // vertex. This will allow traversing of unbounded faces.
-                        face.edge = edge;
-                        face.bounded = false;
+                        face.setEdge(edge);
+                        face.setBounded(false);
 
                         map[id].add(twin);
 
@@ -175,14 +178,14 @@ public abstract class VoronoiBase extends DcelMesh {
                         map[id].add(twin);
                     }
 
-                    vertex.leaving = twin;
-                    end.leaving = edge;
+                    vertex.setLeaving(twin);
+                    end.setLeaving(edge);
 
-                    edge.twin = twin;
-                    twin.twin = edge;
+                    edge.setTwin(twin);
+                    twin.setTwin(edge);
 
-                    edge.id = k++;
-                    twin.id = k++;
+                    edge.setId(k++);
+                    twin.setId(k++);
 
                     this.edges.add(edge);
                     this.edges.add(twin);
@@ -197,10 +200,10 @@ public abstract class VoronoiBase extends DcelMesh {
         // For each half-edge, find its successor in the connected face.
         for (var edge : this.edges)
         {
-            var face = edge.face.generator.id;
+            var face = edge.getFace().getGenerator().id;
 
             // The id of the dest vertex of current edge.
-            int id = edge.twin.origin.id;
+            int id = edge.getTwin().getOrigin().id;
 
             // The edge origin can also be an infinite vertex. Sort them out
             // by checking the id.
@@ -210,9 +213,9 @@ public abstract class VoronoiBase extends DcelMesh {
                 // Voronoi vertex has degree 3, so this loop is actually O(1).
                 for (var next : map[id])
                 {
-                    if (next.face.generator.id == face)
+                    if (next.getFace().getGenerator().id == face)
                     {
-                        edge.next = next;
+                        edge.setNext(next);
                         break;
                     }
                 }
@@ -226,16 +229,16 @@ public abstract class VoronoiBase extends DcelMesh {
 
         for (var edge : this.edges)
         {
-            var twin = edge.twin;
+            var twin = edge.getTwin();
 
             // Report edge only once.
             if (twin == null)
             {
-                edges.add(new Edge(edge.origin.id, edge.next.origin.id));
+                edges.add(new Edge(edge.getOrigin().id, edge.getNext().getOrigin().id));
             }
-            else if (edge.id < twin.id)
+            else if (edge.getId() < twin.getId())
             {
-                edges.add(new Edge(edge.origin.id, twin.origin.id));
+                edges.add(new Edge(edge.getOrigin().id, twin.getOrigin().id));
             }
         }
 

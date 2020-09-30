@@ -2,7 +2,7 @@ package triangle;
 
 public class Point implements Comparable<Point> {
 
-    int id;
+    protected int id;
     int label;
 
     double x;

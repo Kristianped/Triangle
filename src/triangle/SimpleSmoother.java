@@ -1,5 +1,7 @@
 package triangle;
 
+import triangle.dcel.Face;
+
 public class SimpleSmoother implements ISmoother {
 
     TrianglePool pool;
@@ -56,14 +58,14 @@ public class SimpleSmoother implements ISmoother {
         MutableDouble x = new MutableDouble();
         MutableDouble y = new MutableDouble();
 
-        for (var face : voronoi.faces)
+        for (var face : voronoi.getFaces())
         {
-            if (face.generator.label == 0)
+            if (face.getGenerator().label == 0)
             {
                 centroid(face, x, y);
 
-                face.generator.x = x.getValue();
-                face.generator.y = y.getValue();
+                face.getGenerator().x = x.getValue();
+                face.getGenerator().y = y.getValue();
             }
         }
     }
@@ -71,24 +73,24 @@ public class SimpleSmoother implements ISmoother {
     private void centroid(Face face, MutableDouble x, MutableDouble y) {
         double ai, atmp = 0, xtmp = 0, ytmp = 0;
 
-        var edge = face.edge;
-        var first = edge.next.id;
+        var edge = face.getEdge();
+        var first = edge.getNext().getId();
 
         Point p, q;
 
         do
         {
-            p = edge.origin;
-            q = edge.twin.origin;
+            p = edge.getOrigin();
+            q = edge.getTwin().getOrigin();
 
             ai = p.x * q.y - q.x * p.y;
             atmp += ai;
             xtmp += (q.x + p.x) * ai;
             ytmp += (q.y + p.y) * ai;
 
-            edge = edge.next;
+            edge = edge.getNext();
 
-        } while (edge.next.id != first);
+        } while (edge.getNext().getId() != first);
 
         x.setValue(xtmp / (3 * atmp));
         y.setValue(ytmp / (3 * atmp));

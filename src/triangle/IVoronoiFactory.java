@@ -1,9 +1,8 @@
 package triangle;
 
-import triangle.Vertex;
-import triangle.Face;
-import triangle.HalfEdge;
-import triangle.DcelVertex;
+import triangle.dcel.Face;
+import triangle.dcel.HalfEdge;
+import triangle.dcel.DcelVertex;
 
 public interface IVoronoiFactory {
 

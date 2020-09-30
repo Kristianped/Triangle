@@ -29,14 +29,13 @@ public class SweeplineTest {
 
             // Refine a couple times
             Statistic statistic = new Statistic();
+            int refines = 5;
 
-            statistic.update((Mesh) mesh, 10);
-            quality.setMaxArea(0.25 * statistic.LargestArea());
-            mesh.refine(quality, true);
-
-            statistic.update((Mesh) mesh, 10);
-            quality.setMaxArea(0.25 * statistic.LargestArea());
-            mesh.refine(quality, true);
+            for (int i = 0; i < refines; i++) {
+                statistic.update((Mesh) mesh, 10);
+                quality.setMaxArea(0.25 * statistic.LargestArea());
+                mesh.refine(quality, true);
+            }
 
             // Smooth
             SimpleSmoother smoother = new SimpleSmoother();

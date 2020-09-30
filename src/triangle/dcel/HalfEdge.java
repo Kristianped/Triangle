@@ -1,4 +1,4 @@
-package triangle;
+package triangle.dcel;
 
 public class HalfEdge {
 
