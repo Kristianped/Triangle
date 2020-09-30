@@ -18,6 +18,14 @@ public class Osub {
         return seg;
     }
 
+    public void setSegment(SubSegment seg) {
+        this.seg = seg;
+    }
+
+    public void setOrient(int orient) {
+        this.orient = orient;
+    }
+
     public Osub shallowCopy() {
         Osub os = new Osub();
         os.orient = orient;

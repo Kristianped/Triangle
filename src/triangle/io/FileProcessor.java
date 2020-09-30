@@ -46,7 +46,7 @@ public class FileProcessor {
         new TriangleWriter().exportMesh((Mesh) mesh, filename);
     }
 
-    public static void exportPolygon(IPolygon polygon, String filename) {
+    public static void exportPolygon(IPolygon polygon, String filename) throws IOException {
         new TriangleWriter().exportPolygon(polygon, filename);
     }
 

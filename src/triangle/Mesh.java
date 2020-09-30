@@ -161,6 +161,14 @@ public class Mesh implements IMesh {
 
     public int getDimensions() { return mesh_dim; }
 
+    public int getNextras() {
+        return nextras;
+    }
+
+    public List<RegionPointer> getRegions() {
+        return regions;
+    }
+
     @Override
     public Collection<Vertex> getVertices() {
         return vertices.values();

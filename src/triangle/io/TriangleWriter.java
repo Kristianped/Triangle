@@ -5,52 +5,73 @@ import triangle.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TriangleWriter {
 
     public void exportMesh(Mesh mesh, String filename) throws IOException {
         String base = FileProcessor.removeExtension(filename);
 
+        Locale.setDefault(new Locale("en", "US"));
         writePolygon(mesh, base.concat(".poly"));
-        exportElements(mesh, base.concat(".ele"));
+        writeElements(mesh, base.concat(".ele"));
     }
 
-    public void exportElements(Mesh mesh, String filename) throws IOException {
-        Otri tri = new Otri();
-        Vertex p1;
-        Vertex p2;
-        Vertex p3;
-        boolean regions = mesh.getBehavior().isUseRegions();
-        int j = 0;
-        tri.setOrient(0);
+    public void exportPolygon(IPolygon polygon, String filename) throws IOException {
+        boolean hasMarkers = polygon.hasSegmentMarkers();
 
-        try (FileWriter fw = new FileWriter(filename); BufferedWriter writer = new BufferedWriter(fw)) {
-            writer.write(String.format("%d %d %d", mesh.getTriangles().size(), 3, regions ? 1 : 0));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            writer.write(String.format("%d 2 0 %d", polygon.getPoints().size(), polygon.hasPointMarkers() ? 1 : 0));
             writer.newLine();
 
-            for (var item : mesh.getTriangles()) {
-                tri.setTriangle(item);
+            // Write nodes to file
+            writeNodes(writer, polygon.getPoints(), polygon.hasPointMarkers(), 0, false);
 
-                p1 = tri.org();
-                p2 = tri.dest();
-                p3 = tri.apex();
+            // Number of segments, number of boundary markers (zero or one).
+            writer.write(String.format("%d %d", polygon.getSegments().size(), polygon.hasPointMarkers() ? 1 : 0));
+            writer.newLine();
 
-                // Triangle number, indices for three vertices.
-                writer.write(String.format("%d %d %d %d", j, p1.getId(), p2.getId(), p3.getId()));
+            Vertex p, q;
+            int j = 0;
 
-                if (regions)
-                    writer.write(String.format(" %d", tri.getTriangle().getLabel()));
+            for (var seg : polygon.getSegments()) {
+                p = seg.getVertex(0);
+                q = seg.getVertex(1);
+
+                // Segment number, indices of its two endpoints, and possibly a marker.
+                if (hasMarkers)
+                    writer.write(String.format("%d %d %d %d", j, p.getId(), q.getId(), seg.getLabel()));
+                else
+                    writer.write(String.format("%d %d %d", j, p.getId(), q.getId()));
 
                 writer.newLine();
-                item.setID(j++);
+                j++;
+            }
+
+            // Holes
+            j = 0;
+            writer.write(String.format("%d", polygon.getHoles().size()));
+            writer.newLine();
+
+            for (var hole : polygon.getHoles()) {
+                writer.write(String.format("%d %4.3f %4.3f", j++, hole.getX(), hole.getY()));
+                writer.newLine();
+            }
+
+            // Regions
+            if (polygon.getRegions().size() > 0) {
+                j = 0;
+
+                for (var region : polygon.getRegions()) {
+                    writer.write(String.format("%d %4.3f %4.3f %d", j++, region.getPoint().getX(), region.getPoint().getY(), region.getId()));
+                    writer.newLine();
+                }
             }
         }
-    }
-
-    public void exportPolygon(IPolygon polygon, String filename) {
-
     }
 
     private void writeNodes(Mesh mesh, String filename) throws IOException {
@@ -88,7 +109,7 @@ public class TriangleWriter {
             List<Vertex> nodes = new ArrayList<>(mesh.getVertices().size());
 
             for (var node : mesh.getVertices())
-                nodes.set(node.getId(), node);
+                nodes.add(node);
 
             writeNodes(writer, nodes, behavior.useBoundaryMarkers(), nextras, behavior.isJettison());
         }
@@ -116,13 +137,103 @@ public class TriangleWriter {
         }
     }
 
-    private void writePolygon(Mesh mesh, String filename) {
+    private void writePolygon(Mesh mesh, String filename) throws IOException {
         writePolygon(mesh, filename, true);
     }
 
-    private void writePolygon(Mesh mesh, String filename, boolean writeNodes) {
+    private void writePolygon(Mesh mesh, String filename, boolean writeNodes) throws IOException {
+        Osub subseg = new Osub();
+        Vertex pt1, pt2;
+        boolean useBoundaryMarkers = mesh.getBehavior().useBoundaryMarkers();
 
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            if (writeNodes) {
+                writeNodes(writer, mesh);
+            } else {
+                // The zero indicates that the vertices are in a separate .node file.
+                // Followed by number of dimensions, number of vertex attributes,
+                // and number of boundary markers (zero or one).
+                writer.write(String.format("0 %d %d %d", mesh.getDimensions(), mesh.getNextras(), useBoundaryMarkers ? 1 : 0));
+                writer.newLine();
+            }
+
+            // Number of segments, number of boundary markers (zero or one).
+            writer.write(String.format("%d %d", mesh.getSegments().size(), useBoundaryMarkers ? 1 : 0));
+            writer.newLine();
+
+            subseg.setOrient(0);
+            int j = 0;
+
+            for (var item : mesh.getSegments()) {
+                subseg.setSegment(item);
+
+                pt1 = subseg.org();
+                pt2 = subseg.dest();
+
+                // Segment number, indices of its two endpoints, and possibly a marker.
+                if (useBoundaryMarkers)
+                    writer.write(String.format("%d %d %d %d", j, pt1.getId(), pt2.getId(), subseg.getSegment().getLabel()));
+                else
+                    writer.write(String.format("%d %d %d", j, pt1.getId(), pt2.getId()));
+
+                writer.newLine();
+                j++;
+            }
+
+            // Holes
+            j = 0;
+            writer.write(String.format("%d", mesh.getHoles().size()));
+            writer.newLine();
+
+            for (var hole : mesh.getHoles()) {
+                writer.write(String.format("%d %4.3f %4.3f", j++, hole.getX(), hole.getY()));
+                writer.newLine();
+            }
+
+            // Regions
+            if (mesh.getRegions().size() > 0) {
+                j = 0;
+                writer.write(String.format("%d", mesh.getRegions().size()));
+                writer.newLine();
+
+                for (var region : mesh.getRegions()) {
+                    writer.write(String.format("%d %4.3f %4.3f %d", j++, region.getPoint().getX(), region.getPoint().getY(), region.getId()));
+                    writer.newLine();
+                }
+            }
+        }
     }
 
+    private void writeElements(Mesh mesh, String filename) throws IOException {
+        Otri tri = new Otri();
+        Vertex p1;
+        Vertex p2;
+        Vertex p3;
+        boolean regions = mesh.getBehavior().isUseRegions();
+        int j = 0;
+
+        try (FileWriter fw = new FileWriter(filename); BufferedWriter writer = new BufferedWriter(fw)) {
+            writer.write(String.format("%d %d %d", mesh.getTriangles().size(), 3, regions ? 1 : 0));
+            writer.newLine();
+
+            for (var item : mesh.getTriangles()) {
+                tri.setOrient(0);
+                tri.setTriangle(item);
+
+                p1 = tri.org();
+                p2 = tri.dest();
+                p3 = tri.apex();
+
+                // Triangle number, indices for three vertices.
+                writer.write(String.format("%d %d %d %d", j, p1.getId(), p2.getId(), p3.getId()));
+
+                if (regions)
+                    writer.write(String.format(" %d", tri.getTriangle().getLabel()));
+
+                writer.newLine();
+                item.setID(j++);
+            }
+        }
+    }
 
 }

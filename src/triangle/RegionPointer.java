@@ -16,8 +16,16 @@ public class RegionPointer {
         this.area = area;
     }
 
+    public Point getPoint() {
+        return point;
+    }
+
     public double getArea() {
         return area;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void setArea(double area) {
