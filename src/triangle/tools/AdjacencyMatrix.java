@@ -120,7 +120,7 @@ public class AdjacencyMatrix {
             // Add edge (1,2) if this is the first occurrence, that is, if
             // the edge (1,2) is on a boundary (nid <= 0) or if this triangle
             // is the first of the pair in which the edge occurs (tid < nid).
-            nid = tri.getNeighbors()[2].getTriangle().getID();
+            nid = tri.getNeighbors()[2].tri.getID();
 
             if (nid < 0 || tid < nid) {
                 pcol[n1] += 1;
@@ -128,7 +128,7 @@ public class AdjacencyMatrix {
             }
 
             // Add edge (2,3).
-            nid = tri.getNeighbors()[0].getTriangle().getID();
+            nid = tri.getNeighbors()[0].tri.getID();
 
             if (nid < 0 || tid < nid) {
                 pcol[n2] += 1;
@@ -136,7 +136,7 @@ public class AdjacencyMatrix {
             }
 
             // Add edge (3,1).
-            nid = tri.getNeighbors()[1].getTriangle().getID();
+            nid = tri.getNeighbors()[1].tri.getID();
 
             if (nid < 0 || tid < nid) {
                 pcol[n3] += 1;
@@ -196,7 +196,7 @@ public class AdjacencyMatrix {
             // Add edge (1,2) if this is the first occurrence, that is, if
             // the edge (1,2) is on a boundary (nid <= 0) or if this triangle
             // is the first of the pair in which the edge occurs (tid < nid).
-            nid = tri.getNeighbors()[2].getTriangle().getID();
+            nid = tri.getNeighbors()[2].tri.getID();
 
             if (nid < 0 || tid < nid) {
                 list[col[n1]++] = n2;
@@ -204,7 +204,7 @@ public class AdjacencyMatrix {
             }
 
             // Add edge (2,3).
-            nid = tri.getNeighbors()[0].getTriangle().getID();
+            nid = tri.getNeighbors()[0].tri.getID();
 
             if (nid < 0 || tid < nid) {
                 list[col[n2]++] = n3;
@@ -212,7 +212,7 @@ public class AdjacencyMatrix {
             }
 
             // Add edge (3,1).
-            nid = tri.getNeighbors()[1].getTriangle().getID();
+            nid = tri.getNeighbors()[1].tri.getID();
 
             if (nid < 0 || tid < nid) {
                 list[col[n1]++] = n3;

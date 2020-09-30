@@ -1,6 +1,8 @@
 package triangle.io;
 
 import triangle.*;
+import triangle.meshing.Converter;
+import triangle.meshing.IMesh;
 
 import java.io.File;
 import java.io.IOException;

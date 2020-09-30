@@ -76,9 +76,9 @@ public class Statistic {
         int aspectindex;
         int i, j, k;
 
-        tri.setOrient(0);
+        tri.orient = 0;
         for (var t : mesh.getTriangles()) {
-            tri.setTriangle(t);
+            tri.tri = t;
             p[0] = tri.org();
             p[1] = tri.dest();
             p[2] = tri.apex();

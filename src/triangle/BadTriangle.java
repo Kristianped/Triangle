@@ -21,4 +21,32 @@ public class BadTriangle {
     public String toString() {
         return String.format("B-TID %d", poortri.tri.hash);
     }
+
+    public Otri getPoortri() {
+        return poortri;
+    }
+
+    public Vertex getOrg() {
+        return org;
+    }
+
+    public void setOrg(Vertex org) {
+        this.org = org;
+    }
+
+    public Vertex getDest() {
+        return dest;
+    }
+
+    public void setDest(Vertex dest) {
+        this.dest = dest;
+    }
+
+    public Vertex getApex() {
+        return apex;
+    }
+
+    public void setApex(Vertex apex) {
+        this.apex = apex;
+    }
 }

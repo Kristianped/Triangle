@@ -19,4 +19,28 @@ public class BadSubSeg {
     public String toString() {
         return String.format("B-SID %d", subseg.seg.hash);
     }
+
+    public Osub getSubseg() {
+        return subseg;
+    }
+
+    public void setSubseg(Osub os) {
+        subseg = os;
+    }
+
+    public Vertex getOrg() {
+        return org;
+    }
+
+    public void setOrg(Vertex org) {
+        this.org = org;
+    }
+
+    public Vertex getDest() {
+        return dest;
+    }
+
+    public void setDest(Vertex dest) {
+        this.dest = dest;
+    }
 }

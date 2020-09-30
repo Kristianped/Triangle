@@ -49,6 +49,14 @@ public class Vertex extends Point {
             this.attributes = new double[attribs];
     }
 
+    public Otri getTri() {
+        return tri;
+    }
+
+    public void setTri(Otri tri) {
+        this.tri = tri;
+    }
+
     public double[] getAttributes() {
         return attributes;
     }
@@ -68,5 +76,9 @@ public class Vertex extends Point {
     @Override
     public int hashCode() {
         return hash;
+    }
+
+    public void setHash(int hash) {
+        this.hash = hash;
     }
 }

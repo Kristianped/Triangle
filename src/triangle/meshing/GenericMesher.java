@@ -1,8 +1,9 @@
-package triangle;
+package triangle.meshing;
+
+import triangle.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class GenericMesher {
@@ -109,17 +110,19 @@ public class GenericMesher {
             }
         }
 
-        polygon.points.addAll(Arrays.asList(points));
+        polygon.getPoints().addAll(Arrays.asList(points));
 
         n = 0;
 
         // Set vertex hash and id.
-        for (var v : points)
-            v.hash = v.id = n++;
-
+        for (var v : points) {
+            v.setHash(n);
+            v.setId(n);
+            n++;
+        }
 
         // Add boundary segments.
-        var segments = polygon.segments;
+        var segments = polygon.getSegments();
         ((ArrayList<ISegment>) segments).ensureCapacity(2 * (nx + ny));
 
         Vertex a;
@@ -132,7 +135,8 @@ public class GenericMesher {
 
             segments.add(new Segment(a, b, 1));
 
-            a.label = b.label = 1;
+            a.setLabel(1);
+            b.setLabel(1);
 
             // Right
             a = points[nx * (ny + 1) + j];
@@ -140,7 +144,8 @@ public class GenericMesher {
 
             segments.add(new Segment(a, b, 1));
 
-            a.label = b.label = 1;
+            a.setLabel(1);
+            b.setLabel(1);
         }
 
         for (i = 0; i < nx; i++) {
@@ -150,7 +155,8 @@ public class GenericMesher {
 
             segments.add(new Segment(a, b, 1));
 
-            a.label = b.label = 1;
+            a.setLabel(1);
+            b.setLabel(1);
 
             // Top
             a = points[ny + (ny + 1) * i];
@@ -158,7 +164,8 @@ public class GenericMesher {
 
             segments.add(new Segment(a, b, 1));
 
-            a.label = b.label = 1;
+            a.setLabel(1);
+            b.setLabel(1);
         }
 
         // Add triangles.

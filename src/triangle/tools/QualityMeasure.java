@@ -1,4 +1,7 @@
-package triangle;
+package triangle.tools;
+
+import triangle.Mesh;
+import triangle.Point;
 
 /**
  * Provides mesh quality information.
@@ -73,21 +76,21 @@ public class QualityMeasure {
 
         int n = 0;
 
-        for (var tri : mesh.triangles) {
+        for (var tri : mesh.getTriangles()) {
             n++;
 
-            a = tri.vertices[0];
-            b = tri.vertices[1];
-            c = tri.vertices[2];
+            a = tri.getVertex(0);
+            b = tri.getVertex(1);
+            c = tri.getVertex(2);
 
-            lx = a.x - b.x;
-            ly = a.y - b.y;
+            lx = a.getX() - b.getX();
+            ly = a.getY() - b.getY();
             ab = Math.sqrt(lx * lx + ly * ly);
-            lx = b.x - c.x;
-            ly = b.y - c.y;
+            lx = b.getX() - c.getX();
+            ly = b.getY() - c.getY();
             bc = Math.sqrt(lx * lx + ly * ly);
-            lx = c.x - a.x;
-            ly = c.y - a.y;
+            lx = c.getX() - a.getX();
+            ly = c.getY() - a.getY();
             ca = Math.sqrt(lx * lx + ly * ly);
 
             area = areaMeasure.measure(a, b, c);
@@ -134,12 +137,12 @@ public class QualityMeasure {
 
         int gi, gj;
 
-        for (var tri : mesh.triangles) {
+        for (var tri : mesh.getTriangles()) {
             for (int j = 0; j < 3; j++) {
-                gi = tri.getVertex(j).id;
+                gi = tri.getVertex(j).getId();
 
                 for (int k = 0; k < 3; k++) {
-                    gj = tri.getVertex(k).id;
+                    gj = tri.getVertex(k).getId();
 
                     mu = Math.max(mu, gj - gi);
                     ml = Math.max(ml, gi - gj);
@@ -225,7 +228,7 @@ class AreaMeasure {
      * @return Triangle area
      */
     public double measure(Point a, Point b, Point c) {
-        double area = 0.5 * Math.abs(a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y));
+        double area = 0.5 * Math.abs(a.getX() * (b.getY() - c.getY()) + b.getX() * (c.getY() - a.getY()) + c.getX() * (a.getY() - b.getY()));
 
         area_min = Math.min(area_min, area);
         area_max = Math.max(area_max, area);

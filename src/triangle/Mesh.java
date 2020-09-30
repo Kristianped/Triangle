@@ -1,5 +1,8 @@
 package triangle;
 
+import triangle.meshing.IMesh;
+import triangle.meshing.QualityMesher;
+import triangle.meshing.QualityOptions;
 import triangle.tools.CuthillMcKee;
 import triangle.tools.Statistic;
 
@@ -22,28 +25,28 @@ public class Mesh implements IMesh {
     Map<Integer, Vertex> vertices;
 
     // Hash seeds
-    int hash_vtx = 0;
-    int hash_seg = 0;
-    int hash_tri = 0;
+    public int hash_vtx = 0;
+    public int hash_seg = 0;
+    public int hash_tri = 0;
 
     List<Point> holes;
     List<RegionPointer> regions;
 
-    Rectangle bounds;         // X and Y bounds
-    int invertices;           // Number of input vertices
-    int insegments;           // Number og input segments
-    int undeads;              // Number of input vertices that don't appear in the mesh
-    int mesh_dim;             // Dimension (ought to be 2)
-    int nextras;              // Number of attributes per vertex
-    int hullsize;             // Number of edges in convex hull
-    int steinerleft;          // Number of Steiner points not yet used
-    boolean checksegments;    // Are there segments in the triangulation yet?
-    boolean checkquality;     // Has quality triangulation begun yet?
+    public Rectangle bounds;         // X and Y bounds
+    public int invertices;           // Number of input vertices
+    public int insegments;           // Number og input segments
+    public int undeads;              // Number of input vertices that don't appear in the mesh
+    public int mesh_dim;             // Dimension (ought to be 2)
+    public int nextras;              // Number of attributes per vertex
+    public int hullsize;             // Number of edges in convex hull
+    public int steinerleft;          // Number of Steiner points not yet used
+    public boolean checksegments;    // Are there segments in the triangulation yet?
+    public boolean checkquality;     // Has quality triangulation begun yet?
 
     // Triangular bounding box vertices
-    Vertex infvertex1;
-    Vertex infvertex2;
-    Vertex infvertex3;
+    public Vertex infvertex1;
+    public Vertex infvertex2;
+    public Vertex infvertex3;
 
     TriangleLocator locator;
 
@@ -69,12 +72,12 @@ public class Mesh implements IMesh {
     // present, and so forth.  Other entities are frequently bonded to
     // 'dummytri' and 'dummysub' as if they were real mesh entities, with no
     // harm done.
-    Triangle dummytri;
+    public Triangle dummytri;
 
     // Set up 'dummysub', the omnipresent subsegment pointed to by any
     // triangle side or subsegment end that isn't attached to a real
     // subsegment.
-    SubSegment dummysub;
+    public SubSegment dummysub;
 
     public Mesh(Configuration config)
     {
@@ -160,6 +163,10 @@ public class Mesh implements IMesh {
 
     public Behavior getBehavior() { return behavior; }
 
+    public TriangleLocator getLocator() {
+        return locator;
+    }
+
     public int getUndeads() { return undeads; }
 
     public int getDimensions() { return mesh_dim; }
@@ -174,6 +181,18 @@ public class Mesh implements IMesh {
 
     public TrianglePool getTrianglePool() {
         return triangles;
+    }
+
+    public int getSteinerleft() {
+        return steinerleft;
+    }
+
+    public void setSteinerleft(int steinerleft) {
+        this.steinerleft = steinerleft;
+    }
+
+    public Map<Integer, Vertex> getVertexMap() {
+        return vertices;
     }
 
     @Override
@@ -248,8 +267,6 @@ public class Mesh implements IMesh {
 
 
     }
-    
-    
 
     @Override
     public void refine(QualityOptions quality, boolean delaunay) {
@@ -330,9 +347,8 @@ public class Mesh implements IMesh {
     /**
      * Read the vertices from memory
      * @param points The input data
-     * @throws Exception If size of input data is less than three
      */
-    void transferNodes(List<Vertex> points) {
+    public void transferNodes(List<Vertex> points) {
         this.invertices = points.size();
         this.mesh_dim = 2;
         this.bounds = new Rectangle();
@@ -377,7 +393,7 @@ public class Mesh implements IMesh {
      * triangles, but in the end every vertex will point to some triangle
      * that contains it.
      */
-    void makeVertexMap() {
+    public void makeVertexMap() {
         Otri tri = new Otri();
         Vertex triorg;
 
@@ -395,7 +411,7 @@ public class Mesh implements IMesh {
      * Create a new triangle with orientation zero
      * @param newotri to the new triangle
      */
-    void makeTriangle(Otri newotri) {
+    public void makeTriangle(Otri newotri) {
         Triangle tri = triangles.get();
 
         tri.subsegs[0].seg = dummysub;
@@ -478,7 +494,7 @@ public class Mesh implements IMesh {
      * SUCCESSFULVERTEX otherwise. In either case, 'searchtri' is set to a handle
      * whose origin is the newly inserted vertex.
      */
-    Enums.InsertVertexResult insertVertex(Vertex newvertex, Otri searchtri, Osub splitseg, boolean segmentflaws, boolean triflaws) {
+    public Enums.InsertVertexResult insertVertex(Vertex newvertex, Otri searchtri, Osub splitseg, boolean segmentflaws, boolean triflaws) {
         Otri horiz = new Otri();
         Otri top = new Otri();
         Otri botleft = new Otri();
@@ -1030,7 +1046,7 @@ public class Mesh implements IMesh {
      * @param tri The new subsegment is inserted at the edge described by this handle
      * @param subsegmark The marker 'subsegmark' is applied to the subsegment and, if appropriate, its vertices
      */
-    void insertSubseg(Otri tri, int subsegmark) {
+    public void insertSubseg(Otri tri, int subsegmark) {
         Otri oppotri = new Otri();
         Osub newsubseg = new Osub();
         Vertex triorg, tridest;
@@ -1113,7 +1129,7 @@ public class Mesh implements IMesh {
      * involve a different casing.
      * @param flipedge Handle to the edge that will be flipped
      */
-    void flip(Otri flipedge) {
+    public void flip(Otri flipedge) {
         Otri botleft = new Otri(), botright = new Otri();
         Otri topleft = new Otri(), topright = new Otri();
         Otri top = new Otri();
@@ -1449,7 +1465,7 @@ public class Mesh implements IMesh {
      * Only interior vertices that do not lie on segments or boundaries
      * may be deleted.
      */
-    void deleteVertex(Otri deltri) {
+    public void deleteVertex(Otri deltri) {
         Otri countingtri = new Otri();
         Otri firstedge = new Otri(), lastedge = new Otri();
         Otri deltriright = new Otri();
@@ -1522,7 +1538,7 @@ public class Mesh implements IMesh {
      * The inserted vertex is removed from the triangulation and deallocated.
      * Two triangles (possibly just one) are also deallocated.
      */
-    void undoVertex() {
+    public void undoVertex() {
         Otri fliptri;
 
         Otri botleft = new Otri(), botright = new Otri(), topright = new Otri();
@@ -1612,7 +1628,7 @@ public class Mesh implements IMesh {
         }
     }
 
-    void triangleDealloc(Triangle dyingtriangle) {
+    public void triangleDealloc(Triangle dyingtriangle) {
         // Mark the triangle as dead. This makes it possible to detect dead
         // triangles when traversing the list of all triangles.
         Otri.kill(dyingtriangle);
@@ -1626,7 +1642,7 @@ public class Mesh implements IMesh {
         vertices.remove(dyingvertex.hash);
     }
 
-    void subsegDealloc(SubSegment dyingsubseg) {
+    public void subsegDealloc(SubSegment dyingsubseg) {
         // Mark the subsegment as dead. This makes it possible to detect dead
         // subsegments when traversing the list of all subsegments.
         Osub.kill(dyingsubseg);

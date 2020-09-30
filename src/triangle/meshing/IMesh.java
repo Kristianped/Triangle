@@ -1,4 +1,6 @@
-package triangle;
+package triangle.meshing;
+
+import triangle.*;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,6 +1,6 @@
 package triangle.smoothing;
 
-import triangle.IMesh;
+import triangle.meshing.IMesh;
 
 public interface ISmoother {
 

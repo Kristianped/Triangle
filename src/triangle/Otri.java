@@ -6,17 +6,8 @@ public class Otri {
     static final int[] plus1Mod3 = { 1, 2, 0 };
     static final int[] minus1Mod3 = { 2, 0, 1 };
 
-    Triangle tri;
-    int orient;   // Ranges from 0 to 2
-
-    public Triangle getTriangle() {
-        return tri;
-    }
-
-    public void setTriangle(Triangle value) {
-        tri = value;
-    }
-    public void setOrient(int value) {orient = value; }
+    public Triangle tri;
+    public int orient;   // Ranges from 0 to 2
 
     @Override
     public String toString() {
@@ -352,7 +343,7 @@ public class Otri {
     /// <summary>
     /// Set Origin
     /// </summary>
-    void setOrg(Vertex v)
+    public void setOrg(Vertex v)
     {
         tri.vertices[plus1Mod3[orient]] = v;
     }
@@ -360,7 +351,7 @@ public class Otri {
     /// <summary>
     /// Set Destination
     /// </summary>
-    void setDest(Vertex v)
+    public void setDest(Vertex v)
     {
         tri.vertices[minus1Mod3[orient]] = v;
     }
@@ -368,7 +359,7 @@ public class Otri {
     /// <summary>
     /// Set Apex
     /// </summary>
-    void setApex(Vertex v)
+    public void setApex(Vertex v)
     {
         tri.vertices[orient] = v;
     }
@@ -376,7 +367,7 @@ public class Otri {
     /// <summary>
     /// Bond two triangles together at the resepective handles. [bond(abc, bad)]
     /// </summary>
-    void bond(Otri ot)
+    public void bond(Otri ot)
     {
         tri.neighbors[orient].tri = ot.tri;
         tri.neighbors[orient].orient = ot.orient;
@@ -392,7 +383,7 @@ public class Otri {
     /// this triangle. Usually, however, the other triangle is being deleted
     /// entirely, or bonded to another triangle, so it doesn't matter.
     /// </remarks>
-    void dissolve(Triangle dummy)
+    public void dissolve(Triangle dummy)
     {
         tri.neighbors[orient].tri = dummy;
         tri.neighbors[orient].orient = 0;
@@ -401,7 +392,7 @@ public class Otri {
     /// <summary>
     /// Infect a triangle with the virus.
     /// </summary>
-    void infect()
+    public void infect()
     {
         tri.infected = true;
     }
@@ -409,7 +400,7 @@ public class Otri {
     /// <summary>
     /// Cure a triangle from the virus.
     /// </summary>
-    void uninfect()
+    public void uninfect()
     {
         tri.infected = false;
     }
@@ -417,7 +408,7 @@ public class Otri {
     /// <summary>
     /// Test a triangle for viral infection.
     /// </summary>
-    boolean isInfected()
+    public boolean isInfected()
     {
         return tri.infected;
     }
@@ -425,7 +416,7 @@ public class Otri {
     /// <summary>
     /// Finds a subsegment abutting a triangle.
     /// </summary>
-    Osub pivot()
+    public Osub pivot()
     {
         return tri.subsegs[orient].shallowCopy();
     }
@@ -433,7 +424,7 @@ public class Otri {
     /// <summary>
     /// Bond a triangle to a subsegment.
     /// </summary>
-    void segBond(Osub os)
+    public void segBond(Osub os)
     {
         tri.subsegs[orient] = os.shallowCopy();
         os.seg.triangles[os.orient] = this.shallowCopy();
@@ -442,7 +433,7 @@ public class Otri {
     /// <summary>
     /// Dissolve a bond (from the triangle side).
     /// </summary>
-    void segDissolve(SubSegment dummy)
+    public void segDissolve(SubSegment dummy)
     {
         tri.subsegs[orient].seg = dummy;
     }
@@ -450,7 +441,7 @@ public class Otri {
     /// <summary>
     /// Check a triangle's deallocation.
     /// </summary>
-    static boolean isDead(Triangle tria)
+    public static boolean isDead(Triangle tria)
     {
         return tria.neighbors[0].tri == null;
     }

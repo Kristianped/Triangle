@@ -77,8 +77,6 @@ public class Behavior {
         }
 
         this.goodAngle *= this.goodAngle;
-
-
     }
 
     public boolean isQuality() {
@@ -194,7 +192,35 @@ public class Behavior {
         jettison = value;
     }
 
-    public boolean isUseRegions() {
+    public boolean useRegions() {
         return useRegions;
+    }
+
+    public void setUseRegions(boolean useRegions) {
+        this.useRegions = useRegions;
+    }
+
+    public boolean useSegments() {
+        return useSegments;
+    }
+
+    public void setUseSegments(boolean useSegments) {
+        this.useSegments = useSegments;
+    }
+
+    public double getGoodAngle() {
+        return goodAngle;
+    }
+
+    public double getMaxGoodAngle() {
+        return maxGoodAngle;
+    }
+
+    public boolean isFixedArea() {
+        return fixedArea;
+    }
+
+    public double getOffconstant() {
+        return offconstant;
     }
 }

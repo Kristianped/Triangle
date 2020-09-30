@@ -1,4 +1,7 @@
-package triangle;
+package triangle.meshing;
+
+import triangle.Configuration;
+import triangle.Vertex;
 
 import java.util.List;
 

@@ -3,8 +3,8 @@ package triangle;
 
 public class Osub {
 
-    SubSegment seg;
-    int orient; // Ranges from 0 to 1.
+    public SubSegment seg;
+    public int orient; // Ranges from 0 to 1.
 
     @Override
     public String toString() {
@@ -64,7 +64,7 @@ public class Osub {
     /// <summary>
     /// Finds a triangle abutting a subsegment.
     /// </summary>
-    Otri pivotTri()
+    public Otri pivotTri()
     {
         return seg.triangles[orient].shallowCopy();
     }
@@ -96,7 +96,7 @@ public class Osub {
     /// <summary>
     /// Set the origin or destination of a subsegment.
     /// </summary>
-    void setOrg(Vertex vertex)
+    public void setOrg(Vertex vertex)
     {
         seg.vertices[orient] = vertex;
     }
@@ -104,7 +104,7 @@ public class Osub {
     /// <summary>
     /// Set destination of a subsegment.
     /// </summary>
-    void setDest(Vertex vertex)
+    public void setDest(Vertex vertex)
     {
         seg.vertices[1 - orient] = vertex;
     }
@@ -112,7 +112,7 @@ public class Osub {
     /// <summary>
     /// Get the origin of the segment that includes the subsegment.
     /// </summary>
-    Vertex segOrg()
+    public Vertex segOrg()
     {
         return seg.vertices[2 + orient];
     }
@@ -120,7 +120,7 @@ public class Osub {
     /// <summary>
     /// Get the destination of the segment that includes the subsegment.
     /// </summary>
-    Vertex segDest()
+    public Vertex segDest()
     {
         return seg.vertices[3 - orient];
     }
@@ -128,7 +128,7 @@ public class Osub {
     /// <summary>
     /// Set the origin of the segment that includes the subsegment.
     /// </summary>
-    void setSegOrg(Vertex vertex)
+    public void setSegOrg(Vertex vertex)
     {
         seg.vertices[2 + orient] = vertex;
     }
@@ -136,7 +136,7 @@ public class Osub {
     /// <summary>
     /// Set the destination of the segment that includes the subsegment.
     /// </summary>
-    void setSegDest(Vertex vertex)
+    public void setSegDest(Vertex vertex)
     {
         seg.vertices[3 - orient] = vertex;
     }
@@ -155,7 +155,7 @@ public class Osub {
     /// </summary>
     /// <remarks>Note that the other subsegment will still think it's
     /// connected to this subsegment.</remarks>
-    void dissolve(SubSegment dummy)
+    public void dissolve(SubSegment dummy)
     {
         seg.subsegs[orient].seg = dummy;
     }
@@ -171,7 +171,7 @@ public class Osub {
     /// <summary>
     /// Dissolve a bond (from the subsegment side).
     /// </summary>
-    void triDissolve(Triangle dummy)
+    public void triDissolve(Triangle dummy)
     {
         seg.triangles[orient].tri = dummy;
     }
@@ -179,7 +179,7 @@ public class Osub {
     /// <summary>
     /// Check a subsegment's deallocation.
     /// </summary>
-    static boolean isDead(SubSegment sub)
+    public static boolean isDead(SubSegment sub)
     {
         return sub.subsegs[0].seg == null;
     }

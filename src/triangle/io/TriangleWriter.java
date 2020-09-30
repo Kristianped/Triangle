@@ -5,8 +5,6 @@ import triangle.*;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -209,7 +207,7 @@ public class TriangleWriter {
         Vertex p1;
         Vertex p2;
         Vertex p3;
-        boolean regions = mesh.getBehavior().isUseRegions();
+        boolean regions = mesh.getBehavior().useRegions();
         int j = 0;
 
         try (FileWriter fw = new FileWriter(filename); BufferedWriter writer = new BufferedWriter(fw)) {
@@ -217,8 +215,8 @@ public class TriangleWriter {
             writer.newLine();
 
             for (var item : mesh.getTriangles()) {
-                tri.setOrient(0);
-                tri.setTriangle(item);
+                tri.orient = 0;
+                tri.tri = item;
 
                 p1 = tri.org();
                 p2 = tri.dest();
@@ -228,7 +226,7 @@ public class TriangleWriter {
                 writer.write(String.format("%d %d %d %d", j, p1.getId(), p2.getId(), p3.getId()));
 
                 if (regions)
-                    writer.write(String.format(" %d", tri.getTriangle().getLabel()));
+                    writer.write(String.format(" %d", tri.tri.getLabel()));
 
                 writer.newLine();
                 item.setID(j++);

@@ -1,5 +1,7 @@
 package triangle;
 
+import triangle.meshing.*;
+
 public class PolygonHelper {
 
     private PolygonHelper() {

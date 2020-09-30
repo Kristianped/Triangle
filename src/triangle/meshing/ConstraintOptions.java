@@ -1,4 +1,4 @@
-package triangle;
+package triangle.meshing;
 
 public class ConstraintOptions {
 

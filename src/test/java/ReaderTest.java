@@ -2,6 +2,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import triangle.*;
 import triangle.io.FileProcessor;
+import triangle.meshing.ConstraintOptions;
+import triangle.meshing.IMesh;
+import triangle.meshing.QualityOptions;
 
 import java.io.IOException;
 

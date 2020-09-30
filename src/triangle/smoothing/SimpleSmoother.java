@@ -2,6 +2,9 @@ package triangle.smoothing;
 
 import triangle.*;
 import triangle.dcel.Face;
+import triangle.meshing.ConstraintOptions;
+import triangle.meshing.GenericMesher;
+import triangle.meshing.IMesh;
 import triangle.voronoi.BoundedVoronoi;
 import triangle.voronoi.IVoronoiFactory;
 

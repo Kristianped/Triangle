@@ -62,4 +62,8 @@ public class SubSegment implements ISegment {
     public int getLabel() {
         return boundary;
     }
+
+    public void setLabel(int label) {
+        this.boundary = label;
+    }
 }

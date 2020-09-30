@@ -80,7 +80,7 @@ public abstract class VoronoiBase extends DcelMesh {
         for (var t : mesh.getTriangles())
         {
             id = t.getID();
-            tri.setTriangle(t);
+            tri.tri = t;
 
             pt = predicates.findCircumcenter(tri.org(), tri.dest(), tri.apex(), xi, eta);
 
@@ -119,15 +119,14 @@ public abstract class VoronoiBase extends DcelMesh {
         for (var t : mesh.getTriangles())
         {
             id = t.getID();
-            tri.setTriangle(t);
-
+            tri.tri = t;
 
             for (int i = 0; i < 3; i++)
             {
-                tri.setOrient(i);
+                tri.orient = i;
                 tri.sym(neighbor);
 
-                nid = neighbor.getTriangle().getID();
+                nid = neighbor.tri.getID();
 
                 if (id < nid || nid < 0)
                 {
