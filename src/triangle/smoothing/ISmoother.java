@@ -1,4 +1,6 @@
-package triangle;
+package triangle.smoothing;
+
+import triangle.IMesh;
 
 public interface ISmoother {
 

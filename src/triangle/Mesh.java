@@ -266,7 +266,7 @@ public class Mesh implements IMesh {
         qualityMesher.apply(quality, delaunay);
     }
 
-    void copyTo(Mesh target) {
+    public void copyTo(Mesh target) {
         target.vertices = this.vertices;
         target.triangles = this.triangles;
         target.subsegs = this.subsegs;

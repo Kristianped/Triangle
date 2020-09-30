@@ -1,5 +1,6 @@
-package triangle;
+package triangle.smoothing;
 
+import triangle.Vertex;
 import triangle.dcel.DcelVertex;
 import triangle.dcel.Face;
 import triangle.dcel.HalfEdge;
@@ -86,7 +87,7 @@ public class VoronoiFactory implements IVoronoiFactory {
         Face face = faces.tryGet();
 
         if (face != null) {
-            face.setId(vertex.id);
+            face.setId(vertex.getId());
             face.setGenerator(vertex);
             face.setEdge(null);
         } else {

@@ -1,5 +1,6 @@
-package triangle;
+package triangle.smoothing;
 
+import triangle.*;
 import triangle.dcel.Face;
 import triangle.voronoi.BoundedVoronoi;
 import triangle.voronoi.IVoronoiFactory;
@@ -33,10 +34,10 @@ public class SimpleSmoother implements ISmoother {
         var smoothedMesh = (Mesh)mesh;
 
         var mesher = new GenericMesher(config);
-        var predicates = config.predicates.get();
+        var predicates = config.getPredicates().get();
 
         // The smoother should respect the mesh segment splitting behavior.
-        this.options.segmentSplitting = smoothedMesh.behavior.noBisect;
+        this.options.setSegmentSplitting(smoothedMesh.getBehavior().getNoBisect());
 
         // Take a few smoothing rounds (Lloyd's algorithm).
         for (int i = 0; i < limit; i++)
@@ -62,12 +63,12 @@ public class SimpleSmoother implements ISmoother {
 
         for (var face : voronoi.getFaces())
         {
-            if (face.getGenerator().label == 0)
+            if (face.getGenerator().getLabel() == 0)
             {
                 centroid(face, x, y);
 
-                face.getGenerator().x = x.getValue();
-                face.getGenerator().y = y.getValue();
+                face.getGenerator().setX(x.getValue());
+                face.getGenerator().setY(y.getValue());
             }
         }
     }
@@ -85,10 +86,10 @@ public class SimpleSmoother implements ISmoother {
             p = edge.getOrigin();
             q = edge.getTwin().getOrigin();
 
-            ai = p.x * q.y - q.x * p.y;
+            ai = p.getX() * q.getY() - q.getX() * p.getY();
             atmp += ai;
-            xtmp += (q.x + p.x) * ai;
-            ytmp += (q.y + p.y) * ai;
+            xtmp += (q.getX() + p.getX()) * ai;
+            ytmp += (q.getY() + p.getY()) * ai;
 
             edge = edge.getNext();
 
@@ -101,20 +102,19 @@ public class SimpleSmoother implements ISmoother {
     }
 
     private Polygon rebuild(Mesh mesh) {
-        var data = new Polygon(mesh.vertices.size());
+        var data = new Polygon(mesh.getVertices().size());
 
-        for (var v : mesh.vertices.values())
+        for (var v : mesh.getVertices())
         {
             // Reset to input vertex.
-            v.type = Enums.VertexType.InputVertex;
-
-            data.points.add(v);
+            v.setType(Enums.VertexType.InputVertex);
+            data.getPoints().add(v);
         }
 
-        data.segments.addAll(mesh.subsegs.values());
+        data.getSegments().addAll(mesh.getSegments());
 
-        data.holes.addAll(mesh.holes);
-        data.regions.addAll(mesh.regions);
+        data.getHoles().addAll(mesh.getHoles());
+        data.getRegions().addAll(mesh.getRegions());
 
         return data;
     }

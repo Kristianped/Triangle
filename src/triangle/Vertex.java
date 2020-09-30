@@ -61,6 +61,10 @@ public class Vertex extends Point {
         return type;
     }
 
+    public void setType(Enums.VertexType type) {
+        this.type = type;
+    }
+
     @Override
     public int hashCode() {
         return hash;

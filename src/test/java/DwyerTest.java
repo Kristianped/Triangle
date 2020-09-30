@@ -1,6 +1,7 @@
 import org.junit.Test;
 import triangle.*;
 import triangle.io.FileProcessor;
+import triangle.smoothing.SimpleSmoother;
 import triangle.tools.Statistic;
 
 import java.io.IOException;
