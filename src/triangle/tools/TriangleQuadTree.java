@@ -1,4 +1,6 @@
-package triangle;
+package triangle.tools;
+
+import triangle.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +18,12 @@ public class TriangleQuadTree {
         this.maxDepth = maxDepth;
         this.sizeBound = sizeBound;
 
-        triangles = new Triangle[mesh.triangles.size()];
-        mesh.triangles.copyTo(triangles, 0);
+        triangles = new Triangle[mesh.getTriangles().size()];
+        mesh.getTrianglePool().copyTo(triangles, 0);
 
         int currentDepth = 0;
 
-        root = new QuadNode(mesh.bounds, this, true);
+        root = new QuadNode(mesh.getBounds(), this, true);
         root.createSubRegion(++currentDepth);
     }
 
@@ -49,15 +51,15 @@ public class TriangleQuadTree {
      */
     static boolean isPointInTriangle(Point p, Point t0, Point t1, Point t2) {
         // TODO: no need to create new Point instances here
-        Point d0 = new Point(t1.x - t0.x, t1.y - t0.y);
-        Point d1 = new Point(t2.x - t0.x, t2.y - t0.y);
-        Point d2 = new Point(p.x - t0.x, p.y - t0.y);
+        Point d0 = new Point(t1.getX() - t0.getX(), t1.getY() - t0.getY());
+        Point d1 = new Point(t2.getX() - t0.getX(), t2.getY() - t0.getY());
+        Point d2 = new Point(p.getX() - t0.getX(), p.getY() - t0.getY());
 
         // crossproduct of (0, 0, 1) and d0
-        Point c0 = new Point(-d0.y, d0.x);
+        Point c0 = new Point(-d0.getY(), d0.getX());
 
         // crossproduct of (0, 0, 1) and d1
-        Point c1 = new Point(-d1.y, d1.x);
+        Point c1 = new Point(-d1.getY(), d1.getX());
 
         // Linear combination d2 = s * d0 + v * d1.
         //
@@ -75,7 +77,7 @@ public class TriangleQuadTree {
     }
 
     static double dotProduct(Point p, Point q) {
-        return p.x * q.x + p.y * q.y;
+        return p.getX() * q.getX() + p.getY() * q.getY();
     }
 }
 
@@ -142,23 +144,23 @@ class QuadNode {
         //   +--------------+
         Rectangle box;
 
-        var width = bounds.right() - pivot.x;
-        var height = bounds.top() - pivot.y;
+        var width = bounds.right() - pivot.getX();
+        var height = bounds.top() - pivot.getY();
 
         // 1. region south west
         box = new Rectangle(bounds.left(), bounds.bottom(), width, height);
         regions[0] = new QuadNode(box, tree);
 
         // 2. region south east
-        box = new Rectangle(pivot.x, bounds.bottom(), width, height);
+        box = new Rectangle(pivot.getX(), bounds.bottom(), width, height);
         regions[1] = new QuadNode(box, tree);
 
         // 3. region north west
-        box = new Rectangle(bounds.left(), pivot.y, width, height);
+        box = new Rectangle(bounds.left(), pivot.getY(), width, height);
         regions[2] = new QuadNode(box, tree);
 
         // 4. region north east
-        box = new Rectangle(pivot.x, pivot.y, width, height);
+        box = new Rectangle(pivot.getX(), pivot.getY(), width, height);
         regions[3] = new QuadNode(box, tree);
 
         Point[] triangle = new Point[3];
@@ -206,8 +208,8 @@ class QuadNode {
         // the pivot point the triangle must be put at least into region 2.
         //
         // Linear equations are in parametric form.
-        //    pivot.x = triangle[0].x + t * (triangle[1].x - triangle[0].x)
-        //    pivot.y = triangle[0].y + t * (triangle[1].y - triangle[0].y)
+        //    pivot.getX() = triangle[0].getX() + t * (triangle[1].getX() - triangle[0].getX())
+        //    pivot.getY() = triangle[0].getY() + t * (triangle[1].getY() - triangle[0].getY())
 
         int k = 2;
 
@@ -215,8 +217,8 @@ class QuadNode {
 
         // Iterate through all triangle laterals and find bounding box intersections
         for (int i = 0; i < 3; k = i++) {
-            dx = triangle[i].x - triangle[k].x;
-            dy = triangle[i].y - triangle[k].y;
+            dx = triangle[i].getX() - triangle[k].getX();
+            dy = triangle[i].getY() - triangle[k].getY();
 
             if (dx != 0.0)
                 findIntersectionsWithX(dx, dy, triangle, index, k);
@@ -230,13 +232,13 @@ class QuadNode {
         double t;
 
         // find intersection with plane x = m_pivot.dX
-        t = (pivot.x - triangle[k].x) / dx;
+        t = (pivot.getX() - triangle[k].getX()) / dx;
 
         if (t < (1 + EPS) && t > -EPS) {
             // we have an intersection
-            double yComponent = triangle[k].y + t * dy;
+            double yComponent = triangle[k].getY() + t * dy;
 
-            if (yComponent < pivot.y && yComponent >= bounds.bottom()) {
+            if (yComponent < pivot.getY() && yComponent >= bounds.bottom()) {
                 addToRegion(index, SW);
                 addToRegion(index, SE);
             } else if (yComponent <= bounds.top()) {
@@ -246,26 +248,26 @@ class QuadNode {
         }
 
         // find intersection with plane x = m_boundingBox[0].dX
-        t = (bounds.left() - triangle[k].x) / dx;
+        t = (bounds.left() - triangle[k].getX()) / dx;
 
         if (t < (1 + EPS) && t > -EPS) {
             // we have an intersection
-            double yComponent = triangle[k].y + t * dy;
+            double yComponent = triangle[k].getY() + t * dy;
 
-            if (yComponent < pivot.y && yComponent >= bounds.bottom())
+            if (yComponent < pivot.getY() && yComponent >= bounds.bottom())
                 addToRegion(index, SW);
-            else if (yComponent <= bounds.top()) // TODO: check && yComponent >= pivot.Y
+            else if (yComponent <= bounds.top()) // TODO: check && yComponent >= pivot.getY()
                 addToRegion(index, NW);
         }
 
         // find intersection with plane x = m_boundingBox[1].dX
-        t = (bounds.right() - triangle[k].x) / dx;
+        t = (bounds.right() - triangle[k].getX()) / dx;
 
         if (t < (1 + EPS) && t > -EPS) {
             // we have an intersection
-            double yComponent = triangle[k].y + t * dy;
+            double yComponent = triangle[k].getY() + t * dy;
 
-            if (yComponent < pivot.y && yComponent >= bounds.bottom())
+            if (yComponent < pivot.getY() && yComponent >= bounds.bottom())
                 addToRegion(index, SE);
             else if (yComponent <= bounds.top())
                 addToRegion(index, NE);
@@ -276,13 +278,13 @@ class QuadNode {
         double t, xComponent;
 
         // find intersection with plane y = m_pivot.dY
-        t = (pivot.y - triangle[k].y) / dy;
+        t = (pivot.getY() - triangle[k].getY()) / dy;
 
         if (t < (1 + EPS) && t > -EPS) {
             // we have an intersection
-            xComponent = triangle[k].x + t * dx;
+            xComponent = triangle[k].getX() + t * dx;
 
-            if (xComponent > pivot.x && xComponent <= bounds.right()) {
+            if (xComponent > pivot.getX() && xComponent <= bounds.right()) {
                 addToRegion(index, SE);
                 addToRegion(index, NE);
             } else if (xComponent >= bounds.left()) {
@@ -292,26 +294,26 @@ class QuadNode {
         }
 
         // find intersection with plane y = m_boundingBox[0].dY
-        t = (bounds.bottom() - triangle[k].y) / dy;
+        t = (bounds.bottom() - triangle[k].getY()) / dy;
 
         if (t < (1 + EPS) && t > -EPS) {
             // we have an intersection
-            xComponent = triangle[k].x + t * dx;
+            xComponent = triangle[k].getX() + t * dx;
 
-            if (xComponent > pivot.x && xComponent <= bounds.right())
+            if (xComponent > pivot.getX() && xComponent <= bounds.right())
                 addToRegion(index, SE);
             else if (xComponent >= bounds.left())
                 addToRegion(index, SW);
         }
 
         // find intersection with plane y = m_boundingBox[1].dY
-        t = (bounds.top() - triangle[k].y) / dy;
+        t = (bounds.top() - triangle[k].getY()) / dy;
 
         if (t < (1 + EPS) && t > -EPS) {
             // we have an intersection
-            xComponent = triangle[k].x + t * dx;
+            xComponent = triangle[k].getX() + t * dx;
 
-            if (xComponent > pivot.x && xComponent <= bounds.right())
+            if (xComponent > pivot.getX() && xComponent <= bounds.right())
                 addToRegion(index, NE);
             else if (xComponent >= bounds.left())
                 addToRegion(index, NW);
@@ -321,10 +323,10 @@ class QuadNode {
     int findRegion(Point point) {
         int b = 2;
 
-        if (point.y < pivot.y)
+        if (point.getY() < pivot.getY())
             b = 0;
 
-        if (point.x > pivot.x)
+        if (point.getX() > pivot.getX())
             b++;
 
         return b;

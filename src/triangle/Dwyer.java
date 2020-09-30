@@ -1,5 +1,7 @@
 package triangle;
 
+import triangle.tools.VertexSorter;
+
 import java.util.List;
 
 public class Dwyer implements ITriangulator {

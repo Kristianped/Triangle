@@ -1,4 +1,4 @@
-package triangle;
+package triangle.tools;
 
 import triangle.Mesh;
 
@@ -23,7 +23,7 @@ public class AdjacencyMatrix {
     final public int N;
 
     public AdjacencyMatrix(Mesh mesh) {
-        this.N = mesh.vertices.size();
+        this.N = mesh.getVertices().size();
 
         // Set up the adj_row adjacency pointer array.
         this.pcol = adjacencyCount(mesh);
@@ -110,17 +110,17 @@ public class AdjacencyMatrix {
             pcol[i] = 1;
 
         // Examine each triangle.
-        for (var tri : mesh.triangles) {
-            tid = tri.id;
+        for (var tri : mesh.getTriangles()) {
+            tid = tri.getID();
 
-            n1 = tri.vertices[0].id;
-            n2 = tri.vertices[1].id;
-            n3 = tri.vertices[2].id;
+            n1 = tri.getVertex(0).getId();
+            n2 = tri.getVertex(1).getId();
+            n3 = tri.getVertex(2).getId();
 
             // Add edge (1,2) if this is the first occurrence, that is, if
             // the edge (1,2) is on a boundary (nid <= 0) or if this triangle
             // is the first of the pair in which the edge occurs (tid < nid).
-            nid = tri.neighbors[2].tri.id;
+            nid = tri.getNeighbors()[2].getTriangle().getID();
 
             if (nid < 0 || tid < nid) {
                 pcol[n1] += 1;
@@ -128,7 +128,7 @@ public class AdjacencyMatrix {
             }
 
             // Add edge (2,3).
-            nid = tri.neighbors[0].tri.id;
+            nid = tri.getNeighbors()[0].getTriangle().getID();
 
             if (nid < 0 || tid < nid) {
                 pcol[n2] += 1;
@@ -136,7 +136,7 @@ public class AdjacencyMatrix {
             }
 
             // Add edge (3,1).
-            nid = tri.neighbors[1].tri.id;
+            nid = tri.getNeighbors()[1].getTriangle().getID();
 
             if (nid < 0 || tid < nid) {
                 pcol[n3] += 1;
@@ -186,17 +186,17 @@ public class AdjacencyMatrix {
         int tid, nid; // Triangle and neighbor id.
 
         // Examine each triangle.
-        for (var tri : mesh.triangles) {
-            tid = tri.id;
+        for (var tri : mesh.getTriangles()) {
+            tid = tri.getID();
 
-            n1 = tri.vertices[0].id;
-            n2 = tri.vertices[1].id;
-            n3 = tri.vertices[2].id;
+            n1 = tri.getVertex(0).getId();
+            n2 = tri.getVertex(1).getId();
+            n3 = tri.getVertex(2).getId();
 
             // Add edge (1,2) if this is the first occurrence, that is, if
             // the edge (1,2) is on a boundary (nid <= 0) or if this triangle
             // is the first of the pair in which the edge occurs (tid < nid).
-            nid = tri.neighbors[2].tri.id;
+            nid = tri.getNeighbors()[2].getTriangle().getID();
 
             if (nid < 0 || tid < nid) {
                 list[col[n1]++] = n2;
@@ -204,7 +204,7 @@ public class AdjacencyMatrix {
             }
 
             // Add edge (2,3).
-            nid = tri.neighbors[0].tri.id;
+            nid = tri.getNeighbors()[0].getTriangle().getID();
 
             if (nid < 0 || tid < nid) {
                 list[col[n2]++] = n3;
@@ -212,7 +212,7 @@ public class AdjacencyMatrix {
             }
 
             // Add edge (3,1).
-            nid = tri.neighbors[1].tri.id;
+            nid = tri.getNeighbors()[1].getTriangle().getID();
 
             if (nid < 0 || tid < nid) {
                 list[col[n1]++] = n3;

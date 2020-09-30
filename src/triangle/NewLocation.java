@@ -1,5 +1,7 @@
 package triangle;
 
+import triangle.tools.Statistic;
+
 public class NewLocation {
 
     static final double EPS = 1e-50;

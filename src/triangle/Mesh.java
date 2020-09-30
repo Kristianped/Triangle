@@ -1,5 +1,8 @@
 package triangle;
 
+import triangle.tools.CuthillMcKee;
+import triangle.tools.Statistic;
+
 import java.util.*;
 
 public class Mesh implements IMesh {
@@ -167,6 +170,10 @@ public class Mesh implements IMesh {
 
     public List<RegionPointer> getRegions() {
         return regions;
+    }
+
+    public TrianglePool getTrianglePool() {
+        return triangles;
     }
 
     @Override

@@ -1,10 +1,8 @@
-package triangle;
+package triangle.tools;
 
 import triangle.Vertex;
 
 import java.util.Random;
-import java.util.RandomAccess;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class VertexSorter {
 
@@ -69,7 +67,7 @@ public class VertexSorter {
                 var a = array[i];
                 int j = i - 1;
 
-                while (j >= left && (array[j].x > a.x || (array[j].x == a.x && array[j].y > a.y))) {
+                while (j >= left && (array[j].getX() > a.getX() || (array[j].getX() == a.getX() && array[j].getY() > a.getY()))) {
                     array[j + 1] = array[j];
                     j--;
                 }
@@ -81,8 +79,8 @@ public class VertexSorter {
 
         // Choose a random pivot to split the array
         pivot = rand.nextInt(right - left) + left;
-        pivotX = array[pivot].x;
-        pivotY = array[pivot].y;
+        pivotX = array[pivot].getX();
+        pivotY = array[pivot].getY();
 
         // Split the array
         left--;
@@ -92,12 +90,12 @@ public class VertexSorter {
             // Search for a vertex whose x-coordinates is too large for the left
             do {
                 left++;
-            } while ((left <= right) && ((array[left].x < pivotX) || ((array[left].x == pivotX) && (array[left].y < pivotY))));
+            } while ((left <= right) && ((array[left].getX() < pivotX) || ((array[left].getX() == pivotX) && (array[left].getY() < pivotY))));
 
             // Search for a vertex whoose x-coordinate is too small for the right
             do {
                 right--;
-            } while ((left <= right) && ((array[right].x > pivotX) || ((array[right].x == pivotX) && (array[right].y > pivotY))));
+            } while ((left <= right) && ((array[right].getX() > pivotX) || ((array[right].getX() == pivotX) && (array[right].getY() > pivotY))));
 
             if (left < right) {
                 // Swap the left and right vertices
@@ -166,9 +164,9 @@ public class VertexSorter {
         if (arraysize == 2)
         {
             // Recursive base case.
-            if ((array[left].x > array[right].x) ||
-                    ((array[left].x == array[right].x) &&
-                            (array[left].y > array[right].y))) {
+            if ((array[left].getX() > array[right].getX()) ||
+                    ((array[left].getX() == array[right].getX()) &&
+                            (array[left].getY() > array[right].getY()))) {
                 temp = array[right];
                 array[right] = array[left];
                 array[left] = temp;
@@ -179,8 +177,8 @@ public class VertexSorter {
 
         // Choose a random pivot to split the array.
         pivot = rand.nextInt(right - left) + left;
-        pivot1 = array[pivot].x;
-        pivot2 = array[pivot].y;
+        pivot1 = array[pivot].getX();
+        pivot2 = array[pivot].getY();
 
         left--;
         right++;
@@ -190,12 +188,12 @@ public class VertexSorter {
             // Search for a vertex whose x-coordinate is too large for the left.
             do {
                 left++;
-            } while ((left <= right) && ((array[left].x < pivot1) || ((array[left].x == pivot1) && (array[left].y < pivot2))));
+            } while ((left <= right) && ((array[left].getX() < pivot1) || ((array[left].getX() == pivot1) && (array[left].getY() < pivot2))));
 
             // Search for a vertex whose x-coordinate is too small for the right.
             do {
                 right--;
-            } while ((left <= right) && ((array[right].x > pivot1) || ((array[right].x == pivot1) && (array[right].y > pivot2))));
+            } while ((left <= right) && ((array[right].getX() > pivot1) || ((array[right].getX() == pivot1) && (array[right].getY() > pivot2))));
 
             if (left < right) {
                 // Swap the left and right vertices.
@@ -235,9 +233,9 @@ public class VertexSorter {
 
         if (arraysize == 2) {
             // Recursive base case.
-            if ((array[left].y > array[right].y) ||
-                    ((array[left].y == array[right].y) &&
-                            (array[left].x > array[right].x))) {
+            if ((array[left].getY() > array[right].getY()) ||
+                    ((array[left].getY() == array[right].getY()) &&
+                            (array[left].getX() > array[right].getX()))) {
                 temp = array[right];
                 array[right] = array[left];
                 array[left] = temp;
@@ -248,8 +246,8 @@ public class VertexSorter {
 
         // Choose a random pivot to split the array.
         pivot = rand.nextInt(right - left) + left;
-        pivot1 = array[pivot].y;
-        pivot2 = array[pivot].x;
+        pivot1 = array[pivot].getY();
+        pivot2 = array[pivot].getX();
 
         left--;
         right++;
@@ -258,12 +256,12 @@ public class VertexSorter {
             // Search for a vertex whose x-coordinate is too large for the left.
             do {
                 left++;
-            } while ((left <= right) && ((array[left].y < pivot1) || ((array[left].y == pivot1) && (array[left].x < pivot2))));
+            } while ((left <= right) && ((array[left].getY() < pivot1) || ((array[left].getY() == pivot1) && (array[left].getX() < pivot2))));
 
             // Search for a vertex whose x-coordinate is too small for the right.
             do {
                 right--;
-            } while ((left <= right) && ((array[right].y > pivot1) || ((array[right].y == pivot1) && (array[right].x > pivot2))));
+            } while ((left <= right) && ((array[right].getY() > pivot1) || ((array[right].getY() == pivot1) && (array[right].getX() > pivot2))));
 
             if (left < right) {
                 // Swap the left and right vertices.

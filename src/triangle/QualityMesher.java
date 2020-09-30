@@ -1,6 +1,7 @@
 package triangle;
 
-import java.time.format.TextStyle;
+import triangle.tools.Interpolation;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 

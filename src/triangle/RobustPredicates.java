@@ -1,5 +1,7 @@
 package triangle;
 
+import triangle.tools.Statistic;
+
 public class RobustPredicates implements IPredicates {
 
     private static final Object creationLock = new Object();

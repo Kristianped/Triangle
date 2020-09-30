@@ -1,5 +1,7 @@
 package triangle;
 
+import triangle.tools.Statistic;
+
 import java.util.ArrayList;
 import java.util.List;
 

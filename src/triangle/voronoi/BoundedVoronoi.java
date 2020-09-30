@@ -3,6 +3,7 @@ package triangle.voronoi;
 import triangle.*;
 import triangle.dcel.DcelVertex;
 import triangle.dcel.HalfEdge;
+import triangle.tools.IntersectionHelper;
 
 import java.util.ArrayList;
 

@@ -1,6 +1,7 @@
 package triangle.voronoi;
 
 import triangle.*;
+import triangle.tools.IntersectionHelper;
 
 public class StandardVoronoi extends VoronoiBase {
 

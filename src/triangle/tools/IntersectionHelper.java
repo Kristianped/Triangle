@@ -1,4 +1,7 @@
-package triangle;
+package triangle.tools;
+
+import triangle.Point;
+import triangle.Rectangle;
 
 public class IntersectionHelper {
 
@@ -14,19 +17,19 @@ public class IntersectionHelper {
      * @param c0 The intersection point
      */
     public static void intersectSegments(Point p0, Point p1, Point q0, Point q1, Point c0) {
-        double ux = p1.x - p0.x;
-        double uy = p1.y - p0.y;
-        double vx = q1.x - q0.x;
-        double vy = q1.y - q0.y;
-        double wx = p0.x - q0.x;
-        double wy = p0.y - q0.y;
+        double ux = p1.getX() - p0.getX();
+        double uy = p1.getY() - p0.getY();
+        double vx = q1.getX() - q0.getX();
+        double vy = q1.getY() - q0.getY();
+        double wx = p0.getX() - q0.getX();
+        double wy = p0.getY() - q0.getY();
 
         double d = (ux * vy - uy * vx);
         double s = (vx * wy - vy * wx) / d;
 
         // Intersection point
-        c0.x = p0.x + s * ux;
-        c0.y = p0.y + s * uy;
+        c0.setX(p0.getX() + s * ux);
+        c0.setY(p0.getY() + s * uy);
     }
 
     /**
@@ -49,10 +52,10 @@ public class IntersectionHelper {
         double ymax = rect.top();
 
         // Define the start and end points of the line.
-        double x0 = p0.x;
-        double y0 = p0.y;
-        double x1 = p1.x;
-        double y1 = p1.y;
+        double x0 = p0.getX();
+        double y0 = p0.getY();
+        double x1 = p1.getX();
+        double y1 = p1.getY();
 
         double t0 = 0.0;
         double t1 = 1.0;
@@ -80,10 +83,10 @@ public class IntersectionHelper {
             }
         }
 
-        c0.x = x0 + t0 * dx;
-        c0.y = y0 + t0 * dy;
-        c1.x = x0 + t1 * dx;
-        c1.y = y0 + t1 * dy;
+        c0.setX(x0 + t0 * dx);
+        c0.setY(y0 + t0 * dy);
+        c1.setX(x0 + t1 * dx);
+        c1.setY(y0 + t1 * dy);
 
         return true; // (clipped) line is drawn
     }
@@ -98,7 +101,7 @@ public class IntersectionHelper {
      */
     public static boolean boxRayIntersection(Rectangle rect, Point p0, Point p1, Point c1)
     {
-        return boxRayIntersection(rect, p0, p1.x - p0.x, p1.y - p0.y, c1);
+        return boxRayIntersection(rect, p0, p1.getX() - p0.getX(), p1.getY() - p0.getY(), c1);
     }
 
     /**
@@ -128,8 +131,8 @@ public class IntersectionHelper {
      * @return Returns false, if startpoint is outside the box
      */
     public static boolean boxRayIntersection(Rectangle rect, Point p, double dx, double dy, Point c) {
-        double x = p.x;
-        double y = p.y;
+        double x = p.getX();
+        double y = p.getY();
 
         double t1, x1, y1, t2, x2, y2;
 
@@ -178,12 +181,12 @@ public class IntersectionHelper {
         }
 
         if (t1 < t2) {
-            c.x = x1;
-            c.y = y1;
+            c.setX(x1);
+            c.setY(y1);
         }
         else {
-            c.x = x2;
-            c.y = y2;
+            c.setX(x2);
+            c.setY(y2);
         }
 
         return true;

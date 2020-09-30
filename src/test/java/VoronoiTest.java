@@ -1,6 +1,7 @@
 import org.junit.Test;
 import triangle.*;
 import triangle.io.FileProcessor;
+import triangle.tools.Statistic;
 import triangle.voronoi.BoundedVoronoi;
 import triangle.voronoi.StandardVoronoi;
 import triangle.voronoi.VoronoiBase;

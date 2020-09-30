@@ -1,6 +1,6 @@
-package triangle;
+package triangle.tools;
 
-import triangle.Mesh;
+import triangle.*;
 
 public class Statistic {
 
@@ -76,9 +76,9 @@ public class Statistic {
         int aspectindex;
         int i, j, k;
 
-        tri.orient = 0;
-        for (var t : mesh.triangles) {
-            tri.tri = t;
+        tri.setOrient(0);
+        for (var t : mesh.getTriangles()) {
+            tri.setTriangle(t);
             p[0] = tri.org();
             p[1] = tri.dest();
             p[2] = tri.apex();
@@ -87,8 +87,8 @@ public class Statistic {
             for (i = 0; i < 3; i++) {
                 j = plus1Mod3[i];
                 k = minus1Mod3[i];
-                dx[i] = p[j].x - p[k].x;
-                dy[i] = p[j].y - p[k].y;
+                dx[i] = p[j].getX() - p[k].getX();
+                dy[i] = p[j].getY() - p[k].getY();
                 edgelength[i] = dx[i] * dx[i] + dy[i] * dy[i];
 
                 if (edgelength[i] > trilongest2)
@@ -96,8 +96,8 @@ public class Statistic {
             }
 
             //triarea = Primitives.CounterClockwise(p[0], p[1], p[2]);
-            triarea = Math.abs((p[2].x - p[0].x) * (p[1].y - p[0].y) -
-                    (p[1].x - p[0].x) * (p[2].y - p[0].y)) / 2.0;
+            triarea = Math.abs((p[2].getX() - p[0].getX()) * (p[1].getY() - p[0].getY()) -
+                    (p[1].getX() - p[0].getX()) * (p[2].getY() - p[0].getY())) / 2.0;
 
             triminaltitude2 = triarea * triarea / trilongest2;
 
@@ -153,7 +153,7 @@ public class Statistic {
             angleTable[i] = 0;
 
 
-        minAspect = mesh.bounds.width() + mesh.bounds.height();
+        minAspect = mesh.getBounds().width() + mesh.getBounds().height();
         minAspect = minAspect * minAspect;
         maxAspect = 0.0;
         minEdge = minAspect;
@@ -168,13 +168,13 @@ public class Statistic {
 
         double triMinAngle, triMaxAngle = 1;
 
-        for (var tri : mesh.triangles) {
+        for (var tri : mesh.getTriangles()) {
             triMinAngle = 0; // Min angle:  0 < a <  60 degress
             triMaxAngle = 1; // Max angle: 60 < a < 180 degress
 
-            p[0] = tri.vertices[0];
-            p[1] = tri.vertices[1];
-            p[2] = tri.vertices[2];
+            p[0] = tri.getVertex(0);
+            p[1] = tri.getVertex(1);
+            p[2] = tri.getVertex(2);
 
             triLongest2 = 0.0;
 
@@ -182,8 +182,8 @@ public class Statistic {
                 k1 = plus1Mod3[i];
                 k2 = minus1Mod3[i];
 
-                dx[i] = p[k1].x - p[k2].x;
-                dy[i] = p[k1].y - p[k2].y;
+                dx[i] = p[k1].getX() - p[k2].getX();
+                dy[i] = p[k1].getY() - p[k2].getY();
 
                 edgeLength[i] = dx[i] * dx[i] + dy[i] * dy[i];
 
@@ -198,8 +198,8 @@ public class Statistic {
             }
 
             //triarea = Primitives.CounterClockwise(p[0], p[1], p[2]);
-            triArea = Math.abs((p[2].x - p[0].x) * (p[1].y - p[0].y) -
-                    (p[1].x - p[0].x) * (p[2].y - p[0].y));
+            triArea = Math.abs((p[2].getX() - p[0].getX()) * (p[1].getY() - p[0].getY()) -
+                    (p[1].getX() - p[0].getX()) * (p[2].getY() - p[0].getY()));
 
             if (triArea < minArea)
                 minArea = triArea;
@@ -324,16 +324,16 @@ public class Statistic {
         var vb = triangle.getVertex(1);
         var vc = triangle.getVertex(2);
 
-        double dxa = vb.x - vc.x;
-        double dya = vb.y - vc.y;
+        double dxa = vb.getX() - vc.getX();
+        double dya = vb.getY() - vc.getY();
         double lena = dxa * dxa + dya * dya;
 
-        double dxb = vc.x - va.x;
-        double dyb = vc.y - va.y;
+        double dxb = vc.getX() - va.getX();
+        double dyb = vc.getY() - va.getY();
         double lenb = dxb * dxb + dyb * dyb;
 
-        double dxc = va.x - vb.x;
-        double dyc = va.y - vb.y;
+        double dxc = va.getX() - vb.getX();
+        double dyc = va.getY() - vb.getY();
         double lenc = dxc * dxc + dyc * dyc;
 
         // Dot products.

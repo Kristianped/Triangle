@@ -1,4 +1,8 @@
-package triangle;
+package triangle.tools;
+
+import triangle.IPolygon;
+import triangle.Point;
+import triangle.Vertex;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -24,11 +28,11 @@ public class PolygonValidator {
                 String s = String.format("Point {0} is null: PolygonValidator.IsConsistent()", i);
                 System.err.println(s);
             }
-            else if (Double.isNaN(p.x) || Double.isNaN(p.y)) {
+            else if (Double.isNaN(p.getX()) || Double.isNaN(p.getY())) {
                 horrors++;
                 System.err.println(String.format("Point {0} has invalid coordinates: PolygonValidator.IsConsistent()", i));
             }
-            else if (Double.isInfinite(p.x) || Double.isInfinite(p.y)) {
+            else if (Double.isInfinite(p.getX()) || Double.isInfinite(p.getY())) {
                 horrors++;
                 System.err.println(String.format("Point {0} has invalid coordinates: PolygonValidator.IsConsistent()", i));
             }
@@ -50,15 +54,15 @@ public class PolygonValidator {
             var p = seg.getVertex(0);
             var q = seg.getVertex(1);
 
-            if ((p.x == q.x) && (p.y == q.y)) {
+            if ((p.getX() == q.getX()) && (p.getY() == q.getY())) {
                 horrors++;
-                System.err.println(String.format("Endpoints of segment {0} are coincident (IDs {1} / {2}): PolygonValidator.IsConsistent()", i, p.id, q.id));
+                System.err.println(String.format("Endpoints of segment {0} are coincident (IDs {1} / {2}): PolygonValidator.IsConsistent()", i, p.getId(), q.getId()));
             }
 
             i++;
         }
 
-        if (points.get(0).id == points.get(1).id)
+        if (points.get(0).getId() == points.get(1).getId())
             horrors += checkVertexIDs(poly, count);
         else
             horrors += checkDuplicateIDs(poly);
@@ -133,12 +137,12 @@ public class PolygonValidator {
 
     private static double dotProduct(Point a, Point b, Point c) {
         //  Calculate the dot product.
-        return (a.x - b.x) * (c.x - b.x) + (a.y - b.y) * (c.y - b.y);
+        return (a.getX() - b.getX()) * (c.getX() - b.getX()) + (a.getY() - b.getY()) * (c.getY() - b.getY());
     }
 
     private static double crossProductLength(Point a, Point b, Point c) {
         //  Calculate the Z coordinate of the cross product.
-        return (a.x - b.x) * (c.y - b.y) - (a.y - b.y) * (c.x - b.x);
+        return (a.getX() - b.getX()) * (c.getY() - b.getY()) - (a.getY() - b.getY()) * (c.getX() - b.getX());
     }
 
     private static int checkVertexIDs(IPolygon poly, int count) {
@@ -152,12 +156,12 @@ public class PolygonValidator {
             p = seg.getVertex(0);
             q = seg.getVertex(1);
 
-            if (p.id < 0 || p.id >= count) {
+            if (p.getId() < 0 || p.getId() >= count) {
                 horrors++;
                 System.err.println(String.format("Segment {0} has invalid startpoint: PolygonValidator.CheckVertexIDs()", i));
             }
 
-            if (q.id < 0 || q.id >= count) {
+            if (q.getId() < 0 || q.getId() >= count) {
                 horrors++;
                 System.err.println(String.format("Segment {0} has invalid endpoint: PolygonValidator.CheckVertexIDs()", i));
             }
@@ -173,7 +177,7 @@ public class PolygonValidator {
 
         // Check for duplicate ids.
         for (var p : poly.getPoints()) {
-            if (!ids.add(p.id)) {
+            if (!ids.add(p.getId())) {
                 System.err.println("Found duplicate vertex ids: PolygonValidator.CheckDuplicateIDs");
                 return 1;
             }

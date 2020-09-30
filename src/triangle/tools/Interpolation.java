@@ -1,4 +1,7 @@
-package triangle;
+package triangle.tools;
+
+import triangle.ITriangle;
+import triangle.Vertex;
 
 public class Interpolation {
 
@@ -19,18 +22,18 @@ public class Interpolation {
         double xi, eta;
 
         // Compute the circumcenter of the triangle.
-        xdo = dest.x - org.x;
-        ydo = dest.y - org.y;
-        xao = apex.x - org.x;
-        yao = apex.y - org.y;
+        xdo = dest.getX() - org.getX();
+        ydo = dest.getY() - org.getY();
+        xao = apex.getX() - org.getX();
+        yao = apex.getY() - org.getY();
 
         denominator = 0.5 / (xdo * yao - xao * ydo);
 
         //dx = (yao * dodist - ydo * aodist) * denominator;
         //dy = (xdo * aodist - xao * dodist) * denominator;
 
-        dx = vertex.x - org.x;
-        dy = vertex.y - org.y;
+        dx = vertex.getX() - org.getX();
+        dy = vertex.getY() - org.getY();
 
         // To interpolate vertex attributes for the new vertex, define a
         // coordinate system with a xi-axis directed from the triangle's
@@ -41,9 +44,9 @@ public class Interpolation {
 
         for (int i = 0; i < n; i++) {
             // Interpolate the vertex attributes.
-            vertex.attributes[i] = org.attributes[i]
-                    + xi * (dest.attributes[i] - org.attributes[i])
-                    + eta * (apex.attributes[i] - org.attributes[i]);
+            vertex.getAttributes()[i] = org.getAttributes()[i]
+                    + xi * (dest.getAttributes()[i] - org.getAttributes()[i])
+                    + eta * (apex.getAttributes()[i] - org.getAttributes()[i]);
         }
     }
 }
