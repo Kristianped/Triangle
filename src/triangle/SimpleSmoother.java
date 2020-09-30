@@ -1,6 +1,8 @@
 package triangle;
 
 import triangle.dcel.Face;
+import triangle.voronoi.BoundedVoronoi;
+import triangle.voronoi.IVoronoiFactory;
 
 public class SimpleSmoother implements ISmoother {
 

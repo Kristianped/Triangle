@@ -1,5 +1,6 @@
-package triangle;
+package triangle.voronoi;
 
+import triangle.Vertex;
 import triangle.dcel.Face;
 import triangle.dcel.HalfEdge;
 import triangle.dcel.DcelVertex;

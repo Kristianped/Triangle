@@ -1,6 +1,9 @@
 import org.junit.Test;
 import triangle.*;
 import triangle.io.FileProcessor;
+import triangle.voronoi.BoundedVoronoi;
+import triangle.voronoi.StandardVoronoi;
+import triangle.voronoi.VoronoiBase;
 
 import java.io.IOException;
 

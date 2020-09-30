@@ -1,5 +1,6 @@
-package triangle;
+package triangle.voronoi;
 
+import triangle.*;
 import triangle.dcel.DcelMesh;
 import triangle.dcel.DcelVertex;
 import triangle.dcel.Face;
@@ -36,8 +37,8 @@ public abstract class VoronoiBase extends DcelMesh {
         this.rays = new ArrayList<HalfEdge>();
 
         // Allocate space for Voronoi diagram.
-        var vertices = new DcelVertex[mesh.triangles.size() + mesh.hullsize];
-        var faces = new Face[mesh.vertices.size()];
+        var vertices = new DcelVertex[mesh.getTriangles().size() + mesh.getHullsize()];
+        var faces = new Face[mesh.getVertices().size()];
 
         if (factory == null)
         {
@@ -50,9 +51,9 @@ public abstract class VoronoiBase extends DcelMesh {
         var map = computeVertices(mesh, vertices);
 
         // Create all Voronoi faces.
-        for (var vertex : mesh.vertices.values())
+        for (var vertex : mesh.getVertices())
         {
-            faces[vertex.id] = factory.createFace(vertex);
+            faces[vertex.getId()] = factory.createFace(vertex);
         }
 
         computeEdges(mesh, vertices, faces, map);
@@ -73,18 +74,18 @@ public abstract class VoronoiBase extends DcelMesh {
         int id;
 
         // Maps all vertices to a list of leaving edges.
-        List<HalfEdge>[] map = new List[mesh.triangles.size()];
+        List<HalfEdge>[] map = new List[mesh.getTriangles().size()];
 
         // Compue triangle circumcenters
-        for (var t : mesh.triangles)
+        for (var t : mesh.getTriangles())
         {
-            id = t.id;
-            tri.tri = t;
+            id = t.getID();
+            tri.setTriangle(t);
 
             pt = predicates.findCircumcenter(tri.org(), tri.dest(), tri.apex(), xi, eta);
 
             vertex = factory.createVertex(pt.getX(), pt.getY());
-            vertex.id = id;
+            vertex.setId(id);
 
             vertices[id] = vertex;
             map[id] = new ArrayList<HalfEdge>();
@@ -98,7 +99,7 @@ public abstract class VoronoiBase extends DcelMesh {
         Vertex org, dest;
 
         double px, py;
-        int id, nid, count = mesh.triangles.size();
+        int id, nid, count = mesh.getTriangles().size();
 
         Face face, neighborFace;
         HalfEdge edge, twin;
@@ -115,18 +116,18 @@ public abstract class VoronoiBase extends DcelMesh {
         // to the edge, operate on the edge. If there is another adjacent triangle,
         // operate on the edge only if the current triangle has a smaller id than
         // its neighbor. This way, each edge is considered only once.
-        for (var t : mesh.triangles)
+        for (var t : mesh.getTriangles())
         {
-            id = t.id;
+            id = t.getID();
+            tri.setTriangle(t);
 
-            tri.tri = t;
 
             for (int i = 0; i < 3; i++)
             {
-                tri.orient = i;
+                tri.setOrient(i);
                 tri.sym(neighbor);
 
-                nid = neighbor.tri.id;
+                nid = neighbor.getTriangle().getID();
 
                 if (id < nid || nid < 0)
                 {
@@ -134,8 +135,8 @@ public abstract class VoronoiBase extends DcelMesh {
                     org = tri.org();
                     dest = tri.dest();
 
-                    face = faces[org.id];
-                    neighborFace = faces[dest.id];
+                    face = faces[org.getId()];
+                    neighborFace = faces[dest.getId()];
 
                     vertex = vertices[id];
 
@@ -149,9 +150,9 @@ public abstract class VoronoiBase extends DcelMesh {
                         py = org.getX() - dest.getX();
 
                         end = factory.createVertex(vertex.getX() + px, vertex.getY() + py);
-                        end.id = count + j++;
+                        end.setId(count + j++);
 
-                        vertices[end.id] = end;
+                        vertices[end.getId()] = end;
 
                         edge = factory.createHalfEdge(end, face);
                         twin = factory.createHalfEdge(vertex, neighborFace);
@@ -200,10 +201,10 @@ public abstract class VoronoiBase extends DcelMesh {
         // For each half-edge, find its successor in the connected face.
         for (var edge : this.edges)
         {
-            var face = edge.getFace().getGenerator().id;
+            var face = edge.getFace().getGenerator().getId();
 
             // The id of the dest vertex of current edge.
-            int id = edge.getTwin().getOrigin().id;
+            int id = edge.getTwin().getOrigin().getId();
 
             // The edge origin can also be an infinite vertex. Sort them out
             // by checking the id.
@@ -213,7 +214,7 @@ public abstract class VoronoiBase extends DcelMesh {
                 // Voronoi vertex has degree 3, so this loop is actually O(1).
                 for (var next : map[id])
                 {
-                    if (next.getFace().getGenerator().id == face)
+                    if (next.getFace().getGenerator().getId() == face)
                     {
                         edge.setNext(next);
                         break;
@@ -234,11 +235,11 @@ public abstract class VoronoiBase extends DcelMesh {
             // Report edge only once.
             if (twin == null)
             {
-                edges.add(new Edge(edge.getOrigin().id, edge.getNext().getOrigin().id));
+                edges.add(new Edge(edge.getOrigin().getId(), edge.getNext().getOrigin().getId()));
             }
             else if (edge.getId() < twin.getId())
             {
-                edges.add(new Edge(edge.getOrigin().id, twin.getOrigin().id));
+                edges.add(new Edge(edge.getOrigin().getId(), twin.getOrigin().getId()));
             }
         }
 

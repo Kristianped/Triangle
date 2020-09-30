@@ -1,5 +1,6 @@
-package triangle;
+package triangle.voronoi;
 
+import triangle.*;
 import triangle.dcel.DcelVertex;
 import triangle.dcel.HalfEdge;
 
@@ -58,11 +59,11 @@ public class BoundedVoronoi extends VoronoiBase {
 
         // The half-edge is the bisector of v1 and v2, so the projection onto the
         // boundary segment is actually its midpoint.
-        v.x = (v1.x + v2.x) / 2.0;
-        v.y = (v1.y + v2.y) / 2.0;
+        v.setX((v1.getX() + v2.getX()) / 2.0);
+        v.setY((v1.getY() + v2.getY()) / 2.0);
 
         // Close the cell connected to edge.
-        var gen = factory.createVertex(v1.x, v1.y);
+        var gen = factory.createVertex(v1.getX(), v1.getY());
 
         var h1 = factory.createHalfEdge(edge.getTwin().getOrigin(), edge.getFace());
         var h2 = factory.createHalfEdge(gen, edge.getFace());
@@ -84,7 +85,7 @@ public class BoundedVoronoi extends VoronoiBase {
         h1.setId(count);
         h2.setId(count + 1);
 
-        gen.id = offset++;
+        gen.setId(offset++);
         this.vertices.add(gen);
     }
 
@@ -112,7 +113,7 @@ public class BoundedVoronoi extends VoronoiBase {
         edge.setTwin(null);
 
         // Close the cell.
-        var gen = factory.createVertex(v1.x, v1.y);
+        var gen = factory.createVertex(v1.getX(), v1.getY());
         var he = factory.createHalfEdge(gen, edge.getFace());
 
         edge.setNext(he);
@@ -125,7 +126,7 @@ public class BoundedVoronoi extends VoronoiBase {
 
         he.setId(this.edges.size());
 
-        gen.id = offset++;
+        gen.setId(offset++);
         this.vertices.add(gen);
     }
 }

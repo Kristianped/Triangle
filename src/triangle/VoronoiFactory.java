@@ -3,6 +3,7 @@ package triangle;
 import triangle.dcel.DcelVertex;
 import triangle.dcel.Face;
 import triangle.dcel.HalfEdge;
+import triangle.voronoi.IVoronoiFactory;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
