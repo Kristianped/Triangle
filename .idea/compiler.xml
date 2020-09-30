@@ -2,7 +2,8 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="Triangle.test" target="11" />
+      <module name="Triangle.test.main" target="1.8" />
+      <module name="Triangle.test.test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
