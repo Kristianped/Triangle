@@ -5,6 +5,7 @@ import triangle.io.FileProcessor;
 import triangle.meshing.ConstraintOptions;
 import triangle.meshing.IMesh;
 import triangle.meshing.QualityOptions;
+import triangle.meshing.algorithm.SweepLine;
 
 import java.io.IOException;
 

@@ -2,6 +2,7 @@ package triangle.meshing;
 
 import triangle.*;
 import triangle.io.InputTriangle;
+import triangle.meshing.algorithm.Dwyer;
 
 import java.util.ArrayList;
 import java.util.Arrays;

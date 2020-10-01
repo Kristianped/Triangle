@@ -1,5 +1,6 @@
-package triangle;
+package triangle.meshing.algorithm;
 
+import triangle.*;
 import triangle.meshing.IMesh;
 import triangle.meshing.ITriangulator;
 import triangle.tools.VertexSorter;
@@ -26,7 +27,7 @@ public class Dwyer implements ITriangulator {
      */
     @Override
     public IMesh triangulate(List<Vertex> points, Configuration config) {
-        this.predicates = config.predicates.get();
+        this.predicates = config.getPredicates().get();
 
         this.mesh = new Mesh(config);
         this.mesh.transferNodes(points);
@@ -51,10 +52,9 @@ public class Dwyer implements ITriangulator {
         i = 0;
         for (j = 1; j < n; j++)
         {
-            if ((sortarray[i].x == sortarray[j].x) && (sortarray[i].y == sortarray[j].y))
+            if ((sortarray[i].getX() == sortarray[j].getX()) && (sortarray[i].getY() == sortarray[j].getY()))
             {
-
-                sortarray[j].type = Enums.VertexType.UndeadVertex;
+                sortarray[j].setType(Enums.VertexType.UndeadVertex);
                 mesh.undeads++;
             }
             else
@@ -150,7 +150,7 @@ public class Dwyer implements ITriangulator {
             // The pointers to the extremal vertices are shifted to point to the
             // topmost and bottommost vertex of each hull, rather than the
             // leftmost and rightmost vertices.
-            while (farleftapex.y < farleftpt.y)
+            while (farleftapex.getY() < farleftpt.getY())
             {
                 farleft.lnext();
                 farleft.sym();
@@ -159,7 +159,7 @@ public class Dwyer implements ITriangulator {
             }
             innerleft.sym(checkedge);
             checkvertex = checkedge.apex();
-            while (checkvertex.y > innerleftdest.y)
+            while (checkvertex.getY() > innerleftdest.getY())
             {
                 checkedge.lnext(innerleft);
                 innerleftapex = innerleftdest;
@@ -167,7 +167,7 @@ public class Dwyer implements ITriangulator {
                 innerleft.sym(checkedge);
                 checkvertex = checkedge.apex();
             }
-            while (innerrightapex.y < innerrightorg.y)
+            while (innerrightapex.getY() < innerrightorg.getY())
             {
                 innerright.lnext();
                 innerright.sym();
@@ -176,7 +176,7 @@ public class Dwyer implements ITriangulator {
             }
             farright.sym(checkedge);
             checkvertex = checkedge.apex();
-            while (checkvertex.y > farrightpt.y)
+            while (checkvertex.getY() > farrightpt.getY())
             {
                 checkedge.lnext(farright);
                 farrightapex = farrightpt;
@@ -275,7 +275,7 @@ public class Dwyer implements ITriangulator {
                     // The pointers to the extremal vertices are restored to the
                     // leftmost and rightmost vertices (rather than topmost and
                     // bottommost).
-                    while (checkvertex.x < farleftpt.x)
+                    while (checkvertex.getX() < farleftpt.getX())
                     {
                         checkedge.lprev(farleft);
                         farleftapex = farleftpt;
@@ -283,7 +283,7 @@ public class Dwyer implements ITriangulator {
                         farleft.sym(checkedge);
                         checkvertex = checkedge.apex();
                     }
-                    while (farrightapex.x > farrightpt.x)
+                    while (farrightapex.getX() > farrightpt.getX())
                     {
                         farright.lprev();
                         farright.sym();
@@ -595,12 +595,12 @@ public class Dwyer implements ITriangulator {
 
         int hullsize;
 
-        boolean noPoly = !mesh.behavior.poly;
+        boolean noPoly = !mesh.getBehavior().isPoly();
 
         // Find an edge on the convex hull to start point location from.
         startghost.lprev(searchedge);
         searchedge.sym();
-        mesh.dummytri.neighbors[0] = searchedge;
+        mesh.dummytri.getNeighbors()[0] = searchedge;
 
         // Remove the bounding box and count the convex hull edges.
         startghost.copy(dissolveedge);
@@ -616,11 +616,11 @@ public class Dwyer implements ITriangulator {
             // on the convex hull.  If a PSLG is used, this step is done later.
             if (noPoly) {
                 // Watch out for the case where all the input vertices are collinear.
-                if (dissolveedge.tri.id != Mesh.DUMMY) {
+                if (dissolveedge.tri.getID() != Mesh.DUMMY) {
                     markorg = dissolveedge.org();
 
-                    if (markorg.label == 0)
-                        markorg.label = 1;
+                    if (markorg.getLabel() == 0)
+                        markorg.setLabel(1);
                 }
             }
 

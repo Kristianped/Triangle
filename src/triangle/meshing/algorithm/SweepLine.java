@@ -1,5 +1,6 @@
-package triangle;
+package triangle.meshing.algorithm;
 
+import triangle.*;
 import triangle.meshing.IMesh;
 import triangle.meshing.ITriangulator;
 import triangle.tools.MutableBoolean;
@@ -26,7 +27,7 @@ public class SweepLine implements ITriangulator {
 
     @Override
     public IMesh triangulate(List<Vertex> points, Configuration config) {
-        this.predicates = config.predicates.get();
+        this.predicates = config.getPredicates().get();
 
         this.mesh = new Mesh(config);
         this.mesh.transferNodes(points);
@@ -83,14 +84,14 @@ public class SweepLine implements ITriangulator {
             secondvertex = eventheap[0].vertexEvent;
             heapDelete(eventheap, heapsize, 0);
             heapsize--;
-            if ((firstvertex.x == secondvertex.x) &&
-                    (firstvertex.y == secondvertex.y))
+            if ((firstvertex.getX() == secondvertex.getX()) &&
+                    (firstvertex.getY() == secondvertex.getY()))
             {
-                secondvertex.type = Enums.VertexType.UndeadVertex;
+                secondvertex.setType(Enums.VertexType.UndeadVertex);
                 mesh.undeads++;
             }
-        } while ((firstvertex.x == secondvertex.x) &&
-                (firstvertex.y == secondvertex.y));
+        } while ((firstvertex.getX() == secondvertex.getX()) &&
+                (firstvertex.getY() == secondvertex.getY()));
         lefttri.setOrg(firstvertex);
         lefttri.setDest(secondvertex);
         righttri.setOrg(secondvertex);
@@ -134,10 +135,10 @@ public class SweepLine implements ITriangulator {
             else
             {
                 nextvertex = nextevent.vertexEvent;
-                if ((nextvertex.x == lastvertex.x) &&
-                        (nextvertex.y == lastvertex.y))
+                if ((nextvertex.getX() == lastvertex.getX()) &&
+                        (nextvertex.getY() == lastvertex.getY()))
                 {
-                    nextvertex.type = Enums.VertexType.UndeadVertex;
+                    nextvertex.setType(Enums.VertexType.UndeadVertex);
                     mesh.undeads++;
                     check4events = false;
                 }
@@ -241,13 +242,13 @@ public class SweepLine implements ITriangulator {
         SweepEvent evt;
 
         i = 0;
-        for (var v : mesh.vertices.values())
+        for (var v : mesh.getVertices())
         {
             thisvertex = v;
             evt = new SweepEvent();
             evt.vertexEvent = thisvertex;
-            evt.xkey = thisvertex.x;
-            evt.ykey = thisvertex.y;
+            evt.xkey = thisvertex.getX();
+            evt.ykey = thisvertex.getY();
             heapInsert(eventheap, i++, evt);
         }
     }
@@ -566,14 +567,15 @@ public class SweepLine implements ITriangulator {
         Otri dummytri = new Otri();
 
         ccwabc = predicates.counterClockwise(pa, pb, pc);
-        xac = pa.x - pc.x;
-        yac = pa.y - pc.y;
-        xbc = pb.x - pc.x;
-        ybc = pb.y - pc.y;
+        xac = pa.getX() - pc.getX();
+        yac = pa.getY() - pc.getY();
+        xbc = pb.getX() - pc.getX();
+        ybc = pb.getY() - pc.getY();
         aclen2 = xac * xac + yac * yac;
         bclen2 = xbc * xbc + ybc * ybc;
-        searchpoint.x = pc.x - (yac * bclen2 - ybc * aclen2) / (2.0 * ccwabc);
-        searchpoint.y = topy;
+        searchpoint.setX(pc.getX() - (yac * bclen2 - ybc * aclen2) / (2.0 * ccwabc));
+        searchpoint.setY(topy);
+
         return splayInsert(splay(splayroot, searchpoint, dummytri), newkey.shallowCopy(), searchpoint);
     }
 
@@ -585,26 +587,26 @@ public class SweepLine implements ITriangulator {
 
         leftvertex = fronttri.dest();
         rightvertex = fronttri.apex();
-        if ((leftvertex.y < rightvertex.y) ||
-                ((leftvertex.y == rightvertex.y) &&
-                        (leftvertex.x < rightvertex.x)))
+        if ((leftvertex.getY() < rightvertex.getY()) ||
+                ((leftvertex.getY() == rightvertex.getY()) &&
+                        (leftvertex.getX() < rightvertex.getX())))
         {
-            if (newsite.x >= rightvertex.x)
+            if (newsite.getX() >= rightvertex.getX())
             {
                 return true;
             }
         }
         else
         {
-            if (newsite.x <= leftvertex.x)
+            if (newsite.getX() <= leftvertex.getX())
             {
                 return false;
             }
         }
-        dxa = leftvertex.x - newsite.x;
-        dya = leftvertex.y - newsite.y;
-        dxb = rightvertex.x - newsite.x;
-        dyb = rightvertex.y - newsite.y;
+        dxa = leftvertex.getX() - newsite.getX();
+        dya = leftvertex.getY() - newsite.getY();
+        dxb = rightvertex.getX() - newsite.getX();
+        dyb = rightvertex.getY() - newsite.getY();
         return dya * (dxb * dxb + dyb * dyb) > dyb * (dxa * dxa + dya * dya);
     }
 
@@ -633,16 +635,16 @@ public class SweepLine implements ITriangulator {
 
         Statistic.CircleTopCount++;
 
-        xac = pa.x - pc.x;
-        yac = pa.y - pc.y;
-        xbc = pb.x - pc.x;
-        ybc = pb.y - pc.y;
-        xab = pa.x - pb.x;
-        yab = pa.y - pb.y;
+        xac = pa.getX() - pc.getX();
+        yac = pa.getY() - pc.getY();
+        xbc = pb.getX() - pc.getX();
+        ybc = pb.getY() - pc.getY();
+        xab = pa.getX() - pb.getX();
+        yab = pa.getY() - pb.getY();
         aclen2 = xac * xac + yac * yac;
         bclen2 = xbc * xbc + ybc * ybc;
         ablen2 = xab * xab + yab * yab;
-        return pc.y + (xac * bclen2 - xbc * aclen2 + Math.sqrt(aclen2 * bclen2 * ablen2)) / (2.0 * ccwabc);
+        return pc.getY() + (xac * bclen2 - xbc * aclen2 + Math.sqrt(aclen2 * bclen2 * ablen2)) / (2.0 * ccwabc);
     }
 
     int removeGhosts(Otri startghost) {
@@ -652,14 +654,14 @@ public class SweepLine implements ITriangulator {
         Vertex markorg;
         int hullsize;
 
-        boolean noPoly = !mesh.behavior.poly;
+        boolean noPoly = !mesh.getBehavior().isPoly();
 
         var dummytri = mesh.dummytri;
 
         // Find an edge on the convex hull to start point location from.
         startghost.lprev(searchedge);
         searchedge.sym();
-        dummytri.neighbors[0] = searchedge;
+        dummytri.getNeighbors()[0] = searchedge;
         // Remove the bounding box and count the convex hull edges.
         startghost.copy(dissolveedge);
         hullsize = 0;
@@ -675,12 +677,12 @@ public class SweepLine implements ITriangulator {
             if (noPoly)
             {
                 // Watch out for the case where all the input vertices are collinear.
-                if (dissolveedge.tri.id != Mesh.DUMMY)
+                if (dissolveedge.tri.getID() != Mesh.DUMMY)
                 {
                     markorg = dissolveedge.org();
-                    if (markorg.label == 0)
+                    if (markorg.getLabel() == 0)
                     {
-                        markorg.label = 1;
+                        markorg.setLabel(1);
                     }
                 }
             }
