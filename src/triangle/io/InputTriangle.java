@@ -1,4 +1,8 @@
-package triangle;
+package triangle.io;
+
+import triangle.ISegment;
+import triangle.ITriangle;
+import triangle.Vertex;
 
 public class InputTriangle implements ITriangle {
 

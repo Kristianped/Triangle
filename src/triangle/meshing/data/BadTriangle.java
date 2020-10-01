@@ -1,4 +1,7 @@
-package triangle;
+package triangle.meshing.data;
+
+import triangle.Otri;
+import triangle.Vertex;
 
 /**
  * A queue used to store bad triangles<br><br>
@@ -19,7 +22,7 @@ public class BadTriangle {
 
     @Override
     public String toString() {
-        return String.format("B-TID %d", poortri.tri.hash);
+        return String.format("B-TID %d", poortri.tri.hashCode());
     }
 
     public Otri getPoortri() {

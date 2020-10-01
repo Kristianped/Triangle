@@ -1,4 +1,7 @@
-package triangle;
+package triangle.meshing.data;
+
+import triangle.Otri;
+import triangle.Vertex;
 
 /**
  * A priority queue for bad triangles<br><br>
@@ -126,6 +129,11 @@ public class BadTriQueue {
 
     /**
      * Add a bad triangle to the end of the queue
+     * @param enqtri A skinny or too-large triangle
+     * @param minedge cos^2 of smallest (atypical) angle
+     * @param apex First vertex of the triangle
+     * @param org Second vertex of the triangle
+     * @param dest Third vertex of the triangle
      */
     public void enqueue(Otri enqtri, double minedge, Vertex apex, Vertex org, Vertex dest) {
         // Allocate space for the bad triangle.

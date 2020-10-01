@@ -36,14 +36,14 @@ public class DwyerTest {
             int refines = 5;
 
             for (int i = 0; i < refines; i++) {
-                statistic.update((Mesh) mesh, 10);
+                statistic.update((Mesh) mesh);
                 quality.setMaxArea(0.25 * statistic.LargestArea());
                 mesh.refine(quality, true);
             }
 
             // Smooth
             SimpleSmoother smoother = new SimpleSmoother();
-            statistic.update((Mesh) mesh, 10);
+            statistic.update((Mesh) mesh);
             smoother.smooth(mesh);
             System.out.println("Success");
 

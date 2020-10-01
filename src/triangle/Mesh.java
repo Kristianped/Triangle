@@ -3,6 +3,8 @@ package triangle;
 import triangle.meshing.IMesh;
 import triangle.meshing.QualityMesher;
 import triangle.meshing.QualityOptions;
+import triangle.meshing.data.BadSubSeg;
+import triangle.meshing.iterators.EdgeIterator;
 import triangle.tools.CuthillMcKee;
 import triangle.tools.Statistic;
 
@@ -593,9 +595,9 @@ public class Mesh implements IMesh {
                         {
                             // Add the subsegment to the list of encroached subsegments.
                             encroached = new BadSubSeg();
-                            encroached.subseg = brokensubseg;
-                            encroached.org = brokensubseg.org();
-                            encroached.dest = brokensubseg.dest();
+                            encroached.setSubseg(brokensubseg);
+                            encroached.setOrg(brokensubseg.org());
+                            encroached.setDest(brokensubseg.dest());
 
                             qualityMesher.addBadSubseg(encroached);
                         }
@@ -1464,6 +1466,7 @@ public class Mesh implements IMesh {
      * <br>
      * Only interior vertices that do not lie on segments or boundaries
      * may be deleted.
+     * @param deltri The triangle containing the vertex to be deleted
      */
     public void deleteVertex(Otri deltri) {
         Otri countingtri = new Otri();

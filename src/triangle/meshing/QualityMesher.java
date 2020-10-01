@@ -1,8 +1,12 @@
 package triangle.meshing;
 
 import triangle.*;
+import triangle.meshing.data.BadSubSeg;
+import triangle.meshing.data.BadTriQueue;
+import triangle.meshing.data.BadTriangle;
 import triangle.tools.Interpolation;
 import triangle.tools.MutableDouble;
+import triangle.tools.Tuple;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

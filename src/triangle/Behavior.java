@@ -1,5 +1,7 @@
 package triangle;
 
+import triangle.tools.Tuple;
+
 import java.util.function.Function;
 
 /**

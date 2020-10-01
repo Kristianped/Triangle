@@ -1,6 +1,7 @@
 package triangle.meshing;
 
 import triangle.*;
+import triangle.io.InputTriangle;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,6 +68,7 @@ public class GenericMesher {
      * @param height Height of the mesh (must be higher than 0)
      * @param nx Number of sections in x direction
      * @param ny Number of sections in y direction
+     * @return Structured mesh with points, segments and triangles
      */
     public static IMesh structuredMesh(double width, double height, int nx, int ny) {
         if (width <= 0.0)
@@ -83,6 +85,7 @@ public class GenericMesher {
      * @param bounds Bounds of the mesh
      * @param nx Number of segments in x direction
      * @param ny Number of segments in y direction
+     * @return Structured mesh with points, segments and triangles
      */
     public static IMesh structuredMesh(Rectangle bounds, int nx, int ny) {
         var polygon = new Polygon((nx + 1) * (ny + 1));

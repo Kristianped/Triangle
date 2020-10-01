@@ -1,4 +1,6 @@
-package triangle;
+package triangle.meshing.iterators;
+
+import triangle.*;
 
 import java.util.Iterator;
 
@@ -12,7 +14,7 @@ public class EdgeIterator implements Iterator<Edge> {
     Vertex p1, p2;
 
     public EdgeIterator(Mesh mesh) {
-        mesh.triangles.iterator();
+        triangles = mesh.getTrianglePool().iterator();
         triangles.hasNext();
 
         tri.tri = triangles.next();
@@ -39,14 +41,14 @@ public class EdgeIterator implements Iterator<Edge> {
 
             tri.sym(neighbor);
 
-            if (tri.tri.id < neighbor.tri.id || neighbor.tri.id == Mesh.DUMMY) {
+            if (tri.tri.getID() < neighbor.tri.getID() || neighbor.tri.getID() == Mesh.DUMMY) {
                 p1 = tri.org();
                 p2 = tri.dest();
 
                 sub = tri.pivot();
 
                 // Boundary mark of dummysub is 0, so we don't need to worry about that
-                current = new Edge(p1.id, p2.id, sub.seg.boundary);
+                current = new Edge(p1.getId(), p2.getId(), sub.seg.getLabel());
             }
 
             tri.orient = tri.orient + 1;
@@ -59,4 +61,6 @@ public class EdgeIterator implements Iterator<Edge> {
     public Edge next() {
         return current;
     }
+
+
 }

@@ -1,4 +1,7 @@
-package triangle;
+package triangle.meshing.data;
+
+import triangle.Osub;
+import triangle.Vertex;
 
 /**
  * A queue used to store enroached subsegments.<br><br>
@@ -12,12 +15,12 @@ public class BadSubSeg {
 
     @Override
     public int hashCode() {
-        return subseg.seg.hash;
+        return subseg.seg.hashCode();
     }
 
     @Override
     public String toString() {
-        return String.format("B-SID %d", subseg.seg.hash);
+        return String.format("B-SID %d", subseg.seg.hashCode());
     }
 
     public Osub getSubseg() {

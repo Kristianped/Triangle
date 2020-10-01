@@ -39,7 +39,7 @@ public class TriangleReader {
 
     /**
      * Read elements from an .ele file
-     * @param filename
+     * @param filename Import triangles from a .ele file
      * @return List of triangles read in from file
      * @throws IOException If an error occurs during reading of the file
      */

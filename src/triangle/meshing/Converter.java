@@ -9,6 +9,9 @@ public class Converter {
 
     /**
      * Reconstruct a triangulation from its raw data representation.
+     * @param polygon he polygon with vertices and segments
+     * @param triangles List of triangles representing the mesh
+     * @return A mesh converted from the input
      */
     public static Mesh toMesh(Polygon polygon, List<ITriangle> triangles) {
         var arr = triangles.stream().toArray(ITriangle[]::new);
@@ -17,6 +20,9 @@ public class Converter {
 
     /**
      * Reconstruct a triangulation from its raw data representation.
+     * @param polygon The polygon with vertices and segments
+     * @param triangles Array of triangles representing the mesh
+     * @return A mesh converted from the input
      */
     public static Mesh toMesh(Polygon polygon, ITriangle[] triangles) {
         Otri tri = new Otri();

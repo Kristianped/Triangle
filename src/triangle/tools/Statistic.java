@@ -114,8 +114,9 @@ public class Statistic {
 
     /**
      * Update statistics about the quality of the mesh.
+     * @param mesh The mesh to update the statistics on
      */
-    public void update(Mesh mesh, int sampleDegrees) {
+    public void update(Mesh mesh) {
         Point[] p = new Point[3];
 
         int k1, k2;
@@ -123,7 +124,7 @@ public class Statistic {
 
         //sampleDegrees = 36; // sample every 5 degrees
         //sampleDegrees = 45; // sample every 4 degrees
-        sampleDegrees = 60; // sample every 3 degrees
+        int sampleDegrees = 60; // sample every 3 degrees
 
         double[] cosSquareTable = new double[sampleDegrees / 2 - 1];
         double[] dx = new double[3];

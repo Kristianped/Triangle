@@ -1,6 +1,7 @@
 package triangle.meshing;
 
 import triangle.*;
+import triangle.meshing.iterators.RegionIterator;
 
 import java.util.ArrayList;
 import java.util.List;

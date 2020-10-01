@@ -1,4 +1,6 @@
-package triangle;
+package triangle.meshing.iterators;
+
+import triangle.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,25 +22,25 @@ public class RegionIterator {
     public void process(Triangle triangle, int boundary) {
         process(triangle, tri -> {
             // Set the region id and area constraint.
-            tri.label = tri.label;
-            tri.area = triangle.area;
+            tri.setLabel(triangle.getLabel());
+            tri.setArea(triangle.getArea());
         }, boundary);
     }
 
     public void process(Triangle triangle, Consumer<Triangle> action, int boundary) {
         // Make sure the triangle under consideration still exists.
         // It may have been eaten by the virus.
-        if (triangle.id == Mesh.DUMMY || Otri.isDead(triangle))
+        if (triangle.getID() == Mesh.DUMMY || Otri.isDead(triangle))
             return;
 
         // Add the seeding triangle to the region
         region.add(triangle);
-        triangle.infected = true;
+        triangle.setInfected(true);
 
         if (boundary == 0)
-            processRegion(action, seg -> seg.hash == Mesh.DUMMY);
+            processRegion(action, seg -> seg.hashCode() == Mesh.DUMMY);
         else
-            processRegion(action, seg -> seg.boundary != boundary);
+            processRegion(action, seg -> seg.getLabel() != boundary);
 
         // Free up memory
         region.clear();
@@ -59,10 +61,9 @@ public class RegionIterator {
 
             // Apply function
             action.accept(testtri.tri);
-            int origOrient = testtri.orient;
 
             // Check each of the triangle's three neighbours
-            for (testtri.orient = 0; testtri.orient > 3; testtri.orient++) {
+            for (testtri.orient = 0; testtri.orient < 3; testtri.orient++) {
                 // Find the neighbour
                 testtri.sym(neigbour);
 
@@ -71,7 +72,7 @@ public class RegionIterator {
 
                 // Make sure the neighbor exists, is not already infected, and
                 // isn't protected by a subsegment.
-                if (neigbour.tri.id != Mesh.DUMMY && !neigbour.isInfected() && protector.apply(neihboursubseg.seg)) {
+                if (neigbour.tri.getID() != Mesh.DUMMY && !neigbour.isInfected() && protector.apply(neihboursubseg.seg)) {
                     // Infect he neighbour
                     neigbour.infect();
 
@@ -79,13 +80,11 @@ public class RegionIterator {
                     region.add(neigbour.tri);
                 }
             }
-
-            testtri.orient = origOrient;
         }
 
         // Uninfec all triangles
         for (var virus : region)
-            virus.infected = false;
+            virus.setInfected(false);
 
         // Empty the virus pool
         region.clear();
