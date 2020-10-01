@@ -1,12 +1,13 @@
 import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
-import triangle.*;
+
 import triangle.geometry.IPolygon;
 import triangle.io.FileProcessor;
 import triangle.meshing.ConstraintOptions;
 import triangle.meshing.IMesh;
 import triangle.meshing.QualityOptions;
 import triangle.meshing.algorithm.SweepLine;
+import triangle.tools.PolygonHelper;
 
 import java.io.IOException;
 

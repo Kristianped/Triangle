@@ -35,6 +35,7 @@ public class Rectangle {
 
     /**
      * Expand rectangle to include point
+     * @param p The point to be included in the rectancle, expands the rectangle if it is out of bounds
      */
     public void expand(Point p) {
        xmin = Math.min(xmin, p.x);
@@ -45,6 +46,7 @@ public class Rectangle {
 
     /**
      * Expand rectangle to include a list of points
+     * @param points List of points to be included in the rectangle, expands the rectangle if one or more if out of bounds
      */
     public void expand(List<Point> points) {
         for (Point p : points)
@@ -53,6 +55,7 @@ public class Rectangle {
 
     /**
      * Expand rectangle to include given rectangle
+     * @param other Rectangle to be included into this rectangle, expanding if necessary
      */
     public void expand(Rectangle other) {
        xmin = Math.min(xmin, other.xmin);

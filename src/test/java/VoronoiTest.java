@@ -6,6 +6,7 @@ import triangle.meshing.ConstraintOptions;
 import triangle.meshing.IMesh;
 import triangle.meshing.QualityOptions;
 import triangle.smoothing.SimpleSmoother;
+import triangle.tools.PolygonHelper;
 import triangle.tools.Statistic;
 import triangle.voronoi.BoundedVoronoi;
 import triangle.voronoi.StandardVoronoi;

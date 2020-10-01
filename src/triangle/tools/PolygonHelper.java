@@ -1,4 +1,4 @@
-package triangle;
+package triangle.tools;
 
 import triangle.geometry.IPolygon;
 import triangle.meshing.*;

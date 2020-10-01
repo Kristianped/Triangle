@@ -150,6 +150,7 @@ public class BadTriQueue {
 
     /**
      * Remove a triangle from the front of the queue
+     * @return Returns the triangle that is removed
      */
     public BadTriangle dequeue() {
         // If no queues are nonempty, return NULL.

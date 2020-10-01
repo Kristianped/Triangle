@@ -34,6 +34,7 @@ public class TrianglePool implements Collection<Triangle> {
 
     /**
      * Gets a triangle from the pool
+     * @return A triangle pulled from the pool
      */
     public Triangle get() {
         Triangle triangle;
@@ -80,6 +81,7 @@ public class TrianglePool implements Collection<Triangle> {
 
     /**
      * Restart the triangle pool
+     * @return Returns the triangle pool, with the pool reset
      */
     public TrianglePool restart() {
         for (Triangle t : stack)
