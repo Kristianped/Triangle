@@ -1,6 +1,6 @@
 package triangle.smoothing;
 
-import triangle.Vertex;
+import triangle.geometry.Vertex;
 import triangle.dcel.DcelVertex;
 import triangle.dcel.Face;
 import triangle.dcel.HalfEdge;

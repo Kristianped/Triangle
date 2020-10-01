@@ -1,6 +1,8 @@
 package triangle.io;
 
 import triangle.*;
+import triangle.geometry.IPolygon;
+import triangle.geometry.Vertex;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

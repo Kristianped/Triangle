@@ -1,6 +1,9 @@
 package triangle.meshing;
 
 import triangle.*;
+import triangle.geometry.ITriangle;
+import triangle.geometry.Polygon;
+import triangle.geometry.Vertex;
 
 import java.util.ArrayList;
 import java.util.List;

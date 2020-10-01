@@ -1,7 +1,7 @@
 package triangle.dcel;
 
-import triangle.Edge;
-import triangle.IEdge;
+import triangle.geometry.Edge;
+import triangle.geometry.IEdge;
 
 import java.util.ArrayList;
 import java.util.HashMap;

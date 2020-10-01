@@ -1,6 +1,6 @@
 package triangle.io;
 
-import triangle.*;
+import triangle.geometry.*;
 
 import java.io.*;
 import java.nio.file.Files;

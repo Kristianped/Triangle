@@ -1,5 +1,7 @@
 package triangle;
 
+import triangle.geometry.Point;
+import triangle.geometry.Vertex;
 import triangle.tools.MutableDouble;
 import triangle.tools.Statistic;
 
@@ -123,17 +125,17 @@ public class NewLocation {
         Statistic.CircumcenterCount++;
 
         // Compute the circumcenter of the triangle.
-        xdo = tdest.x - torg.x;
-        ydo = tdest.y - torg.y;
-        xao = tapex.x - torg.x;
-        yao = tapex.y - torg.y;
-        xda = tapex.x - tdest.x;
-        yda = tapex.y - tdest.y;
+        xdo = tdest.getX() - torg.getX();
+        ydo = tdest.getY() - torg.getY();
+        xao = tapex.getX() - torg.getX();
+        yao = tapex.getY() - torg.getY();
+        xda = tapex.getX() - tdest.getX();
+        yda = tapex.getY() - tdest.getY();
         // keeps the square of the distances
         dodist = xdo * xdo + ydo * ydo;
         aodist = xao * xao + yao * yao;
-        dadist = (tdest.x - tapex.x) * (tdest.x - tapex.x) +
-                (tdest.y - tapex.y) * (tdest.y - tapex.y);
+        dadist = (tdest.getX() - tapex.getX()) * (tdest.getX() - tapex.getX()) +
+                (tdest.getY() - tapex.getY()) * (tdest.getY() - tapex.getY());
 
         // checking if the user wanted exact arithmetic or not
         if (Behavior.NoExact) {
@@ -152,7 +154,7 @@ public class NewLocation {
         dy = (xdo * aodist - xao * dodist) * denominator;
         // for debugging and for keeping circumcenter to use later
         // coordinate value of the circumcenter
-        myCircumcenter = new Point(torg.x + dx, torg.y + dy);
+        myCircumcenter = new Point(torg.getX() + dx, torg.getY() + dy);
 
         delotri = badotri.shallowCopy(); // save for later
 
@@ -329,10 +331,10 @@ public class NewLocation {
             if (relocated > 0) {
                 Statistic.RelocationCount++;
 
-                dx = newloc[0] - torg.x;
-                dy = newloc[1] - torg.y;
-                origin_x = torg.x;	// keep for later use
-                origin_y = torg.y;
+                dx = newloc[0] - torg.getX();
+                dy = newloc[1] - torg.getY();
+                origin_x = torg.getX();	// keep for later use
+                origin_y = torg.getY();
 
                 switch (relocated)
                 {
@@ -359,24 +361,24 @@ public class NewLocation {
                 /// compute two possible centers of the petal ///
                 // finding the center
                 // first find the middle point of smallest edge
-                xMidOfShortestEdge = (middleAngleCorner.x + largestAngleCorner.x) / 2.0;
-                yMidOfShortestEdge = (middleAngleCorner.y + largestAngleCorner.y) / 2.0;
+                xMidOfShortestEdge = (middleAngleCorner.getX() + largestAngleCorner.getX()) / 2.0;
+                yMidOfShortestEdge = (middleAngleCorner.getY() + largestAngleCorner.getY()) / 2.0;
                 // two possible centers
-                xPetalCtr_1 = xMidOfShortestEdge + Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (middleAngleCorner.y -
-                        largestAngleCorner.y) / Math.sqrt(shortestEdgeDist);
-                yPetalCtr_1 = yMidOfShortestEdge + Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (largestAngleCorner.x -
-                        middleAngleCorner.x) / Math.sqrt(shortestEdgeDist);
+                xPetalCtr_1 = xMidOfShortestEdge + Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (middleAngleCorner.getY() -
+                        largestAngleCorner.getY()) / Math.sqrt(shortestEdgeDist);
+                yPetalCtr_1 = yMidOfShortestEdge + Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (largestAngleCorner.getX() -
+                        middleAngleCorner.getX()) / Math.sqrt(shortestEdgeDist);
 
-                xPetalCtr_2 = xMidOfShortestEdge - Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (middleAngleCorner.y -
-                        largestAngleCorner.y) / Math.sqrt(shortestEdgeDist);
-                yPetalCtr_2 = yMidOfShortestEdge - Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (largestAngleCorner.x -
-                        middleAngleCorner.x) / Math.sqrt(shortestEdgeDist);
+                xPetalCtr_2 = xMidOfShortestEdge - Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (middleAngleCorner.getY() -
+                        largestAngleCorner.getY()) / Math.sqrt(shortestEdgeDist);
+                yPetalCtr_2 = yMidOfShortestEdge - Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (largestAngleCorner.getX() -
+                        middleAngleCorner.getX()) / Math.sqrt(shortestEdgeDist);
                 // find the correct circle since there will be two possible circles
                 // calculate the distance to smallest angle corner
-                dxcenter1 = (xPetalCtr_1 - smallestAngleCorner.x) * (xPetalCtr_1 - smallestAngleCorner.x);
-                dycenter1 = (yPetalCtr_1 - smallestAngleCorner.y) * (yPetalCtr_1 - smallestAngleCorner.y);
-                dxcenter2 = (xPetalCtr_2 - smallestAngleCorner.x) * (xPetalCtr_2 - smallestAngleCorner.x);
-                dycenter2 = (yPetalCtr_2 - smallestAngleCorner.y) * (yPetalCtr_2 - smallestAngleCorner.y);
+                dxcenter1 = (xPetalCtr_1 - smallestAngleCorner.getX()) * (xPetalCtr_1 - smallestAngleCorner.getX());
+                dycenter1 = (yPetalCtr_1 - smallestAngleCorner.getY()) * (yPetalCtr_1 - smallestAngleCorner.getY());
+                dxcenter2 = (xPetalCtr_2 - smallestAngleCorner.getX()) * (xPetalCtr_2 - smallestAngleCorner.getX());
+                dycenter2 = (yPetalCtr_2 - smallestAngleCorner.getY()) * (yPetalCtr_2 - smallestAngleCorner.getY());
 
                 // whichever is closer to smallest angle corner, it must be the center
                 if (dxcenter1 + dycenter1 <= dxcenter2 + dycenter2) {
@@ -386,8 +388,8 @@ public class NewLocation {
                 }
 
                 /// find the third point of the neighbor triangle  ///
-                neighborNotFound = getNeighborsVertex(badotri.shallowCopy(), middleAngleCorner.x, middleAngleCorner.y,
-                        smallestAngleCorner.x, smallestAngleCorner.y, thirdPoint, neighborotri);
+                neighborNotFound = getNeighborsVertex(badotri.shallowCopy(), middleAngleCorner.getX(), middleAngleCorner.getY(),
+                        smallestAngleCorner.getX(), smallestAngleCorner.getY(), thirdPoint, neighborotri);
                 /// find the circumcenter of the neighbor triangle ///
                 dxFirstSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
                 dyFirstSuggestion = dy;
@@ -404,23 +406,23 @@ public class NewLocation {
 
                     /// compute petal and Voronoi edge intersection ///
                     // in order to avoid degenerate cases, we need to do a vector based calculation for line
-                    vector_x = (middleAngleCorner.y - smallestAngleCorner.y);//(-y, x)
-                    vector_y = smallestAngleCorner.x - middleAngleCorner.x;
-                    vector_x = myCircumcenter.x + vector_x;
-                    vector_y = myCircumcenter.y + vector_y;
+                    vector_x = (middleAngleCorner.getY() - smallestAngleCorner.getY());//(-y, x)
+                    vector_y = smallestAngleCorner.getX() - middleAngleCorner.getX();
+                    vector_x = myCircumcenter.getX() + vector_x;
+                    vector_y = myCircumcenter.getY() + vector_y;
 
 
                     // by intersecting bisectors you will end up with the one you want to walk on
                     // then this line and circle should be intersected
-                    circleLineIntersection(myCircumcenter.x, myCircumcenter.y, vector_x, vector_y,
+                    circleLineIntersection(myCircumcenter.getX(), myCircumcenter.getY(), vector_x, vector_y,
                             xPetalCtr, yPetalCtr, petalRadius, p);
                     /// choose the correct intersection point ///
                     // calculate middle point of the longest edge(bisector)
-                    xMidOfLongestEdge = (middleAngleCorner.x + smallestAngleCorner.x) / 2.0;
-                    yMidOfLongestEdge = (middleAngleCorner.y + smallestAngleCorner.y) / 2.0;
+                    xMidOfLongestEdge = (middleAngleCorner.getX() + smallestAngleCorner.getX()) / 2.0;
+                    yMidOfLongestEdge = (middleAngleCorner.getY() + smallestAngleCorner.getY()) / 2.0;
                     // we need to find correct intersection point, since line intersects circle twice
                     isCorrect = chooseCorrectPoint(xMidOfLongestEdge, yMidOfLongestEdge, p[3], p[4],
-                            myCircumcenter.x, myCircumcenter.y, isObtuse);
+                            myCircumcenter.getX(), myCircumcenter.getY(), isObtuse);
 
                     // make sure which point is the correct one to be considered
                     if (isCorrect) {
@@ -433,34 +435,34 @@ public class NewLocation {
 
                     /// check if there is a Voronoi vertex between before intersection ///
                     // check if the voronoi vertex is between the intersection and circumcenter
-                    pointBetweenPoints(inter_x, inter_y, myCircumcenter.x, myCircumcenter.y,
-                            neighborCircumcenter.x, neighborCircumcenter.y, voronoiOrInter);
+                    pointBetweenPoints(inter_x, inter_y, myCircumcenter.getX(), myCircumcenter.getY(),
+                            neighborCircumcenter.getX(), neighborCircumcenter.getY(), voronoiOrInter);
 
                     /// determine the point to be suggested ///
                     if (p[0] > 0.0) { // there is at least one intersection point
                         // if it is between circumcenter and intersection
                         // if it returns 1.0 this means we have a voronoi vertex within feasible region
                         if (Math.abs(voronoiOrInter[0] - 1.0) <= EPS) {
-                            if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, neighborCircumcenter.x, neighborCircumcenter.y)) {
+                            if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), neighborCircumcenter.getX(), neighborCircumcenter.getY())) {
                                 // go back to circumcenter
                                 dxFirstSuggestion = dx;
                                 dyFirstSuggestion = dy;
 
                             } else { // we are not creating a bad triangle
                                 // neighbor's circumcenter is suggested
-                                dxFirstSuggestion = voronoiOrInter[2] - torg.x;
-                                dyFirstSuggestion = voronoiOrInter[3] - torg.y;
+                                dxFirstSuggestion = voronoiOrInter[2] - torg.getX();
+                                dyFirstSuggestion = voronoiOrInter[3] - torg.getY();
                             }
                         } else { // there is no voronoi vertex between intersection point and circumcenter
-                            if (isBadTriangleAngle(largestAngleCorner.x, largestAngleCorner.y, middleAngleCorner.x, middleAngleCorner.y, inter_x, inter_y)) {
+                            if (isBadTriangleAngle(largestAngleCorner.getX(), largestAngleCorner.getY(), middleAngleCorner.getX(), middleAngleCorner.getY(), inter_x, inter_y)) {
                                 // if it is inside feasible region, then insert v2
                                 // apply perturbation
                                 // find the distance between circumcenter and intersection point
-                                d = Math.sqrt((inter_x - myCircumcenter.x) * (inter_x - myCircumcenter.x) +
-                                        (inter_y - myCircumcenter.y) * (inter_y - myCircumcenter.y));
+                                d = Math.sqrt((inter_x - myCircumcenter.getX()) * (inter_x - myCircumcenter.getX()) +
+                                        (inter_y - myCircumcenter.getY()) * (inter_y - myCircumcenter.getY()));
                                 // then find the vector going from intersection point to circumcenter
-                                ax = myCircumcenter.x - inter_x;
-                                ay = myCircumcenter.y - inter_y;
+                                ax = myCircumcenter.getX() - inter_x;
+                                ay = myCircumcenter.getY() - inter_y;
 
                                 ax = ax / d;
                                 ay = ay / d;
@@ -468,32 +470,32 @@ public class NewLocation {
                                 inter_x = inter_x + ax * pertConst * Math.sqrt(shortestEdgeDist);
                                 inter_y = inter_y + ay * pertConst * Math.sqrt(shortestEdgeDist);
 
-                                if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, inter_x, inter_y)) {
+                                if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), inter_x, inter_y)) {
                                     // go back to circumcenter
                                     dxFirstSuggestion = dx;
                                     dyFirstSuggestion = dy;
 
                                 } else {
                                     // intersection point is suggested
-                                    dxFirstSuggestion = inter_x - torg.x;
-                                    dyFirstSuggestion = inter_y - torg.y;
+                                    dxFirstSuggestion = inter_x - torg.getX();
+                                    dyFirstSuggestion = inter_y - torg.getY();
 
                                 }
                             } else {
                                 // intersection point is suggested
-                                dxFirstSuggestion = inter_x - torg.x;
-                                dyFirstSuggestion = inter_y - torg.y;
+                                dxFirstSuggestion = inter_x - torg.getX();
+                                dyFirstSuggestion = inter_y - torg.getY();
                             }
                         }
 
                         /// if it is an acute triangle, check if it is a good enough location ///
                         // for acute triangle case, we need to check if it is ok to use either of them
-                        if ((smallestAngleCorner.x - myCircumcenter.x) * (smallestAngleCorner.x - myCircumcenter.x) +
-                                (smallestAngleCorner.y - myCircumcenter.y) * (smallestAngleCorner.y - myCircumcenter.y) >
-                                lengthConst * ((smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) *
-                                        (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) +
-                                        (smallestAngleCorner.y - (dyFirstSuggestion + torg.y)) *
-                                                (smallestAngleCorner.y - (dyFirstSuggestion + torg.y))))
+                        if ((smallestAngleCorner.getX() - myCircumcenter.getX()) * (smallestAngleCorner.getX() - myCircumcenter.getX()) +
+                                (smallestAngleCorner.getY() - myCircumcenter.getY()) * (smallestAngleCorner.getY() - myCircumcenter.getY()) >
+                                lengthConst * ((smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) *
+                                        (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) +
+                                        (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY())) *
+                                                (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY()))))
                         {
                             // use circumcenter
                             dxFirstSuggestion = dx;
@@ -505,8 +507,8 @@ public class NewLocation {
 
                 /// DO THE SAME THING FOR THE OTHER DIRECTION ///
                 /// find the third point of the neighbor triangle  ///
-                neighborNotFound = getNeighborsVertex(badotri.shallowCopy(), largestAngleCorner.x, largestAngleCorner.y,
-                        smallestAngleCorner.x, smallestAngleCorner.y, thirdPoint, neighborotri);
+                neighborNotFound = getNeighborsVertex(badotri.shallowCopy(), largestAngleCorner.getX(), largestAngleCorner.getY(),
+                        smallestAngleCorner.getX(), smallestAngleCorner.getY(), thirdPoint, neighborotri);
                 /// find the circumcenter of the neighbor triangle ///
                 dxSecondSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
                 dySecondSuggestion = dy;
@@ -522,25 +524,25 @@ public class NewLocation {
 
                     /// compute petal and Voronoi edge intersection ///
                     // in order to avoid degenerate cases, we need to do a vector based calculation for line
-                    vector_x = (largestAngleCorner.y - smallestAngleCorner.y);//(-y, x)
-                    vector_y = smallestAngleCorner.x - largestAngleCorner.x;
-                    vector_x = myCircumcenter.x + vector_x;
-                    vector_y = myCircumcenter.y + vector_y;
+                    vector_x = (largestAngleCorner.getY() - smallestAngleCorner.getY());//(-y, x)
+                    vector_y = smallestAngleCorner.getX() - largestAngleCorner.getX();
+                    vector_x = myCircumcenter.getX() + vector_x;
+                    vector_y = myCircumcenter.getY() + vector_y;
 
 
                     // by intersecting bisectors you will end up with the one you want to walk on
                     // then this line and circle should be intersected
-                    circleLineIntersection(myCircumcenter.x, myCircumcenter.y, vector_x, vector_y,
+                    circleLineIntersection(myCircumcenter.getX(), myCircumcenter.getY(), vector_x, vector_y,
                             xPetalCtr, yPetalCtr, petalRadius, p);
 
                     /// choose the correct intersection point ///
                     // calcuwedgeslate middle point of the longest edge(bisector)
-                    xMidOfMiddleEdge = (largestAngleCorner.x + smallestAngleCorner.x) / 2.0;
-                    yMidOfMiddleEdge = (largestAngleCorner.y + smallestAngleCorner.y) / 2.0;
+                    xMidOfMiddleEdge = (largestAngleCorner.getX() + smallestAngleCorner.getX()) / 2.0;
+                    yMidOfMiddleEdge = (largestAngleCorner.getY() + smallestAngleCorner.getY()) / 2.0;
                     // we need to find correct intersection point, since line intersects circle twice
                     // this direction is always ACUTE
                     isCorrect = chooseCorrectPoint(xMidOfMiddleEdge, yMidOfMiddleEdge, p[3], p[4],
-                            myCircumcenter.x, myCircumcenter.y, false/*(isObtuse+1)%2*/);
+                            myCircumcenter.getX(), myCircumcenter.getY(), false/*(isObtuse+1)%2*/);
 
                     // make sure which point is the correct one to be considered
                     if (isCorrect) {
@@ -553,8 +555,8 @@ public class NewLocation {
 
                     /// check if there is a Voronoi vertex between before intersection ///
                     // check if the voronoi vertex is between the intersection and circumcenter
-                    pointBetweenPoints(inter_x, inter_y, myCircumcenter.x, myCircumcenter.y,
-                            neighborCircumcenter.x, neighborCircumcenter.y, voronoiOrInter);
+                    pointBetweenPoints(inter_x, inter_y, myCircumcenter.getX(), myCircumcenter.getY(),
+                            neighborCircumcenter.getX(), neighborCircumcenter.getY(), voronoiOrInter);
 
                     /// determine the point to be suggested ///
                     if (p[0] > 0.0) {
@@ -562,7 +564,7 @@ public class NewLocation {
                         // if it is between circumcenter and intersection
                         // if it returns 1.0 this means we have a voronoi vertex within feasible region
                         if (Math.abs(voronoiOrInter[0] - 1.0) <= EPS) {
-                            if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, neighborCircumcenter.x, neighborCircumcenter.y)) {
+                            if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), neighborCircumcenter.getX(), neighborCircumcenter.getY())) {
                                 // go back to circumcenter
                                 dxSecondSuggestion = dx;
                                 dySecondSuggestion = dy;
@@ -570,21 +572,21 @@ public class NewLocation {
                             } else {
                                 // we are not creating a bad triangle
                                 // neighbor's circumcenter is suggested
-                                dxSecondSuggestion = voronoiOrInter[2] - torg.x;
-                                dySecondSuggestion = voronoiOrInter[3] - torg.y;
+                                dxSecondSuggestion = voronoiOrInter[2] - torg.getX();
+                                dySecondSuggestion = voronoiOrInter[3] - torg.getY();
 
                             }
                         } else {
                             // there is no voronoi vertex between intersection point and circumcenter
-                            if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, inter_x, inter_y)) {
+                            if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), inter_x, inter_y)) {
                                 // if it is inside feasible region, then insert v2
                                 // apply perturbation
                                 // find the distance between circumcenter and intersection point
-                                d = Math.sqrt((inter_x - myCircumcenter.x) * (inter_x - myCircumcenter.x) +
-                                        (inter_y - myCircumcenter.y) * (inter_y - myCircumcenter.y));
+                                d = Math.sqrt((inter_x - myCircumcenter.getX()) * (inter_x - myCircumcenter.getX()) +
+                                        (inter_y - myCircumcenter.getY()) * (inter_y - myCircumcenter.getY()));
                                 // then find the vector going from intersection point to circumcenter
-                                ax = myCircumcenter.x - inter_x;
-                                ay = myCircumcenter.y - inter_y;
+                                ax = myCircumcenter.getX() - inter_x;
+                                ay = myCircumcenter.getY() - inter_y;
 
                                 ax = ax / d;
                                 ay = ay / d;
@@ -592,31 +594,31 @@ public class NewLocation {
                                 inter_x = inter_x + ax * pertConst * Math.sqrt(shortestEdgeDist);
                                 inter_y = inter_y + ay * pertConst * Math.sqrt(shortestEdgeDist);
 
-                                if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, inter_x, inter_y)) {
+                                if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), inter_x, inter_y)) {
                                     // go back to circumcenter
                                     dxSecondSuggestion = dx;
                                     dySecondSuggestion = dy;
 
                                 } else {
                                     // intersection point is suggested
-                                    dxSecondSuggestion = inter_x - torg.x;
-                                    dySecondSuggestion = inter_y - torg.y;
+                                    dxSecondSuggestion = inter_x - torg.getX();
+                                    dySecondSuggestion = inter_y - torg.getY();
                                 }
                             } else {
                                 // intersection point is suggested
-                                dxSecondSuggestion = inter_x - torg.x;
-                                dySecondSuggestion = inter_y - torg.y;
+                                dxSecondSuggestion = inter_x - torg.getX();
+                                dySecondSuggestion = inter_y - torg.getY();
                             }
                         }
 
                         /// if it is an acute triangle, check if it is a good enough location ///
                         // for acute triangle case, we need to check if it is ok to use either of them
-                        if ((smallestAngleCorner.x - myCircumcenter.x) * (smallestAngleCorner.x - myCircumcenter.x) +
-                                (smallestAngleCorner.y - myCircumcenter.y) * (smallestAngleCorner.y - myCircumcenter.y) >
-                                lengthConst * ((smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) *
-                                        (smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) +
-                                        (smallestAngleCorner.y - (dySecondSuggestion + torg.y)) *
-                                                (smallestAngleCorner.y - (dySecondSuggestion + torg.y))))
+                        if ((smallestAngleCorner.getX() - myCircumcenter.getX()) * (smallestAngleCorner.getX() - myCircumcenter.getX()) +
+                                (smallestAngleCorner.getY() - myCircumcenter.getY()) * (smallestAngleCorner.getY() - myCircumcenter.getY()) >
+                                lengthConst * ((smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) *
+                                        (smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) +
+                                        (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY())) *
+                                                (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY()))))
                         {
                             // use circumcenter
                             dxSecondSuggestion = dx;
@@ -631,14 +633,14 @@ public class NewLocation {
                     dy = dyFirstSuggestion;
                 } else {
                     // acute : consider other direction
-                    if (justAcute * ((smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) *
-                            (smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) +
-                            (smallestAngleCorner.y - (dySecondSuggestion + torg.y)) *
-                                    (smallestAngleCorner.y - (dySecondSuggestion + torg.y))) >
-                            (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) *
-                                    (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) +
-                                    (smallestAngleCorner.y - (dyFirstSuggestion + torg.y)) *
-                                            (smallestAngleCorner.y - (dyFirstSuggestion + torg.y))) {
+                    if (justAcute * ((smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) *
+                            (smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) +
+                            (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY())) *
+                                    (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY()))) >
+                            (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) *
+                                    (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) +
+                                    (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY())) *
+                                            (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY()))) {
                         dx = dxSecondSuggestion;
                         dy = dySecondSuggestion;
                     } else {
@@ -653,11 +655,11 @@ public class NewLocation {
         Point circumcenter = new Point();
 
         if (relocated <= 0) {
-            circumcenter.x = torg.x + dx;
-            circumcenter.y = torg.y + dy;
+            circumcenter.setX(torg.getX() + dx);
+            circumcenter.setY(torg.getY() + dy);
         } else {
-            circumcenter.x = origin_x + dx;
-            circumcenter.y = origin_y + dy;
+            circumcenter.setX(origin_x + dx);
+            circumcenter.setY(origin_y + dy);
         }
 
         xi.setValue((yao * dx - xao * dy) * (2.0 * denominator));
@@ -755,17 +757,17 @@ public class NewLocation {
         Statistic.CircumcenterCount++;
 
         // Compute the circumcenter of the triangle.
-        xdo = tdest.x - torg.x;
-        ydo = tdest.y - torg.y;
-        xao = tapex.x - torg.x;
-        yao = tapex.y - torg.y;
-        xda = tapex.x - tdest.x;
-        yda = tapex.y - tdest.y;
+        xdo = tdest.getX() - torg.getX();
+        ydo = tdest.getY() - torg.getY();
+        xao = tapex.getX() - torg.getX();
+        yao = tapex.getY() - torg.getY();
+        xda = tapex.getX() - tdest.getX();
+        yda = tapex.getY() - tdest.getY();
         // keeps the square of the distances
         dodist = xdo * xdo + ydo * ydo;
         aodist = xao * xao + yao * yao;
-        dadist = (tdest.x - tapex.x) * (tdest.x - tapex.x) +
-                (tdest.y - tapex.y) * (tdest.y - tapex.y);
+        dadist = (tdest.getX() - tapex.getX()) * (tdest.getX() - tapex.getX()) +
+                (tdest.getY() - tapex.getY()) * (tdest.getY() - tapex.getY());
         // checking if the user wanted exact arithmetic or not
         if (Behavior.NoExact) {
             denominator = 0.5 / (xdo * yao - xao * ydo);
@@ -783,7 +785,7 @@ public class NewLocation {
         dy = (xdo * aodist - xao * dodist) * denominator;
         // for debugging and for keeping circumcenter to use later
         // coordinate value of the circumcenter
-        myCircumcenter = new Point(torg.x + dx, torg.y + dy);
+        myCircumcenter = new Point(torg.getX() + dx, torg.getY() + dy);
 
         delotri = badotri.shallowCopy(); // save for later
         ///////////////// FINDING THE ORIENTATION OF TRIANGLE //////////////////
@@ -962,10 +964,10 @@ public class NewLocation {
             if (relocated > 0) {
                 Statistic.RelocationCount++;
 
-                dx = newloc[0] - torg.x;
-                dy = newloc[1] - torg.y;
-                origin_x = torg.x;	// keep for later use
-                origin_y = torg.y;
+                dx = newloc[0] - torg.getX();
+                dy = newloc[1] - torg.getY();
+                origin_x = torg.getX();	// keep for later use
+                origin_y = torg.getY();
                 switch (relocated) {
                     case 1:
                         //printf("Relocate: (%f,%f)\n", torg[0],torg[1]);
@@ -1000,24 +1002,24 @@ public class NewLocation {
                 /// compute two possible centers of the petal ///
                 // finding the center
                 // first find the middle point of smallest edge
-                xMidOfShortestEdge = (middleAngleCorner.x + largestAngleCorner.x) / 2.0;
-                yMidOfShortestEdge = (middleAngleCorner.y + largestAngleCorner.y) / 2.0;
+                xMidOfShortestEdge = (middleAngleCorner.getX() + largestAngleCorner.getX()) / 2.0;
+                yMidOfShortestEdge = (middleAngleCorner.getY() + largestAngleCorner.getY()) / 2.0;
                 // two possible centers
-                xPetalCtr_1 = xMidOfShortestEdge + Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (middleAngleCorner.y -
-                        largestAngleCorner.y) / Math.sqrt(shortestEdgeDist);
-                yPetalCtr_1 = yMidOfShortestEdge + Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (largestAngleCorner.x -
-                        middleAngleCorner.x) / Math.sqrt(shortestEdgeDist);
+                xPetalCtr_1 = xMidOfShortestEdge + Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (middleAngleCorner.getY() -
+                        largestAngleCorner.getY()) / Math.sqrt(shortestEdgeDist);
+                yPetalCtr_1 = yMidOfShortestEdge + Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (largestAngleCorner.getX() -
+                        middleAngleCorner.getX()) / Math.sqrt(shortestEdgeDist);
 
-                xPetalCtr_2 = xMidOfShortestEdge - Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (middleAngleCorner.y -
-                        largestAngleCorner.y) / Math.sqrt(shortestEdgeDist);
-                yPetalCtr_2 = yMidOfShortestEdge - Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (largestAngleCorner.x -
-                        middleAngleCorner.x) / Math.sqrt(shortestEdgeDist);
+                xPetalCtr_2 = xMidOfShortestEdge - Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (middleAngleCorner.getY() -
+                        largestAngleCorner.getY()) / Math.sqrt(shortestEdgeDist);
+                yPetalCtr_2 = yMidOfShortestEdge - Math.sqrt(petalRadius * petalRadius - (shortestEdgeDist / 4)) * (largestAngleCorner.getX() -
+                        middleAngleCorner.getX()) / Math.sqrt(shortestEdgeDist);
                 // find the correct circle since there will be two possible circles
                 // calculate the distance to smallest angle corner
-                dxcenter1 = (xPetalCtr_1 - smallestAngleCorner.x) * (xPetalCtr_1 - smallestAngleCorner.x);
-                dycenter1 = (yPetalCtr_1 - smallestAngleCorner.y) * (yPetalCtr_1 - smallestAngleCorner.y);
-                dxcenter2 = (xPetalCtr_2 - smallestAngleCorner.x) * (xPetalCtr_2 - smallestAngleCorner.x);
-                dycenter2 = (yPetalCtr_2 - smallestAngleCorner.y) * (yPetalCtr_2 - smallestAngleCorner.y);
+                dxcenter1 = (xPetalCtr_1 - smallestAngleCorner.getX()) * (xPetalCtr_1 - smallestAngleCorner.getX());
+                dycenter1 = (yPetalCtr_1 - smallestAngleCorner.getY()) * (yPetalCtr_1 - smallestAngleCorner.getY());
+                dxcenter2 = (xPetalCtr_2 - smallestAngleCorner.getX()) * (xPetalCtr_2 - smallestAngleCorner.getX());
+                dycenter2 = (yPetalCtr_2 - smallestAngleCorner.getY()) * (yPetalCtr_2 - smallestAngleCorner.getY());
 
                 // whichever is closer to smallest angle corner, it must be the center
                 if (dxcenter1 + dycenter1 <= dxcenter2 + dycenter2) {
@@ -1027,8 +1029,8 @@ public class NewLocation {
                 }
 
                 /// find the third point of the neighbor triangle  ///
-                neighborNotFound_first = getNeighborsVertex(badotri.shallowCopy(), middleAngleCorner.x, middleAngleCorner.y,
-                        smallestAngleCorner.x, smallestAngleCorner.y, thirdPoint, neighborotri);
+                neighborNotFound_first = getNeighborsVertex(badotri.shallowCopy(), middleAngleCorner.getX(), middleAngleCorner.getY(),
+                        smallestAngleCorner.getX(), smallestAngleCorner.getY(), thirdPoint, neighborotri);
                 /// find the circumcenter of the neighbor triangle ///
                 dxFirstSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
                 dyFirstSuggestion = dy;
@@ -1052,7 +1054,7 @@ public class NewLocation {
                 y_2 = petal_bisector_x * Math.sin(alpha) + petal_bisector_y * Math.cos(alpha) + yPetalCtr - xPetalCtr * Math.sin(alpha) - yPetalCtr * Math.cos(alpha);
                 // we need to find correct intersection point, since there are two possibilities
                 // weather it is obtuse/acute the one closer to the minimum angle corner is the first direction
-                isCorrect = chooseCorrectPoint(x_2, y_2, middleAngleCorner.x, middleAngleCorner.y, x_1, y_1, true);
+                isCorrect = chooseCorrectPoint(x_2, y_2, middleAngleCorner.getX(), middleAngleCorner.getY(), x_1, y_1, true);
 
                 // make sure which point is the correct one to be considered
                 if (isCorrect) {
@@ -1069,8 +1071,8 @@ public class NewLocation {
 
                 /// choose the correct intersection point ///
                 // calculate middle point of the longest edge(bisector)
-                xMidOfLongestEdge = (middleAngleCorner.x + smallestAngleCorner.x) / 2.0;
-                yMidOfLongestEdge = (middleAngleCorner.y + smallestAngleCorner.y) / 2.0;
+                xMidOfLongestEdge = (middleAngleCorner.getX() + smallestAngleCorner.getX()) / 2.0;
+                yMidOfLongestEdge = (middleAngleCorner.getY() + smallestAngleCorner.getY()) / 2.0;
 
                 // if there is a neighbor triangle
                 if (!neighborNotFound_first) {
@@ -1084,17 +1086,17 @@ public class NewLocation {
 
                     /// compute petal and Voronoi edge intersection ///
                     // in order to avoid degenerate cases, we need to do a vector based calculation for line
-                    vector_x = (middleAngleCorner.y - smallestAngleCorner.y);//(-y, x)
-                    vector_y = smallestAngleCorner.x - middleAngleCorner.x;
-                    vector_x = myCircumcenter.x + vector_x;
-                    vector_y = myCircumcenter.y + vector_y;
+                    vector_x = (middleAngleCorner.getY() - smallestAngleCorner.getY());//(-y, x)
+                    vector_y = smallestAngleCorner.getX() - middleAngleCorner.getX();
+                    vector_x = myCircumcenter.getX() + vector_x;
+                    vector_y = myCircumcenter.getY() + vector_y;
                     // by intersecting bisectors you will end up with the one you want to walk on
                     // then this line and circle should be intersected
-                    circleLineIntersection(myCircumcenter.x, myCircumcenter.y, vector_x, vector_y,
+                    circleLineIntersection(myCircumcenter.getX(), myCircumcenter.getY(), vector_x, vector_y,
                             xPetalCtr, yPetalCtr, petalRadius, p);
                     // we need to find correct intersection point, since line intersects circle twice
                     isCorrect = chooseCorrectPoint(xMidOfLongestEdge, yMidOfLongestEdge, p[3], p[4],
-                            myCircumcenter.x, myCircumcenter.y, isObtuse);
+                            myCircumcenter.getX(), myCircumcenter.getY(), isObtuse);
 
                     // make sure which point is the correct one to be considered
                     if (isCorrect) {
@@ -1107,16 +1109,16 @@ public class NewLocation {
 
                     //----------------------hale new first direction: for slab calculation---------------//
                     // calculate the intersection of angle lines and Voronoi
-                    linepnt1_x = middleAngleCorner.x;
-                    linepnt1_y = middleAngleCorner.y;
+                    linepnt1_x = middleAngleCorner.getX();
+                    linepnt1_y = middleAngleCorner.getY();
                     // vector from middleAngleCorner to largestAngleCorner
-                    line_vector_x = largestAngleCorner.x - middleAngleCorner.x;
-                    line_vector_y = largestAngleCorner.y - middleAngleCorner.y;
+                    line_vector_x = largestAngleCorner.getX() - middleAngleCorner.getX();
+                    line_vector_y = largestAngleCorner.getY() - middleAngleCorner.getY();
                     // rotate the vector around middleAngleCorner in cw by maxangle degrees
                     linepnt2_x = petal_slab_inter_x_first;
                     linepnt2_y = petal_slab_inter_y_first;
                     // now calculate the intersection of two lines
-                    lineLineIntersection(myCircumcenter.x, myCircumcenter.y, vector_x, vector_y, linepnt1_x, linepnt1_y, linepnt2_x, linepnt2_y, line_p);
+                    lineLineIntersection(myCircumcenter.getX(), myCircumcenter.getY(), vector_x, vector_y, linepnt1_x, linepnt1_y, linepnt2_x, linepnt2_y, line_p);
 
                     // check if there is a suitable intersection
                     if (line_p[0] > 0.0) {
@@ -1125,14 +1127,14 @@ public class NewLocation {
                     } else {
                         // for debugging (to make sure)
                         //printf("1) No intersection between two lines!!!\n");
-                        //printf("(%.14f,%.14f) (%.14f,%.14f) (%.14f,%.14f) (%.14f,%.14f)\n",myCircumcenter.x,myCircumcenter.y,vector_x,vector_y,linepnt1_x,linepnt1_y,linepnt2_x,linepnt2_y);
+                        //printf("(%.14f,%.14f) (%.14f,%.14f) (%.14f,%.14f) (%.14f,%.14f)\n",myCircumcenter.getX(),myCircumcenter.getY(),vector_x,vector_y,linepnt1_x,linepnt1_y,linepnt2_x,linepnt2_y);
                     }
 
                     //---------------------------------------------------------------------//
                     /// check if there is a Voronoi vertex between before intersection ///
                     // check if the voronoi vertex is between the intersection and circumcenter
-                    pointBetweenPoints(inter_x, inter_y, myCircumcenter.x, myCircumcenter.y,
-                            neighborCircumcenter.x, neighborCircumcenter.y, voronoiOrInter);
+                    pointBetweenPoints(inter_x, inter_y, myCircumcenter.getX(), myCircumcenter.getY(),
+                            neighborCircumcenter.getX(), neighborCircumcenter.getY(), voronoiOrInter);
 
                     /// determine the point to be suggested ///
                     if (p[0] > 0.0) { // there is at least one intersection point
@@ -1141,33 +1143,33 @@ public class NewLocation {
                         if (Math.abs(voronoiOrInter[0] - 1.0) <= EPS) {
                             //-----------------hale new continues 1------------------//
                             // now check if the line intersection is between cc and voronoi
-                            pointBetweenPoints(voronoiOrInter[2], voronoiOrInter[3], myCircumcenter.x, myCircumcenter.y, line_inter_x, line_inter_y, line_result);
+                            pointBetweenPoints(voronoiOrInter[2], voronoiOrInter[3], myCircumcenter.getX(), myCircumcenter.getY(), line_inter_x, line_inter_y, line_result);
 
                             if (Math.abs(line_result[0] - 1.0) <= EPS && line_p[0] > 0.0) {
                                 // check if we can go further by picking the slab line and petal intersection
                                 // calculate the distance to the smallest angle corner
                                 // check if we create a bad triangle or not
-                                if (((smallestAngleCorner.x - petal_slab_inter_x_first) * (smallestAngleCorner.x - petal_slab_inter_x_first) +
-                                        (smallestAngleCorner.y - petal_slab_inter_y_first) * (smallestAngleCorner.y - petal_slab_inter_y_first) >
-                                        lengthConst * ((smallestAngleCorner.x - line_inter_x) *
-                                                (smallestAngleCorner.x - line_inter_x) +
-                                                (smallestAngleCorner.y - line_inter_y) *
-                                                        (smallestAngleCorner.y - line_inter_y)))
-                                        && (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, petal_slab_inter_x_first, petal_slab_inter_y_first))
+                                if (((smallestAngleCorner.getX() - petal_slab_inter_x_first) * (smallestAngleCorner.getX() - petal_slab_inter_x_first) +
+                                        (smallestAngleCorner.getY() - petal_slab_inter_y_first) * (smallestAngleCorner.getY() - petal_slab_inter_y_first) >
+                                        lengthConst * ((smallestAngleCorner.getX() - line_inter_x) *
+                                                (smallestAngleCorner.getX() - line_inter_x) +
+                                                (smallestAngleCorner.getY() - line_inter_y) *
+                                                        (smallestAngleCorner.getY() - line_inter_y)))
+                                        && (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), petal_slab_inter_x_first, petal_slab_inter_y_first))
                                         && minDistanceToNeighbor(petal_slab_inter_x_first, petal_slab_inter_y_first, neighborotri) > minDistanceToNeighbor(line_inter_x, line_inter_y, neighborotri)) {
                                     // check the neighbor's vertices also, which one if better
                                     //slab and petal intersection is advised
-                                    dxFirstSuggestion = petal_slab_inter_x_first - torg.x;
-                                    dyFirstSuggestion = petal_slab_inter_y_first - torg.y;
+                                    dxFirstSuggestion = petal_slab_inter_x_first - torg.getX();
+                                    dyFirstSuggestion = petal_slab_inter_y_first - torg.getY();
                                 } else { // slab intersection point is further away
-                                    if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, line_inter_x, line_inter_y)) {
+                                    if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), line_inter_x, line_inter_y)) {
                                         // apply perturbation
                                         // find the distance between circumcenter and intersection point
-                                        d = Math.sqrt((line_inter_x - myCircumcenter.x) * (line_inter_x - myCircumcenter.x) +
-                                                (line_inter_y - myCircumcenter.y) * (line_inter_y - myCircumcenter.y));
+                                        d = Math.sqrt((line_inter_x - myCircumcenter.getX()) * (line_inter_x - myCircumcenter.getX()) +
+                                                (line_inter_y - myCircumcenter.getY()) * (line_inter_y - myCircumcenter.getY()));
                                         // then find the vector going from intersection point to circumcenter
-                                        ax = myCircumcenter.x - line_inter_x;
-                                        ay = myCircumcenter.y - line_inter_y;
+                                        ax = myCircumcenter.getX() - line_inter_x;
+                                        ay = myCircumcenter.getY() - line_inter_y;
 
                                         ax = ax / d;
                                         ay = ay / d;
@@ -1175,63 +1177,63 @@ public class NewLocation {
                                         line_inter_x = line_inter_x + ax * pertConst * Math.sqrt(shortestEdgeDist);
                                         line_inter_y = line_inter_y + ay * pertConst * Math.sqrt(shortestEdgeDist);
 
-                                        if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, line_inter_x, line_inter_y)) {
+                                        if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), line_inter_x, line_inter_y)) {
                                             // go back to circumcenter
                                             dxFirstSuggestion = dx;
                                             dyFirstSuggestion = dy;
                                         } else {
                                             // intersection point is suggested
-                                            dxFirstSuggestion = line_inter_x - torg.x;
-                                            dyFirstSuggestion = line_inter_y - torg.y;
+                                            dxFirstSuggestion = line_inter_x - torg.getX();
+                                            dyFirstSuggestion = line_inter_y - torg.getY();
                                         }
                                     } else {// we are not creating a bad triangle
                                         // slab intersection is advised
-                                        dxFirstSuggestion = line_result[2] - torg.x;
-                                        dyFirstSuggestion = line_result[3] - torg.y;
+                                        dxFirstSuggestion = line_result[2] - torg.getX();
+                                        dyFirstSuggestion = line_result[3] - torg.getY();
                                     }
                                 }
                                 //------------------------------------------------------//
                             } else {
                                 /// NOW APPLY A BREADTH-FIRST SEARCH ON THE VORONOI
-                                if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, neighborCircumcenter.x, neighborCircumcenter.y)) {
+                                if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), neighborCircumcenter.getX(), neighborCircumcenter.getY())) {
                                     // go back to circumcenter
                                     dxFirstSuggestion = dx;
                                     dyFirstSuggestion = dy;
                                 } else {
                                     // we are not creating a bad triangle
                                     // neighbor's circumcenter is suggested
-                                    dxFirstSuggestion = voronoiOrInter[2] - torg.x;
-                                    dyFirstSuggestion = voronoiOrInter[3] - torg.y;
+                                    dxFirstSuggestion = voronoiOrInter[2] - torg.getX();
+                                    dyFirstSuggestion = voronoiOrInter[3] - torg.getY();
                                 }
                             }
                         } else { // there is no voronoi vertex between intersection point and circumcenter
                             //-----------------hale new continues 2-----------------//
                             // now check if the line intersection is between cc and intersection point
-                            pointBetweenPoints(inter_x, inter_y, myCircumcenter.x, myCircumcenter.y, line_inter_x, line_inter_y, line_result);
+                            pointBetweenPoints(inter_x, inter_y, myCircumcenter.getX(), myCircumcenter.getY(), line_inter_x, line_inter_y, line_result);
 
                             if (Math.abs(line_result[0] - 1.0) <= EPS && line_p[0] > 0.0) {
                                 // check if we can go further by picking the slab line and petal intersection
                                 // calculate the distance to the smallest angle corner
-                                if (((smallestAngleCorner.x - petal_slab_inter_x_first) * (smallestAngleCorner.x - petal_slab_inter_x_first) +
-                                        (smallestAngleCorner.y - petal_slab_inter_y_first) * (smallestAngleCorner.y - petal_slab_inter_y_first) >
-                                        lengthConst * ((smallestAngleCorner.x - line_inter_x) *
-                                                (smallestAngleCorner.x - line_inter_x) +
-                                                (smallestAngleCorner.y - line_inter_y) *
-                                                        (smallestAngleCorner.y - line_inter_y)))
-                                        && (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, petal_slab_inter_x_first, petal_slab_inter_y_first))
+                                if (((smallestAngleCorner.getX() - petal_slab_inter_x_first) * (smallestAngleCorner.getX() - petal_slab_inter_x_first) +
+                                        (smallestAngleCorner.getY() - petal_slab_inter_y_first) * (smallestAngleCorner.getY() - petal_slab_inter_y_first) >
+                                        lengthConst * ((smallestAngleCorner.getX() - line_inter_x) *
+                                                (smallestAngleCorner.getX() - line_inter_x) +
+                                                (smallestAngleCorner.getY() - line_inter_y) *
+                                                        (smallestAngleCorner.getY() - line_inter_y)))
+                                        && (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), petal_slab_inter_x_first, petal_slab_inter_y_first))
                                         && minDistanceToNeighbor(petal_slab_inter_x_first, petal_slab_inter_y_first, neighborotri) > minDistanceToNeighbor(line_inter_x, line_inter_y, neighborotri)) {
                                     //slab and petal intersection is advised
-                                    dxFirstSuggestion = petal_slab_inter_x_first - torg.x;
-                                    dyFirstSuggestion = petal_slab_inter_y_first - torg.y;
+                                    dxFirstSuggestion = petal_slab_inter_x_first - torg.getX();
+                                    dyFirstSuggestion = petal_slab_inter_y_first - torg.getY();
                                 } else { // slab intersection point is further away
-                                    if (isBadTriangleAngle(largestAngleCorner.x, largestAngleCorner.y, middleAngleCorner.x, middleAngleCorner.y, line_inter_x, line_inter_y)) {
+                                    if (isBadTriangleAngle(largestAngleCorner.getX(), largestAngleCorner.getY(), middleAngleCorner.getX(), middleAngleCorner.getY(), line_inter_x, line_inter_y)) {
                                         // apply perturbation
                                         // find the distance between circumcenter and intersection point
-                                        d = Math.sqrt((line_inter_x - myCircumcenter.x) * (line_inter_x - myCircumcenter.x) +
-                                                (line_inter_y - myCircumcenter.y) * (line_inter_y - myCircumcenter.y));
+                                        d = Math.sqrt((line_inter_x - myCircumcenter.getX()) * (line_inter_x - myCircumcenter.getX()) +
+                                                (line_inter_y - myCircumcenter.getY()) * (line_inter_y - myCircumcenter.getY()));
                                         // then find the vector going from intersection point to circumcenter
-                                        ax = myCircumcenter.x - line_inter_x;
-                                        ay = myCircumcenter.y - line_inter_y;
+                                        ax = myCircumcenter.getX() - line_inter_x;
+                                        ay = myCircumcenter.getY() - line_inter_y;
 
                                         ax = ax / d;
                                         ay = ay / d;
@@ -1239,33 +1241,33 @@ public class NewLocation {
                                         line_inter_x = line_inter_x + ax * pertConst * Math.sqrt(shortestEdgeDist);
                                         line_inter_y = line_inter_y + ay * pertConst * Math.sqrt(shortestEdgeDist);
 
-                                        if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, line_inter_x, line_inter_y)) {
+                                        if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), line_inter_x, line_inter_y)) {
                                             // go back to circumcenter
                                             dxFirstSuggestion = dx;
                                             dyFirstSuggestion = dy;
                                         } else {
                                             // intersection point is suggested
-                                            dxFirstSuggestion = line_inter_x - torg.x;
-                                            dyFirstSuggestion = line_inter_y - torg.y;
+                                            dxFirstSuggestion = line_inter_x - torg.getX();
+                                            dyFirstSuggestion = line_inter_y - torg.getY();
                                         }
                                     } else {// we are not creating a bad triangle
                                         // slab intersection is advised
-                                        dxFirstSuggestion = line_result[2] - torg.x;
-                                        dyFirstSuggestion = line_result[3] - torg.y;
+                                        dxFirstSuggestion = line_result[2] - torg.getX();
+                                        dyFirstSuggestion = line_result[3] - torg.getY();
                                     }
                                 }
                                 //------------------------------------------------------//
                             } else {
-                                if (isBadTriangleAngle(largestAngleCorner.x, largestAngleCorner.y, middleAngleCorner.x, middleAngleCorner.y, inter_x, inter_y)) {
+                                if (isBadTriangleAngle(largestAngleCorner.getX(), largestAngleCorner.getY(), middleAngleCorner.getX(), middleAngleCorner.getY(), inter_x, inter_y)) {
                                     //printf("testtriangle returned false! bad triangle\n");
                                     // if it is inside feasible region, then insert v2
                                     // apply perturbation
                                     // find the distance between circumcenter and intersection point
-                                    d = Math.sqrt((inter_x - myCircumcenter.x) * (inter_x - myCircumcenter.x) +
-                                            (inter_y - myCircumcenter.y) * (inter_y - myCircumcenter.y));
+                                    d = Math.sqrt((inter_x - myCircumcenter.getX()) * (inter_x - myCircumcenter.getX()) +
+                                            (inter_y - myCircumcenter.getY()) * (inter_y - myCircumcenter.getY()));
                                     // then find the vector going from intersection point to circumcenter
-                                    ax = myCircumcenter.x - inter_x;
-                                    ay = myCircumcenter.y - inter_y;
+                                    ax = myCircumcenter.getX() - inter_x;
+                                    ay = myCircumcenter.getY() - inter_y;
 
                                     ax = ax / d;
                                     ay = ay / d;
@@ -1273,31 +1275,31 @@ public class NewLocation {
                                     inter_x = inter_x + ax * pertConst * Math.sqrt(shortestEdgeDist);
                                     inter_y = inter_y + ay * pertConst * Math.sqrt(shortestEdgeDist);
 
-                                    if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, inter_x, inter_y)) {
+                                    if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), inter_x, inter_y)) {
                                         // go back to circumcenter
                                         dxFirstSuggestion = dx;
                                         dyFirstSuggestion = dy;
                                     } else {
                                         // intersection point is suggested
-                                        dxFirstSuggestion = inter_x - torg.x;
-                                        dyFirstSuggestion = inter_y - torg.y;
+                                        dxFirstSuggestion = inter_x - torg.getX();
+                                        dyFirstSuggestion = inter_y - torg.getY();
                                     }
                                 } else {
                                     // intersection point is suggested
-                                    dxFirstSuggestion = inter_x - torg.x;
-                                    dyFirstSuggestion = inter_y - torg.y;
+                                    dxFirstSuggestion = inter_x - torg.getX();
+                                    dyFirstSuggestion = inter_y - torg.getY();
                                 }
                             }
                         }
 
                         /// if it is an acute triangle, check if it is a good enough location ///
                         // for acute triangle case, we need to check if it is ok to use either of them
-                        if ((smallestAngleCorner.x - myCircumcenter.x) * (smallestAngleCorner.x - myCircumcenter.x) +
-                                (smallestAngleCorner.y - myCircumcenter.y) * (smallestAngleCorner.y - myCircumcenter.y) >
-                                lengthConst * ((smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) *
-                                        (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) +
-                                        (smallestAngleCorner.y - (dyFirstSuggestion + torg.y)) *
-                                                (smallestAngleCorner.y - (dyFirstSuggestion + torg.y)))) {
+                        if ((smallestAngleCorner.getX() - myCircumcenter.getX()) * (smallestAngleCorner.getX() - myCircumcenter.getX()) +
+                                (smallestAngleCorner.getY() - myCircumcenter.getY()) * (smallestAngleCorner.getY() - myCircumcenter.getY()) >
+                                lengthConst * ((smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) *
+                                        (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) +
+                                        (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY())) *
+                                                (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY())))) {
                             // use circumcenter
                             dxFirstSuggestion = dx;
                             dyFirstSuggestion = dy;
@@ -1309,16 +1311,16 @@ public class NewLocation {
 
                 /// DO THE SAME THING FOR THE OTHER DIRECTION ///
                 /// find the third point of the neighbor triangle  ///
-                neighborNotFound_second = getNeighborsVertex(badotri.shallowCopy(), largestAngleCorner.x, largestAngleCorner.y,
-                        smallestAngleCorner.x, smallestAngleCorner.y, thirdPoint, neighborotri);
+                neighborNotFound_second = getNeighborsVertex(badotri.shallowCopy(), largestAngleCorner.getX(), largestAngleCorner.getY(),
+                        smallestAngleCorner.getX(), smallestAngleCorner.getY(), thirdPoint, neighborotri);
                 /// find the circumcenter of the neighbor triangle ///
                 dxSecondSuggestion = dx;	// if we cannot find any appropriate suggestion, we use circumcenter
                 dySecondSuggestion = dy;
 
                 /// choose the correct intersection point ///
                 // calculate middle point of the longest edge(bisector)
-                xMidOfMiddleEdge = (largestAngleCorner.x + smallestAngleCorner.x) / 2.0;
-                yMidOfMiddleEdge = (largestAngleCorner.y + smallestAngleCorner.y) / 2.0;
+                xMidOfMiddleEdge = (largestAngleCorner.getX() + smallestAngleCorner.getX()) / 2.0;
+                yMidOfMiddleEdge = (largestAngleCorner.getY() + smallestAngleCorner.getY()) / 2.0;
 
                 // if there is a neighbor triangle
                 if (!neighborNotFound_second) {
@@ -1332,20 +1334,20 @@ public class NewLocation {
 
                     /// compute petal and Voronoi edge intersection ///
                     // in order to avoid degenerate cases, we need to do a vector based calculation for line
-                    vector_x = (largestAngleCorner.y - smallestAngleCorner.y);//(-y, x)
-                    vector_y = smallestAngleCorner.x - largestAngleCorner.x;
-                    vector_x = myCircumcenter.x + vector_x;
-                    vector_y = myCircumcenter.y + vector_y;
+                    vector_x = (largestAngleCorner.getY() - smallestAngleCorner.getY());//(-y, x)
+                    vector_y = smallestAngleCorner.getX() - largestAngleCorner.getX();
+                    vector_x = myCircumcenter.getX() + vector_x;
+                    vector_y = myCircumcenter.getY() + vector_y;
 
                     // by intersecting bisectors you will end up with the one you want to walk on
                     // then this line and circle should be intersected
-                    circleLineIntersection(myCircumcenter.x, myCircumcenter.y, vector_x, vector_y,
+                    circleLineIntersection(myCircumcenter.getX(), myCircumcenter.getY(), vector_x, vector_y,
                             xPetalCtr, yPetalCtr, petalRadius, p);
 
                     // we need to find correct intersection point, since line intersects circle twice
                     // this direction is always ACUTE
                     isCorrect = chooseCorrectPoint(xMidOfMiddleEdge, yMidOfMiddleEdge, p[3], p[4],
-                            myCircumcenter.x, myCircumcenter.y, false/*(isObtuse+1)%2*/);
+                            myCircumcenter.getX(), myCircumcenter.getY(), false/*(isObtuse+1)%2*/);
 
                     // make sure which point is the correct one to be considered
                     if (isCorrect) {
@@ -1358,16 +1360,16 @@ public class NewLocation {
 
                     //----------------------hale new second direction:for slab calculation---------------//
                     // calculate the intersection of angle lines and Voronoi
-                    linepnt1_x = largestAngleCorner.x;
-                    linepnt1_y = largestAngleCorner.y;
+                    linepnt1_x = largestAngleCorner.getX();
+                    linepnt1_y = largestAngleCorner.getY();
                     // vector from largestAngleCorner to middleAngleCorner
-                    line_vector_x = middleAngleCorner.x - largestAngleCorner.x;
-                    line_vector_y = middleAngleCorner.y - largestAngleCorner.y;
+                    line_vector_x = middleAngleCorner.getX() - largestAngleCorner.getX();
+                    line_vector_y = middleAngleCorner.getY() - largestAngleCorner.getY();
                     // rotate the vector around largestAngleCorner in ccw by maxangle degrees
                     linepnt2_x = petal_slab_inter_x_second;
                     linepnt2_y = petal_slab_inter_y_second;
                     // now calculate the intersection of two lines
-                    lineLineIntersection(myCircumcenter.x, myCircumcenter.y, vector_x, vector_y, linepnt1_x, linepnt1_y, linepnt2_x, linepnt2_y, line_p);
+                    lineLineIntersection(myCircumcenter.getX(), myCircumcenter.getY(), vector_x, vector_y, linepnt1_x, linepnt1_y, linepnt2_x, linepnt2_y, line_p);
 
                     // check if there is a suitable intersection
                     if (line_p[0] > 0.0) {
@@ -1376,14 +1378,14 @@ public class NewLocation {
                     } else {
                         // for debugging (to make sure)
                         //printf("1) No intersection between two lines!!!\n");
-                        //printf("(%.14f,%.14f) (%.14f,%.14f) (%.14f,%.14f) (%.14f,%.14f)\n",myCircumcenter.x,myCircumcenter.y,vector_x,vector_y,linepnt1_x,linepnt1_y,linepnt2_x,linepnt2_y);
+                        //printf("(%.14f,%.14f) (%.14f,%.14f) (%.14f,%.14f) (%.14f,%.14f)\n",myCircumcenter.getX(),myCircumcenter.getY(),vector_x,vector_y,linepnt1_x,linepnt1_y,linepnt2_x,linepnt2_y);
                     }
 
                     //---------------------------------------------------------------------//
                     /// check if there is a Voronoi vertex between before intersection ///
                     // check if the voronoi vertex is between the intersection and circumcenter
-                    pointBetweenPoints(inter_x, inter_y, myCircumcenter.x, myCircumcenter.y,
-                            neighborCircumcenter.x, neighborCircumcenter.y, voronoiOrInter);
+                    pointBetweenPoints(inter_x, inter_y, myCircumcenter.getX(), myCircumcenter.getY(),
+                            neighborCircumcenter.getX(), neighborCircumcenter.getY(), voronoiOrInter);
 
                     /// determine the point to be suggested ///
                     if (p[0] > 0.0) {
@@ -1393,33 +1395,33 @@ public class NewLocation {
                         if (Math.abs(voronoiOrInter[0] - 1.0) <= EPS) {
                             //-----------------hale new continues 1------------------//
                             // now check if the line intersection is between cc and voronoi
-                            pointBetweenPoints(voronoiOrInter[2], voronoiOrInter[3], myCircumcenter.x, myCircumcenter.y, line_inter_x, line_inter_y, line_result);
+                            pointBetweenPoints(voronoiOrInter[2], voronoiOrInter[3], myCircumcenter.getX(), myCircumcenter.getY(), line_inter_x, line_inter_y, line_result);
 
                             if (Math.abs(line_result[0] - 1.0) <= EPS && line_p[0] > 0.0) {
                                 // check if we can go further by picking the slab line and petal intersection
                                 // calculate the distance to the smallest angle corner
                                 //
-                                if (((smallestAngleCorner.x - petal_slab_inter_x_second) * (smallestAngleCorner.x - petal_slab_inter_x_second) +
-                                        (smallestAngleCorner.y - petal_slab_inter_y_second) * (smallestAngleCorner.y - petal_slab_inter_y_second) >
-                                        lengthConst * ((smallestAngleCorner.x - line_inter_x) *
-                                                (smallestAngleCorner.x - line_inter_x) +
-                                                (smallestAngleCorner.y - line_inter_y) *
-                                                        (smallestAngleCorner.y - line_inter_y)))
-                                        && (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, petal_slab_inter_x_second, petal_slab_inter_y_second))
+                                if (((smallestAngleCorner.getX() - petal_slab_inter_x_second) * (smallestAngleCorner.getX() - petal_slab_inter_x_second) +
+                                        (smallestAngleCorner.getY() - petal_slab_inter_y_second) * (smallestAngleCorner.getY() - petal_slab_inter_y_second) >
+                                        lengthConst * ((smallestAngleCorner.getX() - line_inter_x) *
+                                                (smallestAngleCorner.getX() - line_inter_x) +
+                                                (smallestAngleCorner.getY() - line_inter_y) *
+                                                        (smallestAngleCorner.getY() - line_inter_y)))
+                                        && (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), petal_slab_inter_x_second, petal_slab_inter_y_second))
                                         && minDistanceToNeighbor(petal_slab_inter_x_second, petal_slab_inter_y_second, neighborotri) > minDistanceToNeighbor(line_inter_x, line_inter_y, neighborotri)) {
                                     // slab and petal intersection is advised
-                                    dxSecondSuggestion = petal_slab_inter_x_second - torg.x;
-                                    dySecondSuggestion = petal_slab_inter_y_second - torg.y;
+                                    dxSecondSuggestion = petal_slab_inter_x_second - torg.getX();
+                                    dySecondSuggestion = petal_slab_inter_y_second - torg.getY();
                                 } else { // slab intersection point is further away
-                                    if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, line_inter_x, line_inter_y))
+                                    if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), line_inter_x, line_inter_y))
                                     {
                                         // apply perturbation
                                         // find the distance between circumcenter and intersection point
-                                        d = Math.sqrt((line_inter_x - myCircumcenter.x) * (line_inter_x - myCircumcenter.x) +
-                                                (line_inter_y - myCircumcenter.y) * (line_inter_y - myCircumcenter.y));
+                                        d = Math.sqrt((line_inter_x - myCircumcenter.getX()) * (line_inter_x - myCircumcenter.getX()) +
+                                                (line_inter_y - myCircumcenter.getY()) * (line_inter_y - myCircumcenter.getY()));
                                         // then find the vector going from intersection point to circumcenter
-                                        ax = myCircumcenter.x - line_inter_x;
-                                        ay = myCircumcenter.y - line_inter_y;
+                                        ax = myCircumcenter.getX() - line_inter_x;
+                                        ay = myCircumcenter.getY() - line_inter_y;
 
                                         ax = ax / d;
                                         ay = ay / d;
@@ -1427,64 +1429,64 @@ public class NewLocation {
                                         line_inter_x = line_inter_x + ax * pertConst * Math.sqrt(shortestEdgeDist);
                                         line_inter_y = line_inter_y + ay * pertConst * Math.sqrt(shortestEdgeDist);
 
-                                        if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, line_inter_x, line_inter_y)) {
+                                        if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), line_inter_x, line_inter_y)) {
                                             // go back to circumcenter
                                             dxSecondSuggestion = dx;
                                             dySecondSuggestion = dy;
                                         } else {
                                             // intersection point is suggested
-                                            dxSecondSuggestion = line_inter_x - torg.x;
-                                            dySecondSuggestion = line_inter_y - torg.y;
+                                            dxSecondSuggestion = line_inter_x - torg.getX();
+                                            dySecondSuggestion = line_inter_y - torg.getY();
 
                                         }
                                     } else {// we are not creating a bad triangle
                                         // slab intersection is advised
-                                        dxSecondSuggestion = line_result[2] - torg.x;
-                                        dySecondSuggestion = line_result[3] - torg.y;
+                                        dxSecondSuggestion = line_result[2] - torg.getX();
+                                        dySecondSuggestion = line_result[3] - torg.getY();
                                     }
                                 }
                                 //------------------------------------------------------//
                             } else {
-                                if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, neighborCircumcenter.x, neighborCircumcenter.y)) {
+                                if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), neighborCircumcenter.getX(), neighborCircumcenter.getY())) {
                                     // go back to circumcenter
                                     dxSecondSuggestion = dx;
                                     dySecondSuggestion = dy;
                                 } else { // we are not creating a bad triangle
                                     // neighbor's circumcenter is suggested
-                                    dxSecondSuggestion = voronoiOrInter[2] - torg.x;
-                                    dySecondSuggestion = voronoiOrInter[3] - torg.y;
+                                    dxSecondSuggestion = voronoiOrInter[2] - torg.getX();
+                                    dySecondSuggestion = voronoiOrInter[3] - torg.getY();
                                 }
                             }
                         } else {
                             // there is no voronoi vertex between intersection point and circumcenter
                             //-----------------hale new continues 2-----------------//
                             // now check if the line intersection is between cc and intersection point
-                            pointBetweenPoints(inter_x, inter_y, myCircumcenter.x, myCircumcenter.y, line_inter_x, line_inter_y, line_result);
+                            pointBetweenPoints(inter_x, inter_y, myCircumcenter.getX(), myCircumcenter.getY(), line_inter_x, line_inter_y, line_result);
 
                             if (Math.abs(line_result[0] - 1.0) <= EPS && line_p[0] > 0.0) {
                                 // check if we can go further by picking the slab line and petal intersection
                                 // calculate the distance to the smallest angle corner
-                                if (((smallestAngleCorner.x - petal_slab_inter_x_second) * (smallestAngleCorner.x - petal_slab_inter_x_second) +
-                                        (smallestAngleCorner.y - petal_slab_inter_y_second) * (smallestAngleCorner.y - petal_slab_inter_y_second) >
-                                        lengthConst * ((smallestAngleCorner.x - line_inter_x) *
-                                                (smallestAngleCorner.x - line_inter_x) +
-                                                (smallestAngleCorner.y - line_inter_y) *
-                                                        (smallestAngleCorner.y - line_inter_y)))
-                                        && (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, petal_slab_inter_x_second, petal_slab_inter_y_second))
+                                if (((smallestAngleCorner.getX() - petal_slab_inter_x_second) * (smallestAngleCorner.getX() - petal_slab_inter_x_second) +
+                                        (smallestAngleCorner.getY() - petal_slab_inter_y_second) * (smallestAngleCorner.getY() - petal_slab_inter_y_second) >
+                                        lengthConst * ((smallestAngleCorner.getX() - line_inter_x) *
+                                                (smallestAngleCorner.getX() - line_inter_x) +
+                                                (smallestAngleCorner.getY() - line_inter_y) *
+                                                        (smallestAngleCorner.getY() - line_inter_y)))
+                                        && (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), petal_slab_inter_x_second, petal_slab_inter_y_second))
                                         && minDistanceToNeighbor(petal_slab_inter_x_second, petal_slab_inter_y_second, neighborotri) > minDistanceToNeighbor(line_inter_x, line_inter_y, neighborotri)) {
                                     // slab and petal intersection is advised
-                                    dxSecondSuggestion = petal_slab_inter_x_second - torg.x;
-                                    dySecondSuggestion = petal_slab_inter_y_second - torg.y;
+                                    dxSecondSuggestion = petal_slab_inter_x_second - torg.getX();
+                                    dySecondSuggestion = petal_slab_inter_y_second - torg.getY();
                                 } else { // slab intersection point is further away							;
-                                    if (isBadTriangleAngle(largestAngleCorner.x, largestAngleCorner.y, middleAngleCorner.x, middleAngleCorner.y, line_inter_x, line_inter_y))
+                                    if (isBadTriangleAngle(largestAngleCorner.getX(), largestAngleCorner.getY(), middleAngleCorner.getX(), middleAngleCorner.getY(), line_inter_x, line_inter_y))
                                     {
                                         // apply perturbation
                                         // find the distance between circumcenter and intersection point
-                                        d = Math.sqrt((line_inter_x - myCircumcenter.x) * (line_inter_x - myCircumcenter.x) +
-                                                (line_inter_y - myCircumcenter.y) * (line_inter_y - myCircumcenter.y));
+                                        d = Math.sqrt((line_inter_x - myCircumcenter.getX()) * (line_inter_x - myCircumcenter.getX()) +
+                                                (line_inter_y - myCircumcenter.getY()) * (line_inter_y - myCircumcenter.getY()));
                                         // then find the vector going from intersection point to circumcenter
-                                        ax = myCircumcenter.x - line_inter_x;
-                                        ay = myCircumcenter.y - line_inter_y;
+                                        ax = myCircumcenter.getX() - line_inter_x;
+                                        ay = myCircumcenter.getY() - line_inter_y;
 
                                         ax = ax / d;
                                         ay = ay / d;
@@ -1492,33 +1494,33 @@ public class NewLocation {
                                         line_inter_x = line_inter_x + ax * pertConst * Math.sqrt(shortestEdgeDist);
                                         line_inter_y = line_inter_y + ay * pertConst * Math.sqrt(shortestEdgeDist);
 
-                                        if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, line_inter_x, line_inter_y)) {
+                                        if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), line_inter_x, line_inter_y)) {
                                             // go back to circumcenter
                                             dxSecondSuggestion = dx;
                                             dySecondSuggestion = dy;
                                         } else {
                                             // intersection point is suggested
-                                            dxSecondSuggestion = line_inter_x - torg.x;
-                                            dySecondSuggestion = line_inter_y - torg.y;
+                                            dxSecondSuggestion = line_inter_x - torg.getX();
+                                            dySecondSuggestion = line_inter_y - torg.getY();
                                         }
                                     } else {
                                         // we are not creating a bad triangle
                                         // slab intersection is advised
-                                        dxSecondSuggestion = line_result[2] - torg.x;
-                                        dySecondSuggestion = line_result[3] - torg.y;
+                                        dxSecondSuggestion = line_result[2] - torg.getX();
+                                        dySecondSuggestion = line_result[3] - torg.getY();
                                     }
                                 }
                                 //------------------------------------------------------//
                             } else {
-                                if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, inter_x, inter_y)) {
+                                if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), inter_x, inter_y)) {
                                     // if it is inside feasible region, then insert v2
                                     // apply perturbation
                                     // find the distance between circumcenter and intersection point
-                                    d = Math.sqrt((inter_x - myCircumcenter.x) * (inter_x - myCircumcenter.x) +
-                                            (inter_y - myCircumcenter.y) * (inter_y - myCircumcenter.y));
+                                    d = Math.sqrt((inter_x - myCircumcenter.getX()) * (inter_x - myCircumcenter.getX()) +
+                                            (inter_y - myCircumcenter.getY()) * (inter_y - myCircumcenter.getY()));
                                     // then find the vector going from intersection point to circumcenter
-                                    ax = myCircumcenter.x - inter_x;
-                                    ay = myCircumcenter.y - inter_y;
+                                    ax = myCircumcenter.getX() - inter_x;
+                                    ay = myCircumcenter.getY() - inter_y;
 
                                     ax = ax / d;
                                     ay = ay / d;
@@ -1526,31 +1528,31 @@ public class NewLocation {
                                     inter_x = inter_x + ax * pertConst * Math.sqrt(shortestEdgeDist);
                                     inter_y = inter_y + ay * pertConst * Math.sqrt(shortestEdgeDist);
 
-                                    if (isBadTriangleAngle(middleAngleCorner.x, middleAngleCorner.y, largestAngleCorner.x, largestAngleCorner.y, inter_x, inter_y)) {
+                                    if (isBadTriangleAngle(middleAngleCorner.getX(), middleAngleCorner.getY(), largestAngleCorner.getX(), largestAngleCorner.getY(), inter_x, inter_y)) {
                                         // go back to circumcenter
                                         dxSecondSuggestion = dx;
                                         dySecondSuggestion = dy;
                                     } else {
                                         // intersection point is suggested
-                                        dxSecondSuggestion = inter_x - torg.x;
-                                        dySecondSuggestion = inter_y - torg.y;
+                                        dxSecondSuggestion = inter_x - torg.getX();
+                                        dySecondSuggestion = inter_y - torg.getY();
                                     }
                                 } else {
                                     // intersection point is suggested
-                                    dxSecondSuggestion = inter_x - torg.x;
-                                    dySecondSuggestion = inter_y - torg.y;
+                                    dxSecondSuggestion = inter_x - torg.getX();
+                                    dySecondSuggestion = inter_y - torg.getY();
                                 }
                             }
                         }
 
                         /// if it is an acute triangle, check if it is a good enough location ///
                         // for acute triangle case, we need to check if it is ok to use either of them
-                        if ((smallestAngleCorner.x - myCircumcenter.x) * (smallestAngleCorner.x - myCircumcenter.x) +
-                                (smallestAngleCorner.y - myCircumcenter.y) * (smallestAngleCorner.y - myCircumcenter.y) >
-                                lengthConst * ((smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) *
-                                        (smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) +
-                                        (smallestAngleCorner.y - (dySecondSuggestion + torg.y)) *
-                                                (smallestAngleCorner.y - (dySecondSuggestion + torg.y)))) {
+                        if ((smallestAngleCorner.getX() - myCircumcenter.getX()) * (smallestAngleCorner.getX() - myCircumcenter.getX()) +
+                                (smallestAngleCorner.getY() - myCircumcenter.getY()) * (smallestAngleCorner.getY() - myCircumcenter.getY()) >
+                                lengthConst * ((smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) *
+                                        (smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) +
+                                        (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY())) *
+                                                (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY())))) {
                             // use circumcenter
                             dxSecondSuggestion = dx;
                             dySecondSuggestion = dy;
@@ -1561,14 +1563,14 @@ public class NewLocation {
                 if (isObtuse) {
                     if (neighborNotFound_first && neighborNotFound_second) {
                         //obtuse: check if the other direction works
-                        if (justAcute * ((smallestAngleCorner.x - (xMidOfMiddleEdge)) *
-                                (smallestAngleCorner.x - (xMidOfMiddleEdge)) +
-                                (smallestAngleCorner.y - (yMidOfMiddleEdge)) *
-                                        (smallestAngleCorner.y - (yMidOfMiddleEdge))) >
-                                (smallestAngleCorner.x - (xMidOfLongestEdge)) *
-                                        (smallestAngleCorner.x - (xMidOfLongestEdge)) +
-                                        (smallestAngleCorner.y - (yMidOfLongestEdge)) *
-                                                (smallestAngleCorner.y - (yMidOfLongestEdge))) {
+                        if (justAcute * ((smallestAngleCorner.getX() - (xMidOfMiddleEdge)) *
+                                (smallestAngleCorner.getX() - (xMidOfMiddleEdge)) +
+                                (smallestAngleCorner.getY() - (yMidOfMiddleEdge)) *
+                                        (smallestAngleCorner.getY() - (yMidOfMiddleEdge))) >
+                                (smallestAngleCorner.getX() - (xMidOfLongestEdge)) *
+                                        (smallestAngleCorner.getX() - (xMidOfLongestEdge)) +
+                                        (smallestAngleCorner.getY() - (yMidOfLongestEdge)) *
+                                                (smallestAngleCorner.getY() - (yMidOfLongestEdge))) {
                             dx = dxSecondSuggestion;
                             dy = dySecondSuggestion;
                         } else {
@@ -1577,14 +1579,14 @@ public class NewLocation {
                         }
                     } else if (neighborNotFound_first) {
                         //obtuse: check if the other direction works
-                        if (justAcute * ((smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) *
-                                (smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) +
-                                (smallestAngleCorner.y - (dySecondSuggestion + torg.y)) *
-                                        (smallestAngleCorner.y - (dySecondSuggestion + torg.y))) >
-                                (smallestAngleCorner.x - (xMidOfLongestEdge)) *
-                                        (smallestAngleCorner.x - (xMidOfLongestEdge)) +
-                                        (smallestAngleCorner.y - (yMidOfLongestEdge)) *
-                                                (smallestAngleCorner.y - (yMidOfLongestEdge))) {
+                        if (justAcute * ((smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) *
+                                (smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) +
+                                (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY())) *
+                                        (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY()))) >
+                                (smallestAngleCorner.getX() - (xMidOfLongestEdge)) *
+                                        (smallestAngleCorner.getX() - (xMidOfLongestEdge)) +
+                                        (smallestAngleCorner.getY() - (yMidOfLongestEdge)) *
+                                                (smallestAngleCorner.getY() - (yMidOfLongestEdge))) {
                             dx = dxSecondSuggestion;
                             dy = dySecondSuggestion;
                         } else {
@@ -1593,14 +1595,14 @@ public class NewLocation {
                         }
                     } else if (neighborNotFound_second) {
                         //obtuse: check if the other direction works
-                        if (justAcute * ((smallestAngleCorner.x - (xMidOfMiddleEdge)) *
-                                (smallestAngleCorner.x - (xMidOfMiddleEdge)) +
-                                (smallestAngleCorner.y - (yMidOfMiddleEdge)) *
-                                        (smallestAngleCorner.y - (yMidOfMiddleEdge))) >
-                                (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) *
-                                        (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) +
-                                        (smallestAngleCorner.y - (dyFirstSuggestion + torg.y)) *
-                                                (smallestAngleCorner.y - (dyFirstSuggestion + torg.y))) {
+                        if (justAcute * ((smallestAngleCorner.getX() - (xMidOfMiddleEdge)) *
+                                (smallestAngleCorner.getX() - (xMidOfMiddleEdge)) +
+                                (smallestAngleCorner.getY() - (yMidOfMiddleEdge)) *
+                                        (smallestAngleCorner.getY() - (yMidOfMiddleEdge))) >
+                                (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) *
+                                        (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) +
+                                        (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY())) *
+                                                (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY()))) {
                             dx = dxSecondSuggestion;
                             dy = dySecondSuggestion;
                         } else {
@@ -1609,14 +1611,14 @@ public class NewLocation {
                         }
                     } else {
                         //obtuse: check if the other direction works
-                        if (justAcute * ((smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) *
-                                (smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) +
-                                (smallestAngleCorner.y - (dySecondSuggestion + torg.y)) *
-                                        (smallestAngleCorner.y - (dySecondSuggestion + torg.y))) >
-                                (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) *
-                                        (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) +
-                                        (smallestAngleCorner.y - (dyFirstSuggestion + torg.y)) *
-                                                (smallestAngleCorner.y - (dyFirstSuggestion + torg.y))) {
+                        if (justAcute * ((smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) *
+                                (smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) +
+                                (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY())) *
+                                        (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY()))) >
+                                (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) *
+                                        (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) +
+                                        (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY())) *
+                                                (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY()))) {
                             dx = dxSecondSuggestion;
                             dy = dySecondSuggestion;
                         } else {
@@ -1627,14 +1629,14 @@ public class NewLocation {
                 } else { // acute : consider other direction
                     if (neighborNotFound_first && neighborNotFound_second) {
                         //obtuse: check if the other direction works
-                        if (justAcute * ((smallestAngleCorner.x - (xMidOfMiddleEdge)) *
-                                (smallestAngleCorner.x - (xMidOfMiddleEdge)) +
-                                (smallestAngleCorner.y - (yMidOfMiddleEdge)) *
-                                        (smallestAngleCorner.y - (yMidOfMiddleEdge))) >
-                                (smallestAngleCorner.x - (xMidOfLongestEdge)) *
-                                        (smallestAngleCorner.x - (xMidOfLongestEdge)) +
-                                        (smallestAngleCorner.y - (yMidOfLongestEdge)) *
-                                                (smallestAngleCorner.y - (yMidOfLongestEdge))) {
+                        if (justAcute * ((smallestAngleCorner.getX() - (xMidOfMiddleEdge)) *
+                                (smallestAngleCorner.getX() - (xMidOfMiddleEdge)) +
+                                (smallestAngleCorner.getY() - (yMidOfMiddleEdge)) *
+                                        (smallestAngleCorner.getY() - (yMidOfMiddleEdge))) >
+                                (smallestAngleCorner.getX() - (xMidOfLongestEdge)) *
+                                        (smallestAngleCorner.getX() - (xMidOfLongestEdge)) +
+                                        (smallestAngleCorner.getY() - (yMidOfLongestEdge)) *
+                                                (smallestAngleCorner.getY() - (yMidOfLongestEdge))) {
                             dx = dxSecondSuggestion;
                             dy = dySecondSuggestion;
                         } else {
@@ -1643,14 +1645,14 @@ public class NewLocation {
                         }
                     } else if (neighborNotFound_first) {
                         //obtuse: check if the other direction works
-                        if (justAcute * ((smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) *
-                                (smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) +
-                                (smallestAngleCorner.y - (dySecondSuggestion + torg.y)) *
-                                        (smallestAngleCorner.y - (dySecondSuggestion + torg.y))) >
-                                (smallestAngleCorner.x - (xMidOfLongestEdge)) *
-                                        (smallestAngleCorner.x - (xMidOfLongestEdge)) +
-                                        (smallestAngleCorner.y - (yMidOfLongestEdge)) *
-                                                (smallestAngleCorner.y - (yMidOfLongestEdge))) {
+                        if (justAcute * ((smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) *
+                                (smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) +
+                                (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY())) *
+                                        (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY()))) >
+                                (smallestAngleCorner.getX() - (xMidOfLongestEdge)) *
+                                        (smallestAngleCorner.getX() - (xMidOfLongestEdge)) +
+                                        (smallestAngleCorner.getY() - (yMidOfLongestEdge)) *
+                                                (smallestAngleCorner.getY() - (yMidOfLongestEdge))) {
                             dx = dxSecondSuggestion;
                             dy = dySecondSuggestion;
                         }
@@ -1660,14 +1662,14 @@ public class NewLocation {
                         }
                     } else if (neighborNotFound_second) {
                         //obtuse: check if the other direction works
-                        if (justAcute * ((smallestAngleCorner.x - (xMidOfMiddleEdge)) *
-                                (smallestAngleCorner.x - (xMidOfMiddleEdge)) +
-                                (smallestAngleCorner.y - (yMidOfMiddleEdge)) *
-                                        (smallestAngleCorner.y - (yMidOfMiddleEdge))) >
-                                (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) *
-                                        (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) +
-                                        (smallestAngleCorner.y - (dyFirstSuggestion + torg.y)) *
-                                                (smallestAngleCorner.y - (dyFirstSuggestion + torg.y))) {
+                        if (justAcute * ((smallestAngleCorner.getX() - (xMidOfMiddleEdge)) *
+                                (smallestAngleCorner.getX() - (xMidOfMiddleEdge)) +
+                                (smallestAngleCorner.getY() - (yMidOfMiddleEdge)) *
+                                        (smallestAngleCorner.getY() - (yMidOfMiddleEdge))) >
+                                (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) *
+                                        (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) +
+                                        (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY())) *
+                                                (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY()))) {
                             dx = dxSecondSuggestion;
                             dy = dySecondSuggestion;
                         } else {
@@ -1676,15 +1678,15 @@ public class NewLocation {
                         }
                     } else {
                         //obtuse: check if the other direction works
-                        if (justAcute * ((smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) *
-                                (smallestAngleCorner.x - (dxSecondSuggestion + torg.x)) +
-                                (smallestAngleCorner.y - (dySecondSuggestion + torg.y)) *
-                                        (smallestAngleCorner.y - (dySecondSuggestion + torg.y))) >
-                                (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) *
-                                        (smallestAngleCorner.x - (dxFirstSuggestion + torg.x)) +
+                        if (justAcute * ((smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) *
+                                (smallestAngleCorner.getX() - (dxSecondSuggestion + torg.getX())) +
+                                (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY())) *
+                                        (smallestAngleCorner.getY() - (dySecondSuggestion + torg.getY()))) >
+                                (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) *
+                                        (smallestAngleCorner.getX() - (dxFirstSuggestion + torg.getX())) +
 
-                                        (smallestAngleCorner.y - (dyFirstSuggestion + torg.y)) *
-                                                (smallestAngleCorner.y - (dyFirstSuggestion + torg.y))) {
+                                        (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY())) *
+                                                (smallestAngleCorner.getY() - (dyFirstSuggestion + torg.getY()))) {
                             dx = dxSecondSuggestion;
                             dy = dySecondSuggestion;
                         } else {
@@ -1700,11 +1702,11 @@ public class NewLocation {
         Point circumcenter = new Point();
 
         if (relocated <= 0) {
-            circumcenter.x = torg.x + dx;
-            circumcenter.y = torg.y + dy;
+            circumcenter.setX(torg.getX() + dx);
+            circumcenter.setY(torg.getY() + dy);
         } else {
-            circumcenter.x = origin_x + dx;
-            circumcenter.y = origin_y + dy;
+            circumcenter.setX(origin_x + dx);
+            circumcenter.setY(origin_y + dy);
         }
 
         xi.setValue((yao * dx - xao * dy) * (2.0 * denominator));
@@ -1801,7 +1803,7 @@ public class NewLocation {
         // 	m.counterclockcount--;
         // INTERSECTION OF PETALS
         // first check whether the star angles are appropriate for relocation
-        if (torg.type == Enums.VertexType.FreeVertex && numpoints_p != 0 && validPolygonAngles(numpoints_p, points_p))
+        if (torg.getType() == Enums.VertexType.FreeVertex && numpoints_p != 0 && validPolygonAngles(numpoints_p, points_p))
         {
             //newLocFound = getPetalIntersection(m, b, numpoints_p, points_p, newloc);
             //newLocFound = getPetalIntersectionBruteForce(m, b,numpoints_p, points_p, newloc,torg[0],torg[1]);
@@ -1844,7 +1846,7 @@ public class NewLocation {
         // 	m.counterclockcount--;
         // INTERSECTION OF PETALS
         // first check whether the star angles are appropriate for relocation
-        if (tdest.type == Enums.VertexType.FreeVertex && numpoints_q != 0 && validPolygonAngles(numpoints_q, points_q)) {
+        if (tdest.getType() == Enums.VertexType.FreeVertex && numpoints_q != 0 && validPolygonAngles(numpoints_q, points_q)) {
             //newLocFound = getPetalIntersection(m, b,numpoints_q, points_q, newloc);
             //newLocFound = getPetalIntersectionBruteForce(m, b,numpoints_q, points_q, newloc,tapex[0],tapex[1]);
             if (behavior.maxAngle == 0.0) {
@@ -1885,7 +1887,7 @@ public class NewLocation {
         // 	m.counterclockcount--;
         // INTERSECTION OF PETALS
         // first check whether the star angles are appropriate for relocation
-        if (tapex.type == Enums.VertexType.FreeVertex && numpoints_r != 0 && validPolygonAngles(numpoints_r, points_r)) {
+        if (tapex.getType() == Enums.VertexType.FreeVertex && numpoints_r != 0 && validPolygonAngles(numpoints_r, points_r)) {
             //newLocFound = getPetalIntersection(m, b,numpoints_r, points_r, newloc);
             //newLocFound = getPetalIntersectionBruteForce(m, b,numpoints_r, points_r, newloc,tdest[0],tdest[1]);
             if (behavior.maxAngle == 0.0) {
@@ -1948,28 +1950,28 @@ public class NewLocation {
         // first determine which point to be used to find its neighbor triangles
         switch (whichPoint) {
             case 1:
-                first_x = p.x;	// point at the center
-                first_y = p.y;
-                second_x = r.x; // second vertex of first edge to consider
-                second_y = r.y;
-                third_x = q.x;  // for terminating the search
-                third_y = q.y;
+                first_x = p.getX();	// point at the center
+                first_y = p.getY();
+                second_x = r.getX(); // second vertex of first edge to consider
+                second_y = r.getY();
+                third_x = q.getX();  // for terminating the search
+                third_y = q.getY();
                 break;
             case 2:
-                first_x = q.x;  // point at the center
-                first_y = q.y;
-                second_x = p.x; // second vertex of first edge to consider
-                second_y = p.y;
-                third_x = r.x;	// for terminating the search
-                third_y = r.y;
+                first_x = q.getX();  // point at the center
+                first_y = q.getY();
+                second_x = p.getX(); // second vertex of first edge to consider
+                second_y = p.getY();
+                third_x = r.getX();	// for terminating the search
+                third_y = r.getY();
                 break;
             case 3:
-                first_x = r.x;	// point at the center
-                first_y = r.y;
-                second_x = q.x; // second vertex of first edge to consider
-                second_y = q.y;
-                third_x = p.x;	// for terminating the search
-                third_y = p.y;
+                first_x = r.getX();	// point at the center
+                first_y = r.getY();
+                second_x = q.getX(); // second vertex of first edge to consider
+                second_y = q.getY();
+                third_x = p.getX();	// for terminating the search
+                third_y = p.getY();
                 break;
         }
 
@@ -2037,23 +2039,23 @@ public class NewLocation {
                 neighborvertex_3 = neighbor.apex();
 
                 // check if it is really a triangle
-                if ((neighborvertex_1.x == neighborvertex_2.x && neighborvertex_1.y == neighborvertex_2.y)
-                        || (neighborvertex_2.x == neighborvertex_3.x && neighborvertex_2.y == neighborvertex_3.y)
-                        || (neighborvertex_1.x == neighborvertex_3.x && neighborvertex_1.y == neighborvertex_3.y)) {
+                if ((neighborvertex_1.getX() == neighborvertex_2.getX() && neighborvertex_1.getY() == neighborvertex_2.getY())
+                        || (neighborvertex_2.getX() == neighborvertex_3.getX() && neighborvertex_2.getY() == neighborvertex_3.getY())
+                        || (neighborvertex_1.getX() == neighborvertex_3.getX() && neighborvertex_1.getY() == neighborvertex_3.getY())) {
                     //printf("Two vertices are the same!!!!!!!\n");
                 } else {
                     // begin searching for the correct neighbor triangle
                     firstVertexMatched = 0;
 
-                    if ((Math.abs(first_x - neighborvertex_1.x) < EPS) &&
-                            (Math.abs(first_y - neighborvertex_1.y) < EPS)) {
+                    if ((Math.abs(first_x - neighborvertex_1.getX()) < EPS) &&
+                            (Math.abs(first_y - neighborvertex_1.getY()) < EPS)) {
                         firstVertexMatched = 11; // neighbor's 1st vertex is matched to first vertex
-                    } else if ((Math.abs(first_x - neighborvertex_2.x) < EPS) &&
-                            (Math.abs(first_y - neighborvertex_2.y) < EPS)) {
+                    } else if ((Math.abs(first_x - neighborvertex_2.getX()) < EPS) &&
+                            (Math.abs(first_y - neighborvertex_2.getY()) < EPS)) {
                         firstVertexMatched = 12; // neighbor's 2nd vertex is matched to first vertex
 
-                    } else if ((Math.abs(first_x - neighborvertex_3.x) < EPS) &&
-                            (Math.abs(first_y - neighborvertex_3.y) < EPS)) {
+                    } else if ((Math.abs(first_x - neighborvertex_3.getX()) < EPS) &&
+                            (Math.abs(first_y - neighborvertex_3.getY()) < EPS)) {
                         firstVertexMatched = 13; // neighbor's 3rd vertex is matched to first vertex
 
                     }/*else{
@@ -2062,14 +2064,14 @@ public class NewLocation {
 
                     secondVertexMatched = 0;
 
-                    if ((Math.abs(second_x - neighborvertex_1.x) < EPS) &&
-                            (Math.abs(second_y - neighborvertex_1.y) < EPS)) {
+                    if ((Math.abs(second_x - neighborvertex_1.getX()) < EPS) &&
+                            (Math.abs(second_y - neighborvertex_1.getY()) < EPS)) {
                         secondVertexMatched = 21; // neighbor's 1st vertex is matched to second vertex
-                    } else if ((Math.abs(second_x - neighborvertex_2.x) < EPS) &&
-                            (Math.abs(second_y - neighborvertex_2.y) < EPS)) {
+                    } else if ((Math.abs(second_x - neighborvertex_2.getX()) < EPS) &&
+                            (Math.abs(second_y - neighborvertex_2.getY()) < EPS)) {
                         secondVertexMatched = 22; // neighbor's 2nd vertex is matched to second vertex
-                    } else if ((Math.abs(second_x - neighborvertex_3.x) < EPS) &&
-                            (Math.abs(second_y - neighborvertex_3.y) < EPS))
+                    } else if ((Math.abs(second_x - neighborvertex_3.getX()) < EPS) &&
+                            (Math.abs(second_y - neighborvertex_3.getY()) < EPS))
                     {
                         secondVertexMatched = 23; // neighbor's 3rd vertex is matched to second vertex
                     }/*else{
@@ -2092,30 +2094,30 @@ public class NewLocation {
                 break;
             case 11:
                 if (secondVertexMatched == 22) {
-                    thirdpoint[0] = neighborvertex_3.x;
-                    thirdpoint[1] = neighborvertex_3.y;
+                    thirdpoint[0] = neighborvertex_3.getX();
+                    thirdpoint[1] = neighborvertex_3.getY();
                 }
                 else if (secondVertexMatched == 23) {
-                    thirdpoint[0] = neighborvertex_2.x;
-                    thirdpoint[1] = neighborvertex_2.y;
+                    thirdpoint[0] = neighborvertex_2.getX();
+                    thirdpoint[1] = neighborvertex_2.getY();
                 } else { notFound = true; }
                 break;
             case 12:
                 if (secondVertexMatched == 21) {
-                    thirdpoint[0] = neighborvertex_3.x;
-                    thirdpoint[1] = neighborvertex_3.y;
+                    thirdpoint[0] = neighborvertex_3.getX();
+                    thirdpoint[1] = neighborvertex_3.getY();
                 } else if (secondVertexMatched == 23) {
-                    thirdpoint[0] = neighborvertex_1.x;
-                    thirdpoint[1] = neighborvertex_1.y;
+                    thirdpoint[0] = neighborvertex_1.getX();
+                    thirdpoint[1] = neighborvertex_1.getY();
                 } else { notFound = true; }
                 break;
             case 13:
                 if (secondVertexMatched == 21) {
-                    thirdpoint[0] = neighborvertex_2.x;
-                    thirdpoint[1] = neighborvertex_2.y;
+                    thirdpoint[0] = neighborvertex_2.getX();
+                    thirdpoint[1] = neighborvertex_2.getY();
                 } else if (secondVertexMatched == 22) {
-                    thirdpoint[0] = neighborvertex_1.x;
-                    thirdpoint[1] = neighborvertex_1.y;
+                    thirdpoint[0] = neighborvertex_1.getX();
+                    thirdpoint[1] = neighborvertex_1.getY();
                 } else { notFound = true; }
                 break;
             default:
@@ -3425,10 +3427,10 @@ public class NewLocation {
         tdest = searchtri.dest();
 
         // Check the starting triangle's vertices.
-        if ((torg.x == newvertex.x) && (torg.y == newvertex.y)) {
+        if ((torg.getX() == newvertex.getX()) && (torg.getY() == newvertex.getY())) {
             intersect = Enums.LocateResult.OnVertex;
             searchtri.copy(horiz);
-        } else if ((tdest.x == newvertex.x) && (tdest.y == newvertex.y)) {
+        } else if ((tdest.getX() == newvertex.getX()) && (tdest.getY() == newvertex.getY())) {
             searchtri.lnext();
             intersect = Enums.LocateResult.OnVertex;
             searchtri.copy(horiz);
@@ -3444,8 +3446,8 @@ public class NewLocation {
                 intersect = mesh.locator.preciseLocate(newvertex, horiz, false);
             } else if (ahead == 0.0) {
                 // Check if 'searchpoint' is between 'torg' and 'tdest'.
-                if (((torg.x < newvertex.x) == (newvertex.x < tdest.x)) &&
-                        ((torg.y < newvertex.y) == (newvertex.y < tdest.y))) {
+                if (((torg.getX() < newvertex.getX()) == (newvertex.getX() < tdest.getX())) &&
+                        ((torg.getY() < newvertex.getY()) == (newvertex.getY() < tdest.getY()))) {
                     intersect = Enums.LocateResult.OnEdge;
                     searchtri.copy(horiz);
 
@@ -3465,9 +3467,9 @@ public class NewLocation {
             v1 = horiz.org();
             v2 = horiz.dest();
             v3 = horiz.apex();
-            d1 = (v1.x - newvertex.x) * (v1.x - newvertex.x) + (v1.y - newvertex.y) * (v1.y - newvertex.y);
-            d2 = (v2.x - newvertex.x) * (v2.x - newvertex.x) + (v2.y - newvertex.y) * (v2.y - newvertex.y);
-            d3 = (v3.x - newvertex.x) * (v3.x - newvertex.x) + (v3.y - newvertex.y) * (v3.y - newvertex.y);
+            d1 = (v1.getX() - newvertex.getX()) * (v1.getX() - newvertex.getX()) + (v1.getY() - newvertex.getY()) * (v1.getY() - newvertex.getY());
+            d2 = (v2.getX() - newvertex.getX()) * (v2.getX() - newvertex.getX()) + (v2.getY() - newvertex.getY()) * (v2.getY() - newvertex.getY());
+            d3 = (v3.getX() - newvertex.getX()) * (v3.getX() - newvertex.getX()) + (v3.getY() - newvertex.getY()) * (v3.getY() - newvertex.getY());
             //m.VertexDealloc(newvertex);
             // find minimum of the distance
             if (d1 <= d2 && d1 <= d3) {

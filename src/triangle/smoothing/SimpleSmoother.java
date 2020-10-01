@@ -2,6 +2,8 @@ package triangle.smoothing;
 
 import triangle.*;
 import triangle.dcel.Face;
+import triangle.geometry.Point;
+import triangle.geometry.Polygon;
 import triangle.meshing.ConstraintOptions;
 import triangle.meshing.GenericMesher;
 import triangle.meshing.IMesh;

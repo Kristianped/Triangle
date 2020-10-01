@@ -1,4 +1,6 @@
-package triangle;
+package triangle.geometry;
+
+import triangle.RobustPredicates;
 
 import java.util.ArrayList;
 import java.util.List;

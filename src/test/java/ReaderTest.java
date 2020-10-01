@@ -1,6 +1,7 @@
 import org.junit.Test;
 import static org.junit.Assert.assertNotNull;
 import triangle.*;
+import triangle.geometry.IPolygon;
 import triangle.io.FileProcessor;
 import triangle.meshing.ConstraintOptions;
 import triangle.meshing.IMesh;

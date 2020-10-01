@@ -1,7 +1,7 @@
 package triangle.meshing;
 
 import triangle.Configuration;
-import triangle.Vertex;
+import triangle.geometry.Vertex;
 
 import java.util.List;
 

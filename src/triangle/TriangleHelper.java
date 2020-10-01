@@ -1,5 +1,9 @@
 package triangle;
 
+import triangle.geometry.ITriangle;
+import triangle.geometry.Point;
+import triangle.geometry.Rectangle;
+
 public class TriangleHelper {
 
     private TriangleHelper() {
@@ -13,7 +17,7 @@ public class TriangleHelper {
      * @return True if point is inside or on the edge of this triangle
      */
     public static boolean contains(ITriangle triangle, Point p) {
-        return contains(triangle, p.x, p.y);
+        return contains(triangle, p.getX(), p.getY());
     }
 
     /**
@@ -29,15 +33,15 @@ public class TriangleHelper {
         var t2 = triangle.getVertex(2);
 
         // TODO: no need to create new Point instances here
-        Point d0 = new Point(t1.x - t0.x, t1.y - t0.y);
-        Point d1 = new Point(t2.x - t0.x, t2.y - t0.y);
-        Point d2 = new Point(x - t0.x, y - t0.y);
+        Point d0 = new Point(t1.getX() - t0.getX(), t1.getY() - t0.getY());
+        Point d1 = new Point(t2.getX() - t0.getX(), t2.getY() - t0.getY());
+        Point d2 = new Point(x - t0.getX(), y - t0.getY());
 
         // crossproduct of (0, 0, 1) and d0
-        Point c0 = new Point(-d0.y, d0.x);
+        Point c0 = new Point(-d0.getY(), d0.getX());
 
         // crossproduct of (0, 0, 1) and d1
-        Point c1 = new Point(-d1.y, d1.x);
+        Point c1 = new Point(-d1.getY(), d1.getX());
 
         // Linear combination d2 = s * d0 + v * d1.
         //
@@ -74,6 +78,6 @@ public class TriangleHelper {
     }
 
     private static double dotProduct(Point p, Point q) {
-        return p.x * q.x + p.y * q.y;
+        return p.getX() * q.getX() + p.getY() * q.getY();
     }
 }

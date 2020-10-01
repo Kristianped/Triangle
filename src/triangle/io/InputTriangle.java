@@ -1,8 +1,8 @@
 package triangle.io;
 
-import triangle.ISegment;
-import triangle.ITriangle;
-import triangle.Vertex;
+import triangle.geometry.ISegment;
+import triangle.geometry.ITriangle;
+import triangle.geometry.Vertex;
 
 public class InputTriangle implements ITriangle {
 

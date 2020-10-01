@@ -1,6 +1,9 @@
 package triangle.meshing;
 
 import triangle.*;
+import triangle.geometry.ITriangle;
+import triangle.geometry.Point;
+import triangle.geometry.Vertex;
 import triangle.meshing.data.BadSubSeg;
 import triangle.meshing.data.BadTriQueue;
 import triangle.meshing.data.BadTriangle;

@@ -1,6 +1,9 @@
 package triangle.tools;
 
 import triangle.*;
+import triangle.geometry.ITriangle;
+import triangle.geometry.Point;
+import triangle.geometry.Rectangle;
 
 import java.util.ArrayList;
 import java.util.List;

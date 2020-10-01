@@ -1,5 +1,8 @@
 package triangle;
 
+import triangle.geometry.Point;
+import triangle.geometry.Vertex;
+
 /**
  * Locate triangles in a mesh.
  * <br><br>
@@ -122,7 +125,7 @@ public class TriangleLocator {
         while (true)
         {
             // Check whether the apex is the point we seek.
-            if ((fapex.x == searchpoint.x) && (fapex.y == searchpoint.y))
+            if ((fapex.getX() == searchpoint.getX()) && (fapex.getY() == searchpoint.getY()))
             {
                 searchtri.lprev();
                 return Enums.LocateResult.OnVertex;
@@ -142,8 +145,8 @@ public class TriangleLocator {
                     // a line perpendicular to the line (forg, fdest) and passing
                     // through 'fapex', and determining which side of this line
                     // 'searchpoint' falls on.
-                    moveleft = (fapex.x - searchpoint.x) * (fdest.x - forg.x) +
-                            (fapex.y - searchpoint.y) * (fdest.y - forg.y) > 0.0;
+                    moveleft = (fapex.getX() - searchpoint.getX()) * (fdest.getX() - forg.getX()) +
+                            (fapex.getY() - searchpoint.getY()) * (fdest.getY() - forg.getY()) > 0.0;
                 }
                 else
                 {
@@ -257,8 +260,8 @@ public class TriangleLocator {
         // Record the distance from the suggested starting triangle to the
         // point we seek.
         torg = searchtri.org();
-        searchdist = (searchpoint.x - torg.x) * (searchpoint.x - torg.x) +
-                (searchpoint.y - torg.y) * (searchpoint.y - torg.y);
+        searchdist = (searchpoint.getX() - torg.getX()) * (searchpoint.getX() - torg.getX()) +
+                (searchpoint.getY() - torg.getY()) * (searchpoint.getY() - torg.getY());
 
         // If a recently encountered triangle has been recorded and has not been
         // deallocated, test it as a good starting point.
@@ -267,13 +270,13 @@ public class TriangleLocator {
             if (!Otri.isDead(recenttri.tri))
             {
                 torg = recenttri.org();
-                if ((torg.x == searchpoint.x) && (torg.y == searchpoint.y))
+                if ((torg.getX() == searchpoint.getX()) && (torg.getY() == searchpoint.getY()))
                 {
                     recenttri.copy(searchtri);
                     return Enums.LocateResult.OnVertex;
                 }
-                dist = (searchpoint.x - torg.x) * (searchpoint.x - torg.x) +
-                        (searchpoint.y - torg.y) * (searchpoint.y - torg.y);
+                dist = (searchpoint.getX() - torg.getX()) * (searchpoint.getX() - torg.getX()) +
+                        (searchpoint.getY() - torg.getY()) * (searchpoint.getY() - torg.getY());
                 if (dist < searchdist)
                 {
                     recenttri.copy(searchtri);
@@ -291,8 +294,8 @@ public class TriangleLocator {
             if (!Otri.isDead(sampletri.tri))
             {
                 torg = sampletri.org();
-                dist = (searchpoint.x - torg.x) * (searchpoint.x - torg.x) +
-                        (searchpoint.y - torg.y) * (searchpoint.y - torg.y);
+                dist = (searchpoint.getX() - torg.getX()) * (searchpoint.getX() - torg.getX()) +
+                        (searchpoint.getY() - torg.getY()) * (searchpoint.getY() - torg.getY());
                 if (dist < searchdist)
                 {
                     sampletri.copy(searchtri);
@@ -306,11 +309,11 @@ public class TriangleLocator {
         tdest = searchtri.dest();
 
         // Check the starting triangle's vertices.
-        if ((torg.x == searchpoint.x) && (torg.y == searchpoint.y))
+        if ((torg.getX() == searchpoint.getX()) && (torg.getY() == searchpoint.getY()))
         {
             return Enums.LocateResult.OnVertex;
         }
-        if ((tdest.x == searchpoint.x) && (tdest.y == searchpoint.y))
+        if ((tdest.getX() == searchpoint.getX()) && (tdest.getY() == searchpoint.getY()))
         {
             searchtri.lnext();
             return Enums.LocateResult.OnVertex;
@@ -327,8 +330,8 @@ public class TriangleLocator {
         else if (ahead == 0.0)
         {
             // Check if 'searchpoint' is between 'torg' and 'tdest'.
-            if (((torg.x < searchpoint.x) == (searchpoint.x < tdest.x)) &&
-                    ((torg.y < searchpoint.y) == (searchpoint.y < tdest.y)))
+            if (((torg.getX() < searchpoint.getX()) == (searchpoint.getX() < tdest.getX())) &&
+                    ((torg.getY() < searchpoint.getY()) == (searchpoint.getY() < tdest.getY())))
             {
                 return Enums.LocateResult.OnEdge;
             }

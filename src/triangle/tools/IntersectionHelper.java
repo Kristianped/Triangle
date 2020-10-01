@@ -1,7 +1,7 @@
 package triangle.tools;
 
-import triangle.Point;
-import triangle.Rectangle;
+import triangle.geometry.Point;
+import triangle.geometry.Rectangle;
 
 public class IntersectionHelper {
 

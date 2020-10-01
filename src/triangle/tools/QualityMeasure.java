@@ -1,7 +1,7 @@
 package triangle.tools;
 
 import triangle.Mesh;
-import triangle.Point;
+import triangle.geometry.Point;
 
 /**
  * Provides mesh quality information.

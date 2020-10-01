@@ -1,5 +1,9 @@
 package triangle;
 
+import triangle.geometry.ISegment;
+import triangle.geometry.ITriangle;
+import triangle.geometry.Vertex;
+
 public class Triangle implements ITriangle {
 
     // Hash for dictionary. Will be set by mesh instance.
@@ -97,7 +101,7 @@ public class Triangle implements ITriangle {
 
     @Override
     public int getVertexID(int index) {
-        return vertices[index].id;
+        return vertices[index].getId();
     }
 
     @Override

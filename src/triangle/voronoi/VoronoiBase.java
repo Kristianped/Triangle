@@ -5,6 +5,10 @@ import triangle.dcel.DcelMesh;
 import triangle.dcel.DcelVertex;
 import triangle.dcel.Face;
 import triangle.dcel.HalfEdge;
+import triangle.geometry.Edge;
+import triangle.geometry.IEdge;
+import triangle.geometry.Point;
+import triangle.geometry.Vertex;
 import triangle.tools.MutableDouble;
 
 import java.util.ArrayList;

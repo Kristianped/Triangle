@@ -1,8 +1,8 @@
 package triangle.tools;
 
-import triangle.IPolygon;
-import triangle.Point;
-import triangle.Vertex;
+import triangle.geometry.IPolygon;
+import triangle.geometry.Point;
+import triangle.geometry.Vertex;
 
 import java.util.HashSet;
 import java.util.Set;

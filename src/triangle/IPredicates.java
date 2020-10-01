@@ -1,5 +1,6 @@
 package triangle;
 
+import triangle.geometry.Point;
 import triangle.tools.MutableDouble;
 
 public interface IPredicates {

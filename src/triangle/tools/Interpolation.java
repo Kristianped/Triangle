@@ -1,7 +1,7 @@
 package triangle.tools;
 
-import triangle.ITriangle;
-import triangle.Vertex;
+import triangle.geometry.ITriangle;
+import triangle.geometry.Vertex;
 
 public class Interpolation {
 

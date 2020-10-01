@@ -1,6 +1,8 @@
 package triangle;
 
 
+import triangle.geometry.Vertex;
+
 public class Osub {
 
     public SubSegment seg;

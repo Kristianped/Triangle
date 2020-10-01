@@ -1,6 +1,8 @@
 package triangle.meshing.iterators;
 
 import triangle.*;
+import triangle.geometry.Edge;
+import triangle.geometry.Vertex;
 
 import java.util.Iterator;
 

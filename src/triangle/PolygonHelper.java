@@ -1,5 +1,6 @@
 package triangle;
 
+import triangle.geometry.IPolygon;
 import triangle.meshing.*;
 
 public class PolygonHelper {

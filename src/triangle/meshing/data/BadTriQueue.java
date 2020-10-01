@@ -1,7 +1,7 @@
 package triangle.meshing.data;
 
 import triangle.Otri;
-import triangle.Vertex;
+import triangle.geometry.Vertex;
 
 /**
  * A priority queue for bad triangles<br><br>

@@ -1,4 +1,4 @@
-package triangle;
+package triangle.geometry;
 
 public class Edge implements IEdge {
 

@@ -1,6 +1,8 @@
 package triangle;
 
 
+import triangle.geometry.Vertex;
+
 public class Otri {
 
     static final int[] plus1Mod3 = { 1, 2, 0 };

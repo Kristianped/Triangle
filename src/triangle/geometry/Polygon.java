@@ -1,4 +1,4 @@
-package triangle;
+package triangle.geometry;
 
 import java.util.ArrayList;
 import java.util.List;

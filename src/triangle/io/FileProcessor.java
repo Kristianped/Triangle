@@ -1,6 +1,9 @@
 package triangle.io;
 
 import triangle.*;
+import triangle.geometry.IPolygon;
+import triangle.geometry.ITriangle;
+import triangle.geometry.Polygon;
 import triangle.meshing.Converter;
 import triangle.meshing.IMesh;
 

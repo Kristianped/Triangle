@@ -1,6 +1,7 @@
 package triangle.meshing;
 
 import triangle.*;
+import triangle.geometry.*;
 import triangle.io.InputTriangle;
 import triangle.meshing.algorithm.Dwyer;
 

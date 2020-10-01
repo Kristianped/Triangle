@@ -1,6 +1,8 @@
 package triangle.meshing.algorithm;
 
 import triangle.*;
+import triangle.geometry.Point;
+import triangle.geometry.Vertex;
 import triangle.meshing.IMesh;
 import triangle.meshing.ITriangulator;
 import triangle.tools.MutableBoolean;

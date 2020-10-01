@@ -1,5 +1,6 @@
 package triangle;
 
+import triangle.geometry.Point;
 import triangle.tools.MutableDouble;
 import triangle.tools.Statistic;
 
@@ -90,8 +91,8 @@ public class RobustPredicates implements IPredicates {
 
         Statistic.CounterClockwiseCount++;
 
-        detleft = (pa.x - pc.x) * (pb.y - pc.y);
-        detright = (pa.y - pc.y) * (pb.x - pc.x);
+        detleft = (pa.getX() - pc.getX()) * (pb.getY() - pc.getY());
+        detright = (pa.getY() - pc.getY()) * (pb.getX() - pc.getX());
         det = detleft - detright;
 
         if (Behavior.NoExact)
@@ -158,12 +159,12 @@ public class RobustPredicates implements IPredicates {
 
         Statistic.InCircleCount++;
 
-        adx = pa.x - pd.x;
-        bdx = pb.x - pd.x;
-        cdx = pc.x - pd.x;
-        ady = pa.y - pd.y;
-        bdy = pb.y - pd.y;
-        cdy = pc.y - pd.y;
+        adx = pa.getX() - pd.getX();
+        bdx = pb.getX() - pd.getX();
+        cdx = pc.getX() - pd.getX();
+        ady = pa.getY() - pd.getY();
+        bdy = pb.getY() - pd.getY();
+        cdy = pc.getY() - pd.getY();
 
         bdxcdy = bdx * cdy;
         cdxbdy = cdx * bdy;
@@ -226,10 +227,10 @@ public class RobustPredicates implements IPredicates {
         Statistic.CircumcenterCount++;
 
         // Compute the circumcenter of the triangle.
-        xdo = dest.x - org.x;
-        ydo = dest.y - org.y;
-        xao = apex.x - org.x;
-        yao = apex.y - org.y;
+        xdo = dest.getX() - org.getX();
+        ydo = dest.getY() - org.getY();
+        xao = apex.getX() - org.getX();
+        yao = apex.getY() - org.getY();
         dodist = xdo * xdo + ydo * ydo;
         aodist = xao * xao + yao * yao;
 
@@ -258,7 +259,7 @@ public class RobustPredicates implements IPredicates {
         xi.setValue((yao * dx - xao * dy) * (2.0 * denominator));
         eta.setValue((xdo * dy - ydo * dx) * (2.0 * denominator));
 
-        return new Point(org.x + dx, org.y + dy);
+        return new Point(org.getX() + dx, org.getY() + dy);
     }
 
     /**
@@ -281,14 +282,14 @@ public class RobustPredicates implements IPredicates {
         Statistic.CircumcenterCount++;
 
         // Compute the circumcenter of the triangle.
-        xdo = dest.x - org.x;
-        ydo = dest.y - org.y;
-        xao = apex.x - org.x;
-        yao = apex.y - org.y;
+        xdo = dest.getX() - org.getX();
+        ydo = dest.getY() - org.getY();
+        xao = apex.getX() - org.getX();
+        yao = apex.getY() - org.getY();
         dodist = xdo * xdo + ydo * ydo;
         aodist = xao * xao + yao * yao;
-        dadist = (dest.x - apex.x) * (dest.x - apex.x) +
-                (dest.y - apex.y) * (dest.y - apex.y);
+        dadist = (dest.getX() - apex.getX()) * (dest.getX() - apex.getX()) +
+                (dest.getY() - apex.getY()) * (dest.getY() - apex.getY());
 
         if (Behavior.NoExact)
         {
@@ -347,8 +348,8 @@ public class RobustPredicates implements IPredicates {
         {
             if (offconstant > 0.0)
             {
-                dxoff = 0.5 * (apex.x - dest.x) - offconstant * (apex.y - dest.y);
-                dyoff = 0.5 * (apex.y - dest.y) + offconstant * (apex.x - dest.x);
+                dxoff = 0.5 * (apex.getX() - dest.getX()) - offconstant * (apex.getY() - dest.getY());
+                dyoff = 0.5 * (apex.getY() - dest.getY()) + offconstant * (apex.getX() - dest.getX());
                 // If the off-center is closer to the destination than the
                 // circumcenter, use the off-center instead.
                 if (dxoff * dxoff + dyoff * dyoff <
@@ -368,7 +369,7 @@ public class RobustPredicates implements IPredicates {
         xi.setValue((yao * dx - xao * dy) * (2.0 * denominator));
         eta.setValue((xdo * dy - ydo * dx) * (2.0 * denominator));
 
-        return new Point(org.x + dx, org.y + dy);
+        return new Point(org.getX() + dx, org.getY() + dy);
     }
 
     /**
@@ -612,10 +613,10 @@ public class RobustPredicates implements IPredicates {
         double _i, _j;
         double _0;
 
-        acx = (double)(pa.x - pc.x);
-        bcx = (double)(pb.x - pc.x);
-        acy = (double)(pa.y - pc.y);
-        bcy = (double)(pb.y - pc.y);
+        acx = (double)(pa.getX() - pc.getX());
+        bcx = (double)(pb.getX() - pc.getX());
+        acy = (double)(pa.getY() - pc.getY());
+        bcy = (double)(pb.getY() - pc.getY());
 
         detleft = (double)(acx * bcy); c = (double)(splitter * acx); abig = (double)(c - acx); ahi = c - abig; alo = acx - ahi; c = (double)(splitter * bcy); abig = (double)(c - bcy); bhi = c - abig; blo = bcy - bhi; err1 = detleft - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); detlefttail = (alo * blo) - err3;
         detright = (double)(acy * bcx); c = (double)(splitter * acy); abig = (double)(c - acy); ahi = c - abig; alo = acy - ahi; c = (double)(splitter * bcx); abig = (double)(c - bcx); bhi = c - abig; blo = bcx - bhi; err1 = detright - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); detrighttail = (alo * blo) - err3;
@@ -631,10 +632,10 @@ public class RobustPredicates implements IPredicates {
             return det;
         }
 
-        bvirt = (double)(pa.x - acx); avirt = acx + bvirt; bround = bvirt - pc.x; around = pa.x - avirt; acxtail = around + bround;
-        bvirt = (double)(pb.x - bcx); avirt = bcx + bvirt; bround = bvirt - pc.x; around = pb.x - avirt; bcxtail = around + bround;
-        bvirt = (double)(pa.y - acy); avirt = acy + bvirt; bround = bvirt - pc.y; around = pa.y - avirt; acytail = around + bround;
-        bvirt = (double)(pb.y - bcy); avirt = bcy + bvirt; bround = bvirt - pc.y; around = pb.y - avirt; bcytail = around + bround;
+        bvirt = (double)(pa.getX() - acx); avirt = acx + bvirt; bround = bvirt - pc.getX(); around = pa.getX() - avirt; acxtail = around + bround;
+        bvirt = (double)(pb.getX() - bcx); avirt = bcx + bvirt; bround = bvirt - pc.getX(); around = pb.getX() - avirt; bcxtail = around + bround;
+        bvirt = (double)(pa.getY() - acy); avirt = acy + bvirt; bround = bvirt - pc.getY(); around = pa.getY() - avirt; acytail = around + bround;
+        bvirt = (double)(pb.getY() - bcy); avirt = bcy + bvirt; bround = bvirt - pc.getY(); around = pb.getY() - avirt; bcytail = around + bround;
 
         if ((acxtail == 0.0) && (acytail == 0.0)
                 && (bcxtail == 0.0) && (bcytail == 0.0))
@@ -728,12 +729,12 @@ public class RobustPredicates implements IPredicates {
         double _i, _j;
         double _0;
 
-        adx = (double)(pa.x - pd.x);
-        bdx = (double)(pb.x - pd.x);
-        cdx = (double)(pc.x - pd.x);
-        ady = (double)(pa.y - pd.y);
-        bdy = (double)(pb.y - pd.y);
-        cdy = (double)(pc.y - pd.y);
+        adx = (double)(pa.getX() - pd.getX());
+        bdx = (double)(pb.getX() - pd.getX());
+        cdx = (double)(pc.getX() - pd.getX());
+        ady = (double)(pa.getY() - pd.getY());
+        bdy = (double)(pb.getY() - pd.getY());
+        cdy = (double)(pc.getY() - pd.getY());
 
         bdxcdy1 = (double)(bdx * cdy); c = (double)(splitter * bdx); abig = (double)(c - bdx); ahi = c - abig; alo = bdx - ahi; c = (double)(splitter * cdy); abig = (double)(c - cdy); bhi = c - abig; blo = cdy - bhi; err1 = bdxcdy1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); bdxcdy0 = (alo * blo) - err3;
         cdxbdy1 = (double)(cdx * bdy); c = (double)(splitter * cdx); abig = (double)(c - cdx); ahi = c - abig; alo = cdx - ahi; c = (double)(splitter * bdy); abig = (double)(c - bdy); bhi = c - abig; blo = bdy - bhi; err1 = cdxbdy1 - (ahi * bhi); err2 = err1 - (alo * bhi); err3 = err2 - (ahi * blo); cdxbdy0 = (alo * blo) - err3;
@@ -775,12 +776,12 @@ public class RobustPredicates implements IPredicates {
             return det;
         }
 
-        bvirt = (double)(pa.x - adx); avirt = adx + bvirt; bround = bvirt - pd.x; around = pa.x - avirt; adxtail = around + bround;
-        bvirt = (double)(pa.y - ady); avirt = ady + bvirt; bround = bvirt - pd.y; around = pa.y - avirt; adytail = around + bround;
-        bvirt = (double)(pb.x - bdx); avirt = bdx + bvirt; bround = bvirt - pd.x; around = pb.x - avirt; bdxtail = around + bround;
-        bvirt = (double)(pb.y - bdy); avirt = bdy + bvirt; bround = bvirt - pd.y; around = pb.y - avirt; bdytail = around + bround;
-        bvirt = (double)(pc.x - cdx); avirt = cdx + bvirt; bround = bvirt - pd.x; around = pc.x - avirt; cdxtail = around + bround;
-        bvirt = (double)(pc.y - cdy); avirt = cdy + bvirt; bround = bvirt - pd.y; around = pc.y - avirt; cdytail = around + bround;
+        bvirt = (double)(pa.getX() - adx); avirt = adx + bvirt; bround = bvirt - pd.getX(); around = pa.getX() - avirt; adxtail = around + bround;
+        bvirt = (double)(pa.getY() - ady); avirt = ady + bvirt; bround = bvirt - pd.getY(); around = pa.getY() - avirt; adytail = around + bround;
+        bvirt = (double)(pb.getX() - bdx); avirt = bdx + bvirt; bround = bvirt - pd.getX(); around = pb.getX() - avirt; bdxtail = around + bround;
+        bvirt = (double)(pb.getY() - bdy); avirt = bdy + bvirt; bround = bvirt - pd.getY(); around = pb.getY() - avirt; bdytail = around + bround;
+        bvirt = (double)(pc.getX() - cdx); avirt = cdx + bvirt; bround = bvirt - pd.getX(); around = pc.getX() - avirt; cdxtail = around + bround;
+        bvirt = (double)(pc.getY() - cdy); avirt = cdy + bvirt; bround = bvirt - pd.getY(); around = pc.getY() - avirt; cdytail = around + bround;
         if ((adxtail == 0.0) && (bdxtail == 0.0) && (cdxtail == 0.0)
                 && (adytail == 0.0) && (bdytail == 0.0) && (cdytail == 0.0))
         {

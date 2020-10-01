@@ -1,5 +1,6 @@
 import org.junit.Test;
 import triangle.*;
+import triangle.geometry.IPolygon;
 import triangle.io.FileProcessor;
 import triangle.meshing.ConstraintOptions;
 import triangle.meshing.IMesh;

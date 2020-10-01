@@ -1,4 +1,7 @@
-package triangle;
+package triangle.geometry;
+
+import triangle.Enums;
+import triangle.Otri;
 
 public class Vertex extends Point {
 

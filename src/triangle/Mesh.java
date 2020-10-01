@@ -1,5 +1,6 @@
 package triangle;
 
+import triangle.geometry.*;
 import triangle.meshing.IMesh;
 import triangle.meshing.QualityMesher;
 import triangle.meshing.QualityOptions;
@@ -249,13 +250,13 @@ public class Mesh implements IMesh {
             id = 0;
 
             for (var node : vertices.values())
-                node.id = id++;
+                node.setId(id++);
         } else if (num == Enums.NodeNumbering.CuthillMcKee) {
             var rcm = new CuthillMcKee();
             var iperm = rcm.renumber(this);
 
             for (var node : vertices.values())
-                node.id = iperm[node.id];
+                node.setId(iperm[node.getId()]);
         }
 
         // Remember the current numbering
@@ -265,9 +266,7 @@ public class Mesh implements IMesh {
         id = 0;
 
         for (var item : triangles)
-            item.id = id++;
-
-
+            item.setID(id++);
     }
 
     @Override
@@ -366,21 +365,21 @@ public class Mesh implements IMesh {
         // Simple heuristic to check if ids are already set.  We assume that if the
         // first two vertex ids are distinct, then all input vertices have pairwise
         // distinct ids.
-        boolean userId = (v.id != points.get(1).id);
+        boolean userId = (v.getId() != points.get(1).getId());
 
         for (var p : points) {
             if (userId) {
-                p.hash = p.id;
+                p.setHash(p.getId());
 
                 // Make sure the hash counter gets updated.
-                hash_vtx = Math.max(p.hash + 1, hash_vtx);
+                hash_vtx = Math.max(p.hashCode() + 1, hash_vtx);
             } else {
-                p.hash = hash_vtx;
-                p.id = hash_vtx;
+                p.setHash(hash_vtx);
+                p.setId(hash_vtx);
                 hash_vtx++;
             }
 
-            this.vertices.put(p.hash, p);
+            this.vertices.put(p.hashCode(), p);
             this.bounds.expand(p);
         }
     }
@@ -404,7 +403,7 @@ public class Mesh implements IMesh {
             // Check all three vertices of the triangle
             for (tri.orient = 0; tri.orient < 3; tri.orient++) {
                 triorg = tri.org();
-                triorg.tri = tri.shallowCopy();
+                triorg.setTri(tri.shallowCopy());
             }
         }
     }
@@ -723,9 +722,9 @@ public class Mesh implements IMesh {
                 splitseg.sym();
 
                 // Transfer the subsegment's boundary marker to the vertex if required.
-                if (newvertex.label == 0)
+                if (newvertex.getLabel() == 0)
                 {
-                    newvertex.label = splitseg.seg.boundary;
+                    newvertex.setLabel(splitseg.seg.boundary);
                 }
             }
 
@@ -815,12 +814,12 @@ public class Mesh implements IMesh {
         // subsegment is found.
         success = Enums.InsertVertexResult.Successful;
 
-        if (newvertex.tri.tri != null)
+        if (newvertex.getTri().tri != null)
         {
             // Store the coordinates of the triangle that contains newvertex.
-            newvertex.tri.setOrg(rightvertex);
-            newvertex.tri.setDest(leftvertex);
-            newvertex.tri.setApex(botvertex);
+            newvertex.getTri().setOrg(rightvertex);
+            newvertex.getTri().setDest(leftvertex);
+            newvertex.getTri().setApex(botvertex);
         }
 
         // Circle around the newly inserted vertex, checking each edge opposite it 
@@ -1056,13 +1055,13 @@ public class Mesh implements IMesh {
         triorg = tri.org();
         tridest = tri.dest();
         // Mark vertices if possible.
-        if (triorg.label == 0)
+        if (triorg.getLabel() == 0)
         {
-            triorg.label = subsegmark;
+            triorg.setLabel(subsegmark);
         }
-        if (tridest.label == 0)
+        if (tridest.getLabel() == 0)
         {
-            tridest.label = subsegmark;
+            tridest.setLabel(subsegmark);
         }
         // Check if there's already a subsegment here.
         newsubseg = tri.pivot();
@@ -1150,7 +1149,7 @@ public class Mesh implements IMesh {
 
         // SELF CHECK
 
-        //if (top.triangle.id == DUMMY)
+        //if (top.triangle.getId() == DUMMY)
         //{
         //    logger.Error("Attempt to flip on boundary.", "Mesh.Flip()");
         //    flipedge.LnextSelf();
@@ -1641,8 +1640,8 @@ public class Mesh implements IMesh {
     void vertexDealloc(Vertex dyingvertex) {
         // Mark the vertex as dead. This makes it possible to detect dead
         // vertices when traversing the list of all vertices.
-        dyingvertex.type = Enums.VertexType.DeadVertex;
-        vertices.remove(dyingvertex.hash);
+        dyingvertex.setType(Enums.VertexType.DeadVertex);
+        vertices.remove(dyingvertex.hashCode());
     }
 
     public void subsegDealloc(SubSegment dyingsubseg) {

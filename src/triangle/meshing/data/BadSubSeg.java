@@ -1,7 +1,7 @@
 package triangle.meshing.data;
 
 import triangle.Osub;
-import triangle.Vertex;
+import triangle.geometry.Vertex;
 
 /**
  * A queue used to store enroached subsegments.<br><br>

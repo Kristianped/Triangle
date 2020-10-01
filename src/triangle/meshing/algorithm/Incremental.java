@@ -1,6 +1,8 @@
 package triangle.meshing.algorithm;
 
 import triangle.*;
+import triangle.geometry.Rectangle;
+import triangle.geometry.Vertex;
 import triangle.meshing.IMesh;
 import triangle.meshing.ITriangulator;
 

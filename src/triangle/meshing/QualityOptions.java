@@ -1,6 +1,6 @@
 package triangle.meshing;
 
-import triangle.ITriangle;
+import triangle.geometry.ITriangle;
 import triangle.tools.Tuple;
 
 import java.util.function.Function;

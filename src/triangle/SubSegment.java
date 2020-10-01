@@ -1,5 +1,9 @@
 package triangle;
 
+import triangle.geometry.ISegment;
+import triangle.geometry.ITriangle;
+import triangle.geometry.Vertex;
+
 public class SubSegment implements ISegment {
 
     int hash;

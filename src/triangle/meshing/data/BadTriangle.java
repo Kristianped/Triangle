@@ -1,7 +1,7 @@
 package triangle.meshing.data;
 
 import triangle.Otri;
-import triangle.Vertex;
+import triangle.geometry.Vertex;
 
 /**
  * A queue used to store bad triangles<br><br>

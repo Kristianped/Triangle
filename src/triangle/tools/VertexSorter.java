@@ -1,6 +1,6 @@
 package triangle.tools;
 
-import triangle.Vertex;
+import triangle.geometry.Vertex;
 
 import java.util.Random;
 
