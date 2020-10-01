@@ -11,6 +11,8 @@ public class PolygonHelper {
 
     /**
      * Triangulates a polygon
+     * @param polygon Polygon to triangulate
+     * @return A triangulated mesh
      */
     public static IMesh triangulate(IPolygon polygon) {
         return new GenericMesher().triangulate(polygon, null, null);
@@ -18,6 +20,9 @@ public class PolygonHelper {
 
     /**
      * Triangulates a polygon, applying constraint options
+     * @param polygon Polygon to triangulate
+     * @param options Constraint options to apply
+     * @return A triangulated mesh
      */
     public static IMesh triangulate(IPolygon polygon, ConstraintOptions options) {
         return new GenericMesher().triangulate(polygon, options, null);
@@ -25,6 +30,9 @@ public class PolygonHelper {
 
     /**
      * Triangulates a polygon, applying quality options
+     * @param polygon Polygon to triangulate
+     * @param quality Quality options to apply
+     * @return A triangulated mesh
      */
     public static IMesh triangulate(IPolygon polygon, QualityOptions quality) {
         return new GenericMesher().triangulate(polygon, null, quality);
@@ -32,10 +40,10 @@ public class PolygonHelper {
 
     /**
      * Triangulates a polygon, applying constraint options and quality options
-     * @param polygon
-     * @param options
-     * @param quality
-     * @return
+     * @param polygon Polygon to triangulate
+     * @param options Constraint options to apply
+     * @param quality Quality options to apply
+     * @return A triangulated mesh
      */
     public static IMesh triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality) {
         return new GenericMesher().triangulate(polygon, options, quality);
@@ -43,11 +51,11 @@ public class PolygonHelper {
 
     /**
      * Triangulates a polygon using the supplies triangulation algorithm, applying constraint options and quality options
-     * @param polygon
-     * @param options
-     * @param quality
-     * @param triangulator
-     * @return
+     * @param polygon Polygon to triangulate
+     * @param options Constraint options to apply
+     * @param quality Quality options to apply
+     * @param triangulator Which algorithm to be used to triangulate
+     * @return A triangulated mesh
      */
     public static IMesh triangulate(IPolygon polygon, ConstraintOptions options, QualityOptions quality, ITriangulator triangulator) {
         return new GenericMesher(triangulator).triangulate(polygon, options, quality);

@@ -6,6 +6,11 @@ public class MeshValidator {
 
     private final static RobustPredicates predicates = RobustPredicates.Default();
 
+    /**
+     * Test the mesh for topological consistency.
+     * @param mesh Mesh to check
+     * @return True if mesh is consistent
+     */
     public static boolean isConsistent(Mesh mesh) {
         Otri tri = new Otri();
         Otri oppotri = new Otri(), oppooppotri = new Otri();
@@ -80,20 +85,24 @@ public class MeshValidator {
         // Restore the status of exact arithmetic.
         Behavior.NoExact = saveexact;
 
-        return (horrors == 0);
+        return horrors == 0;
     }
 
-    /// <summary>
-    /// Check if the mesh is (conforming) Delaunay.
-    /// </summary>
+    /**
+     * Check if the mesh is (conforming) Delaunay.
+     * @param mesh Mesh to check
+     * @return True if mesh is conforming Delaunay
+     */
     public static boolean isDelaunay(Mesh mesh)
     {
         return isDelaunay(mesh, false);
     }
 
-    /// <summary>
-    /// Check if that the mesh is (constrained) Delaunay.
-    /// </summary>
+    /**
+     * Check if that the mesh is (constrained) Delaunay.
+     * @param mesh Mesh to check
+     * @return Returns true if mesh is constrained Delaunay
+     */
     public static boolean IsConstrainedDelaunay(Mesh mesh)
     {
         return isDelaunay(mesh, true);
