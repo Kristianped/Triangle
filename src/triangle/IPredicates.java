@@ -1,5 +1,7 @@
 package triangle;
 
+import triangle.tools.MutableDouble;
+
 public interface IPredicates {
 
     public double counterClockwise(Point a, Point b, Point c);

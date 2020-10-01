@@ -2,6 +2,7 @@ package triangle.meshing;
 
 import triangle.*;
 import triangle.tools.Interpolation;
+import triangle.tools.MutableDouble;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

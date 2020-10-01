@@ -1,4 +1,4 @@
-package triangle;
+package triangle.tools;
 
 public class MutableDouble {
 

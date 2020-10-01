@@ -2,6 +2,7 @@ package triangle;
 
 import triangle.meshing.IMesh;
 import triangle.meshing.ITriangulator;
+import triangle.tools.MutableBoolean;
 import triangle.tools.Statistic;
 
 import java.util.ArrayList;

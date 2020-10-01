@@ -5,6 +5,7 @@ import triangle.dcel.Face;
 import triangle.meshing.ConstraintOptions;
 import triangle.meshing.GenericMesher;
 import triangle.meshing.IMesh;
+import triangle.tools.MutableDouble;
 import triangle.voronoi.BoundedVoronoi;
 import triangle.voronoi.IVoronoiFactory;
 

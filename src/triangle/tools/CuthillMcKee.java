@@ -2,7 +2,6 @@ package triangle.tools;
 
 import triangle.Enums;
 import triangle.Mesh;
-import triangle.MutableInt;
 
 public class CuthillMcKee {
 

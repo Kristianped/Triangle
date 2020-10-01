@@ -1,5 +1,6 @@
 package triangle;
 
+import triangle.tools.MutableDouble;
 import triangle.tools.Statistic;
 
 public class RobustPredicates implements IPredicates {

@@ -1,5 +1,6 @@
 package triangle;
 
+import triangle.tools.MutableDouble;
 import triangle.tools.Statistic;
 
 public class NewLocation {
@@ -37,7 +38,7 @@ public class NewLocation {
     /**
      * Find a new location for a Steiner point.
      */
-    public Point findLocation(Vertex org, Vertex dest, Vertex apex,  MutableDouble xi, MutableDouble eta, boolean offcenter, Otri badotri) {
+    public Point findLocation(Vertex org, Vertex dest, Vertex apex, MutableDouble xi, MutableDouble eta, boolean offcenter, Otri badotri) {
         // Based on using the -U switch, call the corresponding function
         if (behavior.maxAngle == 0.0)
             return findNewLocationWithoutMaxAngle(org, dest, apex, xi, eta, true, badotri);
