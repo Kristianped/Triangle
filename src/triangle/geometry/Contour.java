@@ -240,7 +240,7 @@ public class Contour {
         for (Vertex v : points)
             this.points.add(v);
 
-        int count = this.points.size();
+        int count = this.points.size() - 1;
 
         // Check if first vertex is equal to last vertex
         if (this.points.get(0) == this.points.get(count))

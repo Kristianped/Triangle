@@ -1,5 +1,5 @@
 import org.junit.Test;
-import triangle.*;
+import triangle.Mesh;
 import triangle.geometry.IPolygon;
 import triangle.io.FileProcessor;
 import triangle.meshing.ConstraintOptions;
@@ -14,10 +14,10 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertNotNull;
 
-public class DwyerTest {
+public class IncrementalTest {
 
     @Test
-    public void dwyer() {
+    public void incremental() {
         try {
             var options = new ConstraintOptions();
             var quality = new QualityOptions();
@@ -31,7 +31,7 @@ public class DwyerTest {
             assertNotNull(polygon);
 
             // Meshing
-            IMesh mesh = PolygonHelper.triangulate(polygon, options, quality);
+            IMesh mesh = PolygonHelper.triangulate(polygon, options, quality, new Incremental());
             assertNotNull(mesh);
 
             // Refine a couple times
