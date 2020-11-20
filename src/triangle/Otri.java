@@ -305,7 +305,7 @@ public class Otri {
     /// </summary>
     public Vertex org()
     {
-        return tri.vertices[plus1Mod3[orient]];
+        return tri.getVertex(plus1Mod3[orient]);
     }
 
     /// <summary>
@@ -313,7 +313,7 @@ public class Otri {
     /// </summary>
     public Vertex dest()
     {
-        return tri.vertices[minus1Mod3[orient]];
+        return tri.getVertex(minus1Mod3[orient]);
     }
 
     /// <summary>
@@ -321,7 +321,7 @@ public class Otri {
     /// </summary>
     public Vertex apex()
     {
-        return tri.vertices[orient];
+        return tri.getVertex(orient);
     }
 
     /// <summary>
@@ -347,7 +347,7 @@ public class Otri {
     /// </summary>
     public void setOrg(Vertex v)
     {
-        tri.vertices[plus1Mod3[orient]] = v;
+        tri.setVertex(plus1Mod3[orient], v);
     }
 
     /// <summary>
@@ -355,7 +355,7 @@ public class Otri {
     /// </summary>
     public void setDest(Vertex v)
     {
-        tri.vertices[minus1Mod3[orient]] = v;
+        tri.setVertex(minus1Mod3[orient], v);
     }
 
     /// <summary>
@@ -363,7 +363,7 @@ public class Otri {
     /// </summary>
     public void setApex(Vertex v)
     {
-        tri.vertices[orient] = v;
+        tri.setVertex(orient, v);
     }
 
     /// <summary>
